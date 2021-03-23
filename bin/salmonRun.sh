@@ -36,26 +36,6 @@ echo "input: $inputDir"
 echo "output: $outputDir"
 # set +x 
 
-## activate correct env
-# this will only run if you happen to be in the wrong env
-# I think using directories as envNames could make this moot
-# OR allow us to rely on "$(basename $PWD)" as $reqENV which would make the check
-# super portable
-# function condaCheck() {
-# 	# source the conda script so this shell has access
-# 	source /public/groups/kimlab/.install_bin/anaconda3/etc/profile.d/conda.sh
-
-# 	reqEnv="aale.analysis.env"
-# 	env=$(basename "$CONDA_PREFIX")
-
-# 	if [[ env != reqEnv ]]; then
-# 		echo "switching from "$env" to "$reqEnv""
-# 		conda activate $reqEnv
-# 	else
-# 		echo ""$reqEnv" is active"
-# 	fi
-# }
-
 function runSalmon() {
 	# runs salmon on one sample and outputs to that directory
 	inputDir="$1"
@@ -63,11 +43,13 @@ function runSalmon() {
 	outputDir="$3"
 	outputPath="$inputDir"/"$outputDir"
 
-  outpathGrob=$(echo "$inputDir"/*"$salmonIndex"*)
+  	outpathGrob=$(echo "$inputDir"/*"$salmonIndex"*)
+
+  	echo "$outpathGrob"
 	
 	set -x
 
-  if [[ -f "$(find "$outpathGrob" -name 'quant.sf')" ]]; then
+  if [[ ! -f "$(find "$outpathGrob" -name 'quant.sf')" ]]; then
 
 		mkdir "$outputPath"
 
@@ -83,8 +65,8 @@ function runSalmon() {
 				--validateMappings \
 				--gcBias \
 				--seqBias \
-			  --recoverOrphans \
-			  --rangeFactorizationBins 4 \
+			  	--recoverOrphans \
+			  	--rangeFactorizationBins 4 \
 				--output "$outputPath" 
 
 			exitStatus=$?
@@ -127,10 +109,9 @@ function runSalmon() {
 
 		set +x
 		
-	fi 
+		echo SKIP salmon "$inputDir" already run for "$salmonIndex"
+   fi 
 }
-
-# condaCheck
 
 runSalmon "${inputDir}" "${salmonIndex}" "${outputDir}"
 
