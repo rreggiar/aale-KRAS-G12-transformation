@@ -1,0 +1,97 @@
+Read 3 items
+[1] "parse input dir"
+                                                                                                                                                                    files
+1       /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.2D/exoTIC.2D.1.AMG/exoTIC.2D.1.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.36-PST/quant.sf
+2     /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.2D/exoTIC.2D.1.DMSO/exoTIC.2D.1.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.36-PST/quant.sf
+3       /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.2D/exoTIC.2D.2.AMG/exoTIC.2D.2.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.36-PST/quant.sf
+4     /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.2D/exoTIC.2D.2.DMSO/exoTIC.2D.2.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.36-PST/quant.sf
+5       /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.2D/exoTIC.2D.3.AMG/exoTIC.2D.3.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.36-PST/quant.sf
+6     /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.2D/exoTIC.2D.3.DMSO/exoTIC.2D.3.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.36-PST/quant.sf
+7       /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.3D/exoTIC.3D.1.AMG/exoTIC.3D.1.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.57-PST/quant.sf
+8     /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.3D/exoTIC.3D.1.DMSO/exoTIC.3D.1.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.57-PST/quant.sf
+9       /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.3D/exoTIC.3D.2.AMG/exoTIC.3D.2.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.57-PST/quant.sf
+10    /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.3D/exoTIC.3D.2.DMSO/exoTIC.3D.2.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.57-PST/quant.sf
+11      /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.3D/exoTIC.3D.3.AMG/exoTIC.3D.3.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.57-PST/quant.sf
+12    /public/groups/kimlab/exosome-KRAS-inhib/data/exoTIC.3D/exoTIC.3D.3.DMSO/exoTIC.3D.3.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.57-PST/quant.sf
+13   /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.2D/rnaEASY.2D.1.AMG/rnaEASY.2D.1.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.17-PST/quant.sf
+14 /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.2D/rnaEASY.2D.1.DMSO/rnaEASY.2D.1.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.17-PST/quant.sf
+15   /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.2D/rnaEASY.2D.2.AMG/rnaEASY.2D.2.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.17-PST/quant.sf
+16 /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.2D/rnaEASY.2D.2.DMSO/rnaEASY.2D.2.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.17-PST/quant.sf
+17   /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.2D/rnaEASY.2D.3.AMG/rnaEASY.2D.3.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.17-PST/quant.sf
+18 /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.2D/rnaEASY.2D.3.DMSO/rnaEASY.2D.3.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.17-PST/quant.sf
+19   /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.3D/rnaEASY.3D.1.AMG/rnaEASY.3D.1.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.00-PST/quant.sf
+20 /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.3D/rnaEASY.3D.1.DMSO/rnaEASY.3D.1.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.00-PST/quant.sf
+21   /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.3D/rnaEASY.3D.2.AMG/rnaEASY.3D.2.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.00-PST/quant.sf
+22 /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.3D/rnaEASY.3D.2.DMSO/rnaEASY.3D.2.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.00-PST/quant.sf
+23   /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.3D/rnaEASY.3D.3.AMG/rnaEASY.3D.3.AMG_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.00-PST/quant.sf
+24 /public/groups/kimlab/exosome-KRAS-inhib/data/rnaEASY.3D/rnaEASY.3D.3.DMSO/rnaEASY.3D.3.DMSO_sel.align.gencode.v35.salmon.v1.3.0.sidx_2020-12-12-17.09.00-PST/quant.sf
+               names condition rep platform
+1    exoTIC.2D.1.AMG       AMG   1   exoTIC
+2   exoTIC.2D.1.DMSO      DMSO   1   exoTIC
+3    exoTIC.2D.2.AMG       AMG   2   exoTIC
+4   exoTIC.2D.2.DMSO      DMSO   2   exoTIC
+5    exoTIC.2D.3.AMG       AMG   3   exoTIC
+6   exoTIC.2D.3.DMSO      DMSO   3   exoTIC
+7    exoTIC.3D.1.AMG       AMG   1   exoTIC
+8   exoTIC.3D.1.DMSO      DMSO   1   exoTIC
+9    exoTIC.3D.2.AMG       AMG   2   exoTIC
+10  exoTIC.3D.2.DMSO      DMSO   2   exoTIC
+11   exoTIC.3D.3.AMG       AMG   3   exoTIC
+12  exoTIC.3D.3.DMSO      DMSO   3   exoTIC
+13  rnaEASY.2D.1.AMG       AMG   1  rnaEASY
+14 rnaEASY.2D.1.DMSO      DMSO   1  rnaEASY
+15  rnaEASY.2D.2.AMG       AMG   2  rnaEASY
+16 rnaEASY.2D.2.DMSO      DMSO   2  rnaEASY
+17  rnaEASY.2D.3.AMG       AMG   3  rnaEASY
+18 rnaEASY.2D.3.DMSO      DMSO   3  rnaEASY
+19  rnaEASY.3D.1.AMG       AMG   1  rnaEASY
+20 rnaEASY.3D.1.DMSO      DMSO   1  rnaEASY
+21  rnaEASY.3D.2.AMG       AMG   2  rnaEASY
+22 rnaEASY.3D.2.DMSO      DMSO   2  rnaEASY
+23  rnaEASY.3D.3.AMG       AMG   3  rnaEASY
+24 rnaEASY.3D.3.DMSO      DMSO   3  rnaEASY
+Warning message:
+In for (i in 2:(n - 1)) { : closing unused connection 3 (stdin)
+[1] "load tximeta"
+saving linkedTxome in bfc (first time)
+Parsed with column specification:
+cols(
+  X1 = col_character(),
+  X2 = col_character()
+)
+[1] "import data with tximeta"
+importing quantifications
+reading in files with read_tsv
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 
+found matching linked transcriptome:
+[ GENCODE - Homo sapiens - release Hg38 ]
+building TxDb with 'GenomicFeatures' package
+Import genomic features from the file as a GRanges object ... OK
+Prepare the 'metadata' data frame ... OK
+Make the TxDb object ... OK
+generating transcript ranges
+fetching genome info for GENCODE
+[1] "save tx h5"
+loading existing TxDb created: 2020-12-13 23:22:51
+Loading required package: GenomicFeatures
+Loading required package: AnnotationDbi
+
+Attaching package: 'AnnotationDbi'
+
+The following object is masked from 'package:dplyr':
+
+    select
+
+obtaining transcript-to-gene mapping from database
+generating gene ranges
+summarizing abundance
+summarizing counts
+summarizing length
+[1] "save gene h5"
+Error in file(file, "rt") : invalid 'description' argument
+Calls: read.delim -> read.table -> file
+In addition: Warning message:
+In .get_cds_IDX(mcols0$type, mcols0$phase) :
+  The "phase" metadata column contains non-NA values for features of type
+  stop_codon. This information was ignored.
+Execution halted

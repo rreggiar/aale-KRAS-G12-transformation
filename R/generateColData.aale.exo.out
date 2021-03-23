@@ -1,0 +1,77 @@
+Read 4 items
+[1] "parse input dir"
+                                                                                                                                                                                               files
+1                                                                                                                                                                                               <NA>
+2                                                                                                                                                                                               <NA>
+3                                                                                                                                                                                               <NA>
+4                                                                                                                                                                                               <NA>
+5                                                                                                                                                                                               <NA>
+6                                                                                                                                                                                               <NA>
+7                                                                                                                                                                                               <NA>
+8                                                                                                                                                                                               <NA>
+9                                                                                                                                                                                               <NA>
+10                                                                                                                                                                                              <NA>
+11                                                                                                                                                                                              <NA>
+12                                                                                                                                                                                              <NA>
+13                                                                                                                                                                                              <NA>
+14                                                                                                                                                                                              <NA>
+15                                                                                                                                                                                              <NA>
+16                                                                                                                                                                                              <NA>
+17                                                                                                                                                                                              <NA>
+18                                                                                                                                                                                              <NA>
+19                                                                                                                                                                                              <NA>
+20                                                                                                                                                                                              <NA>
+21                                                                                                                                                                                              <NA>
+22                                                                                                                                                                                              <NA>
+23                                                                                                                                                                                              <NA>
+24                                                                                                                                                                                              <NA>
+25 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-08-21.01.30-PST/quant.sf
+26 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-08-21.01.30-PST/quant.sf
+27                                                                                                                                                                                              <NA>
+28 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-08-21.01.30-PST/quant.sf
+29 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-08-21.01.30-PST/quant.sf
+30 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-08-21.01.30-PST/quant.sf
+                        names     condition rep platform
+1           intra.aale.1.ctrl          ctrl   1    intra
+2           intra.aale.1.kras          kras   1    intra
+3           intra.aale.2.ctrl          ctrl   2    intra
+4           intra.aale.2.kras          kras   2    intra
+5           intra.aale.3.ctrl          ctrl   3    intra
+6           intra.aale.3.kras          kras   3    intra
+7  intra.hbec.1.mut2_kras_v12 mut2_kras_v12   1    intra
+8   intra.hbec.1.mut2_kras_wt  mut2_kras_wt   1    intra
+9      intra.hbec.1.mut2_lacz     mut2_lacz   1    intra
+10  intra.hbec.1.wt2_kras_v12  wt2_kras_v12   1    intra
+11   intra.hbec.1.wt2_kras_wt   wt2_kras_wt   1    intra
+12      intra.hbec.1.wt2_lacz      wt2_lacz   1    intra
+13 intra.hbec.2.mut2_kras_v12 mut2_kras_v12   2    intra
+14  intra.hbec.2.mut2_kras_wt  mut2_kras_wt   2    intra
+15     intra.hbec.2.mut2_lacz     mut2_lacz   2    intra
+16  intra.hbec.2.wt2_kras_v12  wt2_kras_v12   2    intra
+17   intra.hbec.2.wt2_kras_wt   wt2_kras_wt   2    intra
+18      intra.hbec.2.wt2_lacz      wt2_lacz   2    intra
+19 intra.hbec.3.mut2_kras_v12 mut2_kras_v12   3    intra
+20  intra.hbec.3.mut2_kras_wt  mut2_kras_wt   3    intra
+21     intra.hbec.3.mut2_lacz     mut2_lacz   3    intra
+22  intra.hbec.3.wt2_kras_v12  wt2_kras_v12   3    intra
+23   intra.hbec.3.wt2_kras_wt   wt2_kras_wt   3    intra
+24      intra.hbec.3.wt2_lacz      wt2_lacz   3    intra
+25        rnaEASY.aale.1.ctrl          ctrl   1  rnaEASY
+26        rnaEASY.aale.1.kras          kras   1  rnaEASY
+27        rnaEASY.aale.2.ctrl          ctrl   2  rnaEASY
+28        rnaEASY.aale.2.kras          kras   2  rnaEASY
+29        rnaEASY.aale.3.ctrl          ctrl   3  rnaEASY
+30        rnaEASY.aale.3.kras          kras   3  rnaEASY
+Warning message:
+In for (i in 2:(n - 1)) { : closing unused connection 3 (stdin)
+[1] "load tximeta"
+saving linkedTxome in bfc (first time)
+Parsed with column specification:
+cols(
+  X1 = col_character(),
+  X2 = col_character()
+)
+[1] "import data with tximeta"
+Error in tximeta::tximeta(coldata = sample.info.df, type = "salmon", skipMeta = metaSkip) : 
+  the files do not exist at the location specified by 'coldata$files'
+Execution halted

@@ -1,0 +1,2579 @@
+---
+title: "exosome KRAS inhibitor analysis"
+author: 'Roman E. Reggiardo'
+date: '12/16/2020'
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(fig.width = 8, collapse = T)
+knitr::opts_chunk$set(message = F)
+library(here)
+print(here())
+```
+
+# setup:
+## loading
+```{r loading}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(here)
+  library(ggsci)
+  library(ggpubr)
+  library(ggsignif)
+  library(ggthemes) 
+  library(ggrepel)
+  library(ggforce)
+  library(ggpmisc)
+  library(ggprism)
+  library(patchwork)
+  library(extrafont)
+  library(ggrepel)
+  library(pheatmap)
+  library(viridis)
+  library(patchwork)
+  library(fgsea)
+  library(caret)
+  library(msigdbr)
+  library(matrixStats)
+  library(NMF)
+  library(rsample)
+  library(vip)
+  library(ROCR)
+  library(glmnet)
+  library(mlbench)
+  library(tximeta)
+  library(SummarizedExperiment)
+  library(rjson)
+  library(HDF5Array)
+  library(DESeq2)
+  library(ggpmisc)
+  library(survival)
+  library(survminer)
+})
+suppressMessages(loadfonts())
+```
+## setting ggplot theme
+```{r setting ggplot theme}
+
+base_size = 10
+
+theme_set(theme_foundation(base_size = base_size,
+                           base_family = 'Helvetica') + 
+            theme(plot.title = element_blank(),
+                panel.background = element_rect(colour = NA),
+                plot.background = element_rect(colour = NA),
+                panel.border = element_rect(colour = NA), 
+                axis.line = element_line(), 
+                axis.line.x = NULL, 
+                axis.line.y = NULL, 
+                axis.text = element_text(size = rel(0.95)), 
+                axis.text.x = element_text(margin = margin(t = 0.8 * base_size/4)), 
+                axis.text.x.top = element_text(margin = margin(b = 0.8 * base_size/4), vjust = 0), 
+                axis.text.y = element_text(margin = margin(r = 0.5 * base_size/4), hjust = 1), 
+                axis.text.y.right = element_text(margin = margin(l = 0.5 * base_size/4), hjust = 0), 
+                axis.ticks = element_line(), 
+                axis.ticks.length = unit(base_size/2.5, "pt"), axis.ticks.length.x = NULL, 
+                axis.ticks.length.x.top = NULL, axis.ticks.length.x.bottom = NULL, 
+                axis.ticks.length.y = NULL, axis.ticks.length.y.left = NULL, 
+                axis.ticks.length.y.right = NULL,
+                strip.text = element_text(size = 8),
+                strip.background = element_blank(),
+                legend.key.size= unit(0.08, "in"),
+                legend.spacing = unit(0, "in"),
+                legend.key = element_rect(colour = NA),
+                legend.title = element_text(face="italic"),
+                legend.text = element_text(face = 'bold'),
+                legend.justification = c("right", "top"),
+                legend.box.just = "right",
+                legend.margin = margin(6, 6, 6, 6),
+                plot.margin=margin(0.04,
+                                   0.04,
+                                   0.04,
+                                   0.04,
+                                   unit = "in"),
+                # legend.margin = margin(-0.04,
+                #                    -0.02,
+                #                    0.08,
+                #                    0.02,
+                #                    unit = "in"),
+                legend.box.spacing = unit(-0.02, 'in'),
+                panel.grid.major = element_blank(),
+                panel.grid.minor = element_blank()
+          ))
+
+theme_set_fun <- function(){
+  theme_set(theme_foundation(base_size = base_size,
+                             base_family = 'Helvetica') + 
+              theme(plot.title = element_blank(),
+                  panel.background = element_rect(colour = NA),
+                  plot.background = element_rect(colour = NA),
+                  panel.border = element_rect(colour = NA), 
+                  axis.line = element_line(), 
+                  axis.line.x = NULL, 
+                  axis.line.y = NULL, 
+                  axis.text = element_text(size = rel(0.95)), 
+                  axis.text.x = element_text(margin = margin(t = 0.8 * base_size/4)), 
+                  axis.text.x.top = element_text(margin = margin(b = 0.8 * base_size/4), vjust = 0), 
+                  axis.text.y = element_text(margin = margin(r = 0.5 * base_size/4), hjust = 1), 
+                  axis.text.y.right = element_text(margin = margin(l = 0.5 * base_size/4), hjust = 0), 
+                  axis.ticks = element_line(), 
+                  axis.ticks.length = unit(base_size/2.5, "pt"), axis.ticks.length.x = NULL, 
+                  axis.ticks.length.x.top = NULL, axis.ticks.length.x.bottom = NULL, 
+                  axis.ticks.length.y = NULL, axis.ticks.length.y.left = NULL, 
+                  axis.ticks.length.y.right = NULL,
+                  strip.text = element_text(size = 8),
+                  strip.background = element_blank(),
+                  legend.key.size= unit(0.08, "in"),
+                  legend.spacing = unit(0, "in"),
+                  legend.key = element_rect(colour = NA),
+                  legend.title = element_text(face="italic"),
+                  legend.text = element_text(face = 'bold'),
+                  legend.justification = c("right", "top"),
+                  legend.box.just = "right",
+                  legend.margin = margin(6, 6, 6, 6),
+                  plot.margin=margin(0.04,
+                                     0.04,
+                                     0.04,
+                                     0.04,
+                                     unit = "in"),
+                  # legend.margin = margin(-0.04,
+                  #                    -0.02,
+                  #                    0.08,
+                  #                    0.02,
+                  #                    unit = "in"),
+                  legend.box.spacing = unit(-0.02, 'in'),
+                  panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank()
+            ))
+}
+
+```
+## figure dirs, and other globally relevant constants
+```{r system I/O constants}
+figure.dir <-  here('figures')
+data.dir <-  here('data')
+output.data.dir <- here('output.data')
+reference.dir <- here('reference')
+job.scripts.dir <- here('R/job.scripts')
+
+chr.order <- c('chr1', 'chr2', 'chr3', 
+               'chr4', 'chr5', 'chr6', 
+               'chr7', 'chr8', 'chr9',
+               'chr10', 'chr11', 'chr12', 
+               'chr13', 'chr14', 'chr15', 
+               'chr16', 'chr17',
+               'chr18', 'chr19', 'chr20', 
+               'chr21', 'chr22', 'chrX', 'chrY')
+```
+## saving panels
+```{r saving panel}
+panel.figure.width = 8.7
+panel.figure.width.in = 3.4252
+panel.figure.height = 22.5
+panel.figure.height.in = 8.858268
+
+panel.save <- function(figure, name, width = 'single', height = 'single', plot.in = ''){
+  
+  if (width == 'single'){
+    panel.width = panel.figure.width
+  } else if (width == 'medium'){
+    panel.width = panel.figure.width*1.5
+  } else{
+    panel.width = panel.figure.width*2
+  }
+  
+  if (height == 'single'){
+    panel.height = panel.figure.height/3
+  } else if (height == 'double'){
+    panel.height = panel.figure.height/2
+  } else{
+    panel.height = panel.figure.height
+  }
+  
+  ggsave(paste0(figure.dir,
+                '/',
+                'fig.',
+                figure,
+                '/', 
+                name, 
+                '.',
+                panel.width, 
+                'x', 
+                panel.height, 
+                '.pdf'),
+       width = panel.width, 
+       height = panel.height, 
+       units = 'cm', plot = plot.in)
+}
+
+save_pheatmap_pdf <- function(x, filename, width=5, height=3) {
+   stopifnot(!missing(x))
+   stopifnot(!missing(filename))
+   pdf(filename, width=unit(width, 'cm'), height=unit(height, 'cm'), family = 'Helvetica')
+   grid::grid.newpage()
+   grid::grid.draw(x$gtable)
+   dev.off()
+}
+```
+## gene sets for filtering, identification
+```{r gene set I/O}
+## sex linked genes to help clustering
+gencode.sex.linked.genes <- 
+  read_tsv(file.path(output.data.dir, 'reference.data/sex.linked.gene.list.tsv'),
+           skip = 1,
+           col_names = c('chr','ensg','gene'))
+
+gen.34.lnc.names <- 
+  read_table(file.path(output.data.dir, 'reference.data/gen.34.lncRNA.gene.names.txt'),
+             col_names = 'gene')
+
+gen.34.tx.2.gene <- 
+  read_csv(file.path(output.data.dir, 'reference.data/gen.34.tx.to.gene.csv'),
+             col_names = c('tx', 'gene')) %>% 
+  separate(tx, sep = '\\|', into = c('enst','ensg',NA,NA,'tx','gene','len','biotype'))
+
+gen.34.tx.2.gene %>% 
+  select(-enst) %>% 
+  #mutate(biotype = ifelse(biotype %in% c('Mt_rRNA', 'lncRNA', 'protein_coding'),
+  #                        biotype, 'other')) %>% 
+  group_by(biotype) %>% 
+  tally() -> gen.34.tx.2.gene.biotype.count
+
+gen.24.names <- 
+  read_csv(file.path(output.data.dir, 'reference.data/gen.24.names.csv'),
+           col_names = c('enst','ensg','tx','gene','len','biotype')) %>% 
+  select(ensg, gene) %>% 
+  distinct()
+  
+te.clades <- 
+  read_csv(file.path(output.data.dir, 'reference.data','te.clades.csv'))
+
+te.families.clades <- 
+  read_csv(file.path(output.data.dir, 'reference.data','te.family.clade.csv'),
+           col_names = c('gene', 'family', 'clade')) %>% 
+  distinct()
+
+gen.34.lnc.te.overlap <- 
+  read_tsv(file.path(output.data.dir, 'reference.data','gen.34.lncRNA.exon.intersect.ucsc.gb.rep.txt'),
+           col_names = c('chr','te.start','te.end','te','te.ol','strand',
+                         'chr.2', 'exon.start', 'exon.end', 'enst', 'null', 'strand.2', 'exon.ol')) %>% 
+  select(-null, -chr.2, -strand.2) %>% 
+  merge(gen.34.tx.2.gene, by = 'enst') %>% 
+  merge(te.families.clades, by.x = 'te', by.y = 'gene')
+
+yang.ts.score.gtex <- 
+  read_tsv(file.path(output.data.dir, 'reference.data', 'yang_et_al.ts_score_gencode.v19.tsv'),
+           col_names = c('ensg','gene','tissue','tpm','group','ts_score'),
+           skip = 1) %>% 
+  filter(ts_score > 3) %>% 
+  group_by(gene) %>% 
+  filter(n() == 1) %>% 
+  separate(tissue, sep = ' - ', into = c('tissue', NA))
+
+gencode.35.tx.to.gene <- 
+  read_csv(file.path(reference.dir, 'gencode.v35.tx.to.gene.csv'), 
+                                  col_names = c('tx', 'gene')) %>% 
+  separate(tx, sep = '\\|', into = c('enst','ensg',NA,NA,'tx','gene','len','biotype'))
+
+gencode.35.tx.to.gene %>% 
+  select(-enst) %>% 
+  group_by(biotype) %>% 
+  tally() -> gen.35.biotype.count
+
+gencode.35.lnc.gene.names <- 
+  read_csv(file.path(reference.dir, 'gencode.v35.lncRNA.gene.names.txt'), 
+           col_names = 'gene')
+
+ucsc.rmsk.tx.to.gene <-  
+  read_csv(file.path(reference.dir, 'gencode.v35.ucsc.rmsk.tx.to.gene.csv'), 
+                                  col_names = c('enst', 'gene')) %>%
+  filter(grepl('^hg38', enst))
+
+ucsc.rmsk.tx.to.gene %>% 
+  mutate(tx = enst) %>% 
+  separate(tx, sep = '_', into = c(NA, NA, 'gene', 'position', NA, NA, 'strand', NA)) %>% 
+  mutate(position = sub('range=', '', position),
+         strand = sub('strand=', '', strand)) %>% 
+  merge(te.families.clades, by = 'gene') %>% 
+  mutate(tmp.gene = gene,
+         ensg = NA) %>% 
+  select(enst, ensg, 'gene' = tmp.gene, 'len' = clade, 'biotype' = family) -> ucsc.rmsk.tx.to.gene.fmt
+
+
+tot.gencode.35.tx.to.gene <- 
+  read_csv(file.path(reference.dir, 'gencode.v35.tx.to.gene.csv'), 
+                                  col_names = c('tx', 'gene')) %>% 
+  mutate(enst = tx) %>% 
+  separate(tx, sep = '\\|', into = c(NA,'ensg',NA,NA,'tx','gene','len','biotype'))
+
+total.tx.to.gene <- 
+  rbind(tot.gencode.35.tx.to.gene %>% select(enst, ensg, gene, len, biotype),
+        ucsc.rmsk.tx.to.gene.fmt %>% select(enst = enst, ensg, gene, len, biotype))
+
+total.tx.to.gene %>% 
+  select(-enst) %>% 
+  group_by(biotype) %>% 
+  tally() -> total.tx.to.gene.count
+
+g12c.marker.genes <- read_csv(file.path(output.data.dir, 'g12c.bulk.marker.genes.csv')) %>% 
+  select(-X1)
+
+g12c.sc.marker.genes <- read_csv(file.path(output.data.dir, 'g12c.scRNA.marker.genes.csv')) %>% 
+  select(-X1)
+```
+
+```{r ip tables}
+te.locus.count <- 
+  read_csv(file.path(output.data.dir, 'pancreas.plasma.ev.long.RNA.normalized.deseq.tx.counts.csv')) %>%
+  rename('X1' = 'tx')
+
+read_csv(file.path(output.data.dir, 
+                   'pancreas.plasma.ev.long.RNA.normalized.deseq.gene.diseaseState_PDAC_vs_healthy.lfcShrink.csv')) %>% 
+  drop_na() %>% 
+  rename('X1' = 'gene') %>% 
+  filter(!grepl('^MT', gene),
+         abs(lfcShrinkResults.log2FoldChange) >= 0.5) %>% 
+  merge(te.families.clades, by = 'gene') %>% 
+  mutate(family = ifelse(is.na(family), clade, family), 
+         clade = factor(clade, levels = c('coding-gencode', 'lncRNA', 'DNA', 'LINE', 'LTR', 'SINE'))) %>% 
+  filter(!grepl('\\(', gene)) %>% 
+  mutate(genome = 'hg38') -> panc_v_ctrl_te.ip.parse
+
+
+te.locus.count %>% 
+  filter(!grepl('^ENST', tx)) %>% 
+  filter_at(vars(contains('SRR')), any_vars(. > 5)) %>% 
+  separate(tx, '=', into = c('name', 'position')) %>% 
+  separate(name, '_', into = c(NA,NA,'name',NA)) %>%
+  merge(te.families.clades, by.x = 'name', by.y = 'gene') %>% 
+  separate(position, ':', into = c('chr', 'position')) %>% 
+  separate(position, '_', into = c('position', NA)) %>% 
+  separate(position, '-', into = c('start', 'end')) %>% 
+  select(gene='name', chr, start, end, clade, contains('SRR')) %>% 
+  filter(gene %in% panc_v_ctrl_te.ip.parse$gene) %>% 
+  gather(patient, count, -chr, -start, -end, -gene, -clade) %>% 
+  group_by(chr, start, end, gene, clade) %>% 
+  summarize(avg_count = mean(count)) %>% 
+  mutate(start = as.numeric(start),
+           chr = factor(chr, levels = chr.order)) %>% 
+  merge(panc_v_ctrl_te.ip.parse %>% select(-clade), by = 'gene') -> panc_v_ctrl_te.ip.table
+
+write_csv(x = panc_v_ctrl_te.ip.table, 
+          file.path(output.data.dir, 'panc_v_healthy.gut.paper.te.ip.table.RENAME.COLUMNS.csv'))
+```
+
+# feature engineering:
+## FUN: construct.quant.object
+```{r}
+load.tximeta.object <- function(reference){
+  
+  print(file.path(output.data.dir, paste0(reference, '_h5_se')))
+  
+  txi <- loadHDF5SummarizedExperiment(dir=file.path(output.data.dir, paste0(reference, '_h5_se')))
+  gxi <- loadHDF5SummarizedExperiment(dir=file.path(output.data.dir, paste0(reference, '_gene_h5_se')))
+  
+  if (reference == 'process.aware.salmon'){
+    
+    gxi.split <- loadHDF5SummarizedExperiment(dir=file.path(output.data.dir, paste0(reference, '_gene_split_h5_se')))
+    
+    return(list('txi' = txi, 'gxi' = gxi, 'gxi.split' = gxi.split))
+    
+  } else {
+    
+    return(list('txi' = txi, 'gxi' = gxi))
+  }
+  
+}
+
+subset.tximeta.object <- function(tximeta.list, grep.string){
+  
+  if (grepl('\\|', grep.string)){
+      
+    subset.txi <- SummarizedExperiment::subset(tximeta.list$txi, 
+                                         select = !grepl(grep.string, colData(tximeta.list$txi)$names))
+  
+    subset.gxi <- SummarizedExperiment::subset(tximeta.list$gxi, 
+                                         select = !grepl(grep.string, colData(tximeta.list$gxi)$names))
+  } else{
+        
+    subset.txi <- SummarizedExperiment::subset(tximeta.list$txi, 
+                                         select = grepl(grep.string, colData(tximeta.list$txi)$names))
+  
+    subset.gxi <- SummarizedExperiment::subset(tximeta.list$gxi, 
+                                         select = grepl(grep.string, colData(tximeta.list$gxi)$names))
+  }
+  
+  return(list('txi' = subset.txi,
+              'gxi' = subset.gxi))
+}
+```
+### CALL: construct.quant.object
+```{r}
+salmon.quant <- load.tximeta.object('salmon')
+ucsc.rmsk.salmon.quant <- load.tximeta.object('ucsc.rmsk.salmon')
+process.aware.salmon.quant <- load.tximeta.object('process.aware.salmon')
+
+aale.salmon.quant <- load.tximeta.object('aale_salmon')
+
+salmon.quant$exoTIC_2D <- subset.tximeta.object(salmon.quant, 'exoTIC.2D')
+salmon.quant$rnaEasy_2D <- subset.tximeta.object(salmon.quant, 'rnaEASY.2D')
+salmon.quant$exoTIC_3D <- subset.tximeta.object(salmon.quant, 'exoTIC.3D')
+salmon.quant$rnaEasy_3D <- subset.tximeta.object(salmon.quant, 'rnaEASY.3D')
+
+salmon.quant$rnaEasy_dmso <- subset.tximeta.object(salmon.quant, 'AMG|exoTIC')
+
+salmon.quant$exoTIC_all <- subset.tximeta.object(salmon.quant, 'exoTIC')
+salmon.quant$rnaEasy_all <- subset.tximeta.object(salmon.quant, 'rnaEASY')
+
+salmon.quant$two_D <- subset.tximeta.object(salmon.quant, '2D')
+salmon.quant$three_D <- subset.tximeta.object(salmon.quant, '3D')
+
+ucsc.rmsk.salmon.quant$exoTIC_2D <- subset.tximeta.object(ucsc.rmsk.salmon.quant, 'exoTIC.2D')
+ucsc.rmsk.salmon.quant$rnaEasy_2D <- subset.tximeta.object(ucsc.rmsk.salmon.quant, 'rnaEASY.2D')
+ucsc.rmsk.salmon.quant$exoTIC_3D <- subset.tximeta.object(ucsc.rmsk.salmon.quant, 'exoTIC.3D')
+ucsc.rmsk.salmon.quant$rnaEasy_3D <- subset.tximeta.object(ucsc.rmsk.salmon.quant, 'rnaEASY.3D')
+
+ucsc.rmsk.salmon.quant$exoTIC_all <- subset.tximeta.object(ucsc.rmsk.salmon.quant, 'exoTIC')
+ucsc.rmsk.salmon.quant$rnaEasy_all <- subset.tximeta.object(ucsc.rmsk.salmon.quant, 'rnaEASY')
+
+process.aware.salmon.quant$exoTIC_2D <- subset.tximeta.object(process.aware.salmon.quant, 'exoTIC.2D')
+process.aware.salmon.quant$rnaEasy_2D <- subset.tximeta.object(process.aware.salmon.quant, 'rnaEASY.2D')
+process.aware.salmon.quant$exoTIC_3D <- subset.tximeta.object(process.aware.salmon.quant, 'exoTIC.3D')
+process.aware.salmon.quant$rnaEasy_3D <- subset.tximeta.object(process.aware.salmon.quant, 'rnaEASY.3D')
+
+```
+### CALL: build nanosight
+```{r}
+read_csv(file.path(output.data.dir, 'exoTIC_3D_nano.csv')) %>%  
+    gather(sample, value, -size) %>% 
+    mutate(condition = sample) %>% 
+    separate(condition, sep = '_', into = c('context', 'platform', 'condition')) %>% 
+    group_by(size, condition) %>%
+    mutate(mean = (mean(value))/1e6,
+         sd = (sd(value))/1e6) -> exoTIC.3D.nanosight.df
+
+head(read_csv(file.path(output.data.dir, 'exoTIC_2D_nano.csv')), -1) %>% 
+    gather(sample, value, -size) %>% 
+    mutate(condition = sample) %>% 
+    separate(condition, sep = '_', into = c('context', 'platform', 'condition')) %>% 
+    group_by(size, condition) %>%
+    mutate(mean = (mean(value))/1e6,
+         sd = (sd(value))/1e6) %>% 
+  drop_na() -> exoTIC.2D.nanosight.df
+
+
+read_csv(file.path(output.data.dir, 'rnaEasy_DMSO_nano.csv')) %>% 
+  select(-X2) %>% 
+  gather(sample, value, -size) %>%
+  mutate(condition = sample,
+         dose = 'DMSO') %>% 
+  separate(condition, sep = '_', into = c('context', 'platform', 'condition', NA)) %>% 
+  group_by(size, context) -> rnaEasy.dmso.nanosight.df#%>%
+  # mutate(mean = (mean(value))/1e6,
+  #        sd = (sd(value))/1e6) -> rnaEasy.dmso.nanosight.df
+
+read_csv(file.path(output.data.dir, 'rnaEasy_AMG_nano.csv')) %>% 
+  gather(sample, value, -size) %>% 
+  mutate(condition = sample) %>% 
+  separate(condition, sep = '_', into = c('context', 'platform', 'dose', 'condition')) %>% 
+  rbind(rnaEasy.dmso.nanosight.df %>% 
+        filter(context == '2d') %>% select(size, sample, value, context, platform, dose, condition)) %>% 
+  mutate(value = value/1e6) %>%
+  drop_na() -> rnaEasy.amg.nanosight.df
+
+```
+## metadata
+```{r}
+colData(salmon.quant$gxi) %>% 
+  as.data.frame() %>% 
+  remove_rownames() %>%
+  mutate(condition = names) %>% 
+  separate(condition, sep = '[.]', into = c('platform', 'context', NA, 'condition')) %>% 
+  mutate(batch = ifelse(grepl('exoTIC.3D.*.DMSO', names), 1, 0)) -> metadata.df
+```
+## FUN: extract.process.aware
+```{r}
+txome.json <- file.path(reference.dir, 'gencode.v35.annotation.expanded.json')
+txome.tsv <- file.path(reference.dir, 'gencode.v35.annotation.expanded.tsv')
+
+txi.iranges <- rowRanges(process.aware.salmon.quant$gxi.split)
+
+split.gxi <- process.aware.salmon.quant$gxi.split
+
+assay(split.gxi, 'unspliced') %>% 
+  as.data.frame() %>% 
+  rownames_to_column('gene') %>% 
+  gather(sample, count, -gene) %>% 
+  filter(!grepl('SRR|luad', sample)) %>% 
+  group_by(sample) %>% 
+  summarize(unsplice_count = sum(count)) -> unsplice.df
+
+assay(split.gxi, 'spliced') %>% 
+  as.data.frame() %>% 
+  rownames_to_column('gene') %>% 
+  gather(sample, count, -gene) %>% 
+  filter(!grepl('SRR|luad', sample)) %>% 
+  group_by(sample) %>% 
+  summarize(splice_count = sum(count)) -> splice.df
+
+colnames(split.gxi) %>% 
+  as.data.frame() %>% 
+  cbind(as.data.frame(metadata(split.gxi)$quantInfo$percent_mapped)) %>% 
+  select('sample' = '.', 'mapping_rate' = 'metadata(split.gxi)$quantInfo$percent_mapped') -> mapping_rate_df
+
+merge(unsplice.df, splice.df, by = 'sample') %>% 
+  mutate(unsplice_rate = unsplice_count / (unsplice_count + splice_count)) %>% 
+  merge(mapping_rate_df, by = 'sample') -> unsplice.df 
+
+unsplice.df %>% 
+  separate(sample, sep = '[.]', into = c('platform', 'context', 'rep', 'condition')) %>%
+  ggplot(aes(reorder(platform, -unsplice_rate), unsplice_rate, color = context)) +
+  geom_boxplot(fill = NA) +
+  geom_sina()
+
+```
+## FUN: plot tx count
+```{r}
+tx.ome.cov.plt <- function(tx.counts){
+  tx.counts %>% 
+    rownames_to_column('enst') %>% 
+    merge(gencode.35.tx.to.gene, by = 'enst') %>% 
+    gather(names, count, -enst, -ensg:-biotype) %>% 
+    merge(metadata.df, by = 'names') %>% 
+    filter(biotype != 'Mt_rRNA') %>% 
+    filter(count >= 5) %>% 
+    group_by(biotype, names, condition) %>% 
+    mutate(biotype.count = n()) %>% 
+    select(biotype, names, condition, biotype.count) %>% 
+    distinct() %>% 
+    merge(gen.35.biotype.count, by = 'biotype') %>% 
+    mutate(coverage = biotype.count/n) 
+}
+```
+## FUN: run.de.seq
+```{r}
+run.de.seq <- function(tximeta.object){
+  
+  tximeta.name <- deparse(substitute(tximeta.object))
+  
+  print(tximeta.name)
+  
+  colData(tximeta.object$gxi) %>% 
+    as.data.frame() %>% 
+    mutate(sample = names) %>% 
+    separate(names, sep = '[.]', into = c(NA, 'context', NA, NA)) -> colData.gxi
+  
+  print(colData.gxi)
+
+  count.matrix.gxi <- assay(tximeta.object$gxi, 'counts') %>% 
+    as.data.frame() %>% 
+    rownames_to_column('gene') %>% 
+    mutate_if(is.numeric, round) %>% 
+    column_to_rownames('gene')
+    
+  colData(tximeta.object$txi) %>% 
+    as.data.frame() %>% 
+    mutate(sample = names) %>% 
+    separate(names, sep = '[.]', into = c(NA, 'context', NA, NA)) -> colData.txi
+
+  count.matrix.txi <- assay(tximeta.object$txi, 'counts') %>% 
+    as.data.frame() %>% 
+    rownames_to_column('tmp') %>% 
+    mutate_if(is.numeric, round) %>% 
+    column_to_rownames('tmp')
+  
+  
+  if (grepl('all', tximeta.name)){
+    print('2D vs 3D')
+    dds.gxi <- DESeqDataSetFromMatrix(countData = count.matrix.gxi, 
+                                      colData = colData.gxi, 
+                                      design = as.formula(~context + condition:context))
+    
+    dds.gxi <- estimateSizeFactors(dds.gxi)
+  
+    dds.gxi.vst.counts <-  as.data.frame(assay(vst(dds.gxi, blind = F)))
+    print(head(dds.gxi.vst.counts))
+    
+  } else if (grepl('_D', tximeta.name)){
+    dds.gxi <- DESeqDataSetFromMatrix(countData = count.matrix.gxi, 
+                                      colData = colData.gxi, 
+                                      design = as.formula(~condition + condition:platform))
+  } else if (grepl('_dmso', tximeta.name)){
+    dds.gxi <- DESeqDataSetFromMatrix(countData = count.matrix.gxi, 
+                                      colData = colData.gxi, 
+                                      design = as.formula(~context))
+    dds.txi <- DESeqDataSetFromMatrix(countData = count.matrix.txi, 
+                                    colData = colData.txi, 
+                                    design = as.formula(~context))
+    dds.txi <- estimateSizeFactors(dds.txi)
+  } else{
+    dds.gxi <- DESeqDataSetFromMatrix(countData = count.matrix.gxi, 
+                                      colData = colData.gxi, 
+                                      design = as.formula(~condition))
+  }
+  
+  if (!exists('dds.txi')){
+  dds.txi <- DESeqDataSetFromMatrix(countData = count.matrix.txi, 
+                                    colData = colData.txi, 
+                                    design = as.formula(~condition))
+  }
+  
+  dds.txi <- estimateSizeFactors(dds.txi)
+  
+  dds.txi.norm.counts <- as.data.frame(counts(dds.txi, normalized=T))
+  
+  dds.txi.vst.counts <- as.data.frame(assay(vst(dds.txi, blind = F)))
+  
+  dds.gxi <- estimateSizeFactors(dds.gxi)
+  
+  dds.gxi.norm.counts <- as.data.frame(counts(dds.gxi, normalized=T))
+  
+  dds.gxi.vst.counts <-  as.data.frame(assay(vst(dds.gxi, blind = F)))
+  
+  if (!grepl('exoTIC|rnaEasy|_D|aale', tximeta.name)){
+    print('alt approach')
+      if (grepl('ucsc.rmsk', tximeta.name)){  
+    
+        print('rmsk')
+    
+        dds.gxi.norm.counts <- dds.gxi.norm.counts %>% 
+          rownames_to_column('gene') 
+        
+        return(list('counts' = dds.gxi.norm.counts ,
+                    'txi.counts' = dds.txi.norm.counts))
+        
+        quit()
+      }
+    
+      return(list('counts' = dds.gxi.norm.counts %>% 
+                    rownames_to_column('ensg') %>% 
+                    merge(gencode.35.tx.to.gene %>% 
+                            select(gene, ensg), by = 'ensg') %>% 
+                    distinct(), 
+                  'txi.counts' = dds.txi.norm.counts,
+                  'gxi.vst.counts' = dds.gxi.vst.counts))
+      quit()
+
+  }
+  
+  filter <- rowSums(counts(dds.gxi, normalized=T) >= 10) >= 2
+  
+  dds.gxi <- DESeq(dds.gxi[filter,])
+  
+  print(resultsNames(dds.gxi))
+  
+  print(tail(resultsNames(dds.gxi), n=1))
+  
+  if (grepl('ucsc.rmsk', tximeta.name)){  
+    
+    print('rmsk')
+    
+    dds.gxi.lfc <- lfcShrink(dds.gxi, coef = tail(resultsNames(dds.gxi), n=1)) %>% 
+      as.data.frame() %>% 
+      filter(padj <= 0.05) %>% 
+      rownames_to_column('gene') %>% 
+      select(gene, baseMean, log2FoldChange, padj)
+    
+    dds.gxi.norm.counts <- dds.gxi.norm.counts %>% 
+      rownames_to_column('gene') 
+    
+  } else{
+    
+    dds.gxi.lfc <- lfcShrink(dds.gxi, coef = tail(resultsNames(dds.gxi), n=1)) %>% 
+      as.data.frame() %>% 
+      filter(padj <= 0.05) %>% 
+      rownames_to_column('ensg') %>% 
+      merge(gencode.35.tx.to.gene %>% select(gene, ensg) %>% distinct(), by = 'ensg') %>%
+      select(gene, baseMean, log2FoldChange, padj)
+    
+    plotMA(lfcShrink(dds.gxi, coef = tail(resultsNames(dds.gxi), n=1)))
+    
+    dds.gxi.norm.counts <- dds.gxi.norm.counts %>% 
+      rownames_to_column('ensg') %>% 
+      merge(gencode.35.tx.to.gene %>% select(ensg, gene) %>% distinct(), by = 'ensg') %>% 
+      distinct() %>% 
+      select(ensg, gene, everything())
+  }
+
+return(list('de' = dds.gxi.lfc, 
+            'counts' = dds.gxi.norm.counts, 
+            'txi.counts' = dds.txi.norm.counts, 
+            'txi.vst.counts' = dds.txi.vst.counts,
+            'gxi.vst.counts' = dds.gxi.vst.counts))
+  
+}
+
+```
+## CALL: run.de.seq
+```{r}
+salmon.quant$exoTIC_2D$deseq <- run.de.seq(salmon.quant$exoTIC_2D)
+salmon.quant$rnaEasy_2D$deseq <- run.de.seq(salmon.quant$rnaEasy_2D)
+salmon.quant$exoTIC_3D$deseq <- run.de.seq(salmon.quant$exoTIC_3D)
+salmon.quant$rnaEasy_3D$deseq <- run.de.seq(salmon.quant$rnaEasy_3D)
+salmon.quant$exoTIC_all$deseq <- run.de.seq(salmon.quant$exoTIC_all)
+salmon.quant$rnaEasy_all$deseq <- run.de.seq(salmon.quant$rnaEasy_all)
+salmon.quant$two_D$deseq <- run.de.seq(salmon.quant$two_D)
+salmon.quant$three_D$deseq <- run.de.seq(salmon.quant$three_D)
+salmon.quant$deseq <- run.de.seq(salmon.quant)
+
+salmon.quant$rnaEasy_dmso$deseq <- run.de.seq(salmon.quant$rnaEasy_dmso)
+
+aale.salmon.quant$deseq <- run.de.seq(aale.salmon.quant)
+
+# salmon.quant$rnaEasy_3D$deseq$de %>% 
+#   mutate(log2FoldChange = -log2FoldChange) ->salmon.quant$rnaEasy_3D$deseq$de
+# salmon.quant$rnaEasy_2D$deseq$de %>% 
+#   mutate(log2FoldChange = -log2FoldChange) ->salmon.quant$rnaEasy_2D$deseq$de
+# salmon.quant$exoTIC_2D$deseq$de %>% 
+#   mutate(log2FoldChange = -log2FoldChange) ->salmon.quant$exoTIC_2D$deseq$de
+# salmon.quant$exoTIC_3D$deseq$de %>% 
+#   mutate(log2FoldChange = -log2FoldChange) ->salmon.quant$exoTIC_3D$deseq$de
+
+ucsc.rmsk.salmon.quant$exoTIC_2D$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$exoTIC_2D)
+ucsc.rmsk.salmon.quant$rnaEasy_2D$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$rnaEasy_2D)
+ucsc.rmsk.salmon.quant$exoTIC_3D$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$exoTIC_3D)
+ucsc.rmsk.salmon.quant$rnaEasy_3D$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$rnaEasy_3D)
+ucsc.rmsk.salmon.quant$exoTIC_all$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$exoTIC_all)
+ucsc.rmsk.salmon.quant$rnaEasy_all$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$rnaEasy_all)
+ucsc.rmsk.salmon.quant$deseq <- run.de.seq(ucsc.rmsk.salmon.quant)
+# 
+# ucsc.rmsk.salmon.quant$rnaEasy_3D$deseq$de %>% 
+#   mutate(log2FoldChange = -log2FoldChange) ->ucsc.rmsk.salmon.quant$rnaEasy_3D$deseq$de
+# ucsc.rmsk.salmon.quant$rnaEasy_2D$deseq$de %>% 
+#   mutate(log2FoldChange = -log2FoldChange) ->ucsc.rmsk.salmon.quant$rnaEasy_2D$deseq$de
+# ucsc.rmsk.salmon.quant$exoTIC_2D$deseq$de %>% 
+#   mutate(log2FoldChange = -log2FoldChange) ->ucsc.rmsk.salmon.quant$exoTIC_2D$deseq$de
+# ucsc.rmsk.salmon.quant$exoTIC_3D$deseq$de %>% 
+#   mutate(log2FoldChange = -log2FoldChange) ->ucsc.rmsk.salmon.quant$exoTIC_3D$deseq$de
+
+
+```
+## FUN: elbow.plt
+```{r}
+elbow.plt <- function(df){
+  k.max <- nrow(df) - 1
+  k.values <- 1:k.max
+  
+  cluster.compute <- function(k){
+    cluster.out <- kmeans(df, 
+                          k, 
+                          nstart = 25)
+    return(cluster.out$tot.withinss)
+  }
+  
+  elbow.df <- tibble()
+  for(i in k.values){
+    print(i)
+    temp.df <- 
+      tibble(k = i, 
+             ss = cluster.compute(i))
+    elbow.df <- rbind(temp.df, elbow.df)
+  }
+  
+  ggplot(elbow.df,
+         aes(k, ss)) + 
+    geom_point() +
+    geom_line() + 
+    geom_vline(xintercept = k.values, 
+               linetype = 'dashed', 
+               alpha = 0.3)
+}
+```
+## FUN: make.fgsea.ranks
+```{r}
+make.fgsea.ranks <- function(de.seq){
+  
+  # build a ranked gene list in the appropriate format (named list)
+  # using shrunken log2 Fold Change values from DESeqII
+  de.seq <- 
+    de.seq %>%
+    mutate(rank = as.double(log2FoldChange),
+           Gene = as.character(gene)) %>% 
+    select(Gene, rank) %>%
+    mutate(rank = scale(rank)) 
+  
+  de.seq.rnk <- 
+    de.seq$rank
+  de.seq.rnk <- 
+    setNames(de.seq$rank, de.seq$Gene)
+
+  # run the GSEA implementation on the hallmark sets supplemented with custom sets
+  print('fgsea')
+  de.seq.fgsea.res <- 
+    fgsea(pathways = msig.df, 
+          stats = de.seq.rnk, eps = 0.0)
+  
+  print('padj filter and clean names')
+  # convert to a tidy format, clean the names for display
+  de.seq.fgsea.df <-
+    as_tibble(de.seq.fgsea.res) %>%
+    # filter(padj <= 0.05) %>%
+    mutate(pathway = gsub('_', ' ', pathway))
+
+  
+  return(de.seq.fgsea.df)
+  # clean tmp objects
+  rm(de.seq, de.seq.rnk, de.seq.fgsea.res, de.seq.fgsea.df)
+  
+}
+
+
+```
+### CALL: make.fgsea.ranks
+```{r}
+msig.df <- 
+  msigdbr(species = 'Homo sapiens', category = 'H') %>% 
+  select(gene_symbol, gs_name) %>% 
+  split(x = .$gene_symbol, f = .$gs_name)
+
+salmon.quant$exoTIC_2D$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$exoTIC_2D$deseq$de)
+salmon.quant$rnaEasy_2D$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$rnaEasy_2D$deseq$de)
+salmon.quant$rnaEasy_3D$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$rnaEasy_3D$deseq$de)
+aale.salmon.quant$deseq$H.fgsea <- make.fgsea.ranks(aale.salmon.quant$deseq$de)
+kras_wt.vs.g12c_de_h.fgsea <- make.fgsea.ranks(kras_wt.vs.g12c_de)
+```
+### FUN: build.signature.lists
+```{r}
+extract.leading.edge <- function(fgsea, deseq){
+  
+  fgsea %>% 
+    filter(pathway == 'HALLMARK MYC TARGETS V1') %>% 
+    select(leadingEdge) %>% 
+    unlist() %>% 
+    unname() -> myc.tmp
+  fgsea %>% 
+    filter(pathway == 'HALLMARK E2F TARGETS') %>% 
+    select(leadingEdge) %>% 
+    unlist() %>% 
+    unname() -> e2f.tmp
+  fgsea %>% 
+    filter(pathway == 'HALLMARK G2M CHECKPOINT') %>% 
+    select(leadingEdge) %>% 
+    unlist() %>% 
+    unname() -> g2m.tmp
+  
+  deseq %>% 
+    filter(gene %in% g12c.sc.marker.genes$`G12C induced`) %>% 
+    select(gene) %>% unlist() %>% unname() -> g12c.tmp
+  
+  return(list('myc.signature' = myc.tmp,
+              'e2f.signature' = e2f.tmp,
+              'g2m.signature' = g2m.tmp,
+              'g12c.signature' = g12c.tmp))
+}
+
+build.signature.lists <- function(){
+  
+  for (signature in c('myc.signature', 'e2f.signature', 'g2m.signature', 'g12c.signature')){
+      consensus.tmp <- Reduce(intersect, list(salmon.quant$exoTIC_2D$deseq$signatures[[toString(signature)]],
+                                                 salmon.quant$rnaEasy_2D$deseq$signatures[[toString(signature)]],
+                                                 salmon.quant$rnaEasy_3D$deseq$signatures[[toString(signature)]],
+                                                 kras_wt.vs.g12c_de_signatures[[toString(signature)]]))
+      
+      exRNA.consensus.tmp <- Reduce(intersect, list(salmon.quant$exoTIC_2D$deseq$signatures[[toString(signature)]],
+                                                 salmon.quant$rnaEasy_2D$deseq$signatures[[toString(signature)]],
+                                                 salmon.quant$rnaEasy_3D$deseq$signatures[[toString(signature)]]))
+
+      rnaEasy.tmp <- Reduce(intersect, list(salmon.quant$rnaEasy_2D$deseq$signatures[[toString(signature)]],
+                                                   salmon.quant$rnaEasy_3D$deseq$signatures[[toString(signature)]]))
+      
+      two_D.tmp <- Reduce(intersect, list(salmon.quant$rnaEasy_2D$deseq$signatures[[toString(signature)]],
+                                                 salmon.quant$exoTIC_2D$deseq$signatures[[toString(signature)]]))
+      
+      luad.tmp <- Reduce()
+      
+      assign(paste0(toString(signature), '_list'), list('consensus' = consensus.tmp,
+                                             'exRNA.consensus' = exRNA.consensus.tmp,
+                                             'rnaEasy' = rnaEasy.tmp,
+                                             'twoD' = two_D.tmp))
+  }
+  
+  return(list('myc' = myc.signature_list, 
+              'e2f' = e2f.signature_list, 
+              'g2m' = g2m.signature_list, 
+              'g12c' = g12c.signature_list))
+}
+
+build.de.agreement.lists <- function(exoTIC_2D, rnaEasy_2D, rnaEasy_3D, 
+                                     threshold = 1, padj_cutoff = 25){
+  
+  exoTIC_2D %>% 
+    merge(rnaEasy_2D, by = 'gene') %>% 
+    merge(rnaEasy_3D, by = 'gene') %>% 
+    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold & log2FoldChange >= threshold) %>% 
+    select(gene) %>% 
+    unlist() %>% unname() -> up.consensus.tmp
+  
+  exoTIC_2D %>% top_n(padj_cutoff, wt = -padj) %>% 
+    merge(rnaEasy_2D %>% top_n(padj_cutoff, wt = -padj), by = 'gene') %>% 
+    merge(rnaEasy_3D %>% top_n(padj_cutoff, wt = -padj), by = 'gene') %>% 
+    select(gene) %>% 
+    unlist() %>% unname() -> sig.consensus.tmp
+  
+  exoTIC_2D %>% 
+    merge(rnaEasy_2D, by = 'gene') %>% 
+    merge(rnaEasy_3D, by = 'gene') %>% 
+    filter(log2FoldChange.x <= -threshold & log2FoldChange.y <= -threshold & log2FoldChange <= -threshold) %>% 
+    select(gene) %>% 
+    unlist() %>% unname() -> dn.consensus.tmp
+  
+  exoTIC_2D %>% 
+    merge(rnaEasy_2D, by = 'gene') %>% 
+    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>% 
+    select(gene) %>% 
+    unlist() %>% unname() -> up.two_D.tmp
+  
+  exoTIC_2D %>% top_n(padj_cutoff, wt = -padj) %>% 
+    merge(rnaEasy_2D %>% top_n(padj_cutoff, wt = -padj), by = 'gene') %>% 
+    select(gene) %>% 
+    unlist() %>% unname() -> sig.two_D.tmp
+    
+  exoTIC_2D %>% 
+    merge(rnaEasy_2D, by = 'gene') %>% 
+    filter(log2FoldChange.x <= -threshold & log2FoldChange.y <= -threshold) %>% 
+    select(gene) %>% 
+    unlist() %>% unname() -> dn.two_D.tmp
+  
+  rnaEasy_2D %>% 
+    merge(rnaEasy_3D, by = 'gene') %>% 
+    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>% 
+    select(gene) %>% 
+    unlist() %>% unname() -> up.rnaEasy.tmp
+  
+  rnaEasy_2D %>% top_n(padj_cutoff, wt = -padj) %>% 
+    merge(rnaEasy_3D %>% top_n(padj_cutoff, wt = -padj), by = 'gene') %>% 
+    select(gene) %>% 
+    unlist() %>% unname() -> sig.rnaEasy.tmp
+  
+  rnaEasy_2D %>% 
+    merge(rnaEasy_3D, by = 'gene') %>% 
+    filter(log2FoldChange.x <= -threshold & log2FoldChange.y <= -threshold) %>% 
+    select(gene) %>% 
+    unlist() %>% unname() -> dn.rnaEasy.tmp
+  
+  exoTIC_2D %>%
+    merge(kras_wt.vs.g12c_de, by = 'gene') %>%
+    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>%
+    select(gene) %>%
+    unlist() %>% unname() -> luad.2D.exoTIC.tmp
+
+  rnaEasy_2D %>%
+    merge(kras_wt.vs.g12c_de, by = 'gene') %>%
+    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>%
+    select(gene) %>%
+    unlist() %>% unname() -> luad.2D.rnaEasy.tmp
+
+  rnaEasy_3D %>%
+    merge(kras_wt.vs.g12c_de, by = 'gene') %>%
+    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>%
+    select(gene) %>%
+    unlist() %>% unname() -> luad.3D.rnaEasy.tmp
+  
+  
+  
+  return(list('up.consensus' = up.consensus.tmp,
+              'sig.consensus' = sig.consensus.tmp,
+              'up.rnaEasy' = up.rnaEasy.tmp,
+              'sig.rnaEasy' = sig.rnaEasy.tmp,
+              'up.twoD' = up.two_D.tmp,
+              'sig.twoD' = sig.two_D.tmp,
+              'dn.consensus' = dn.consensus.tmp,
+              'dn.rnaEasy' = dn.rnaEasy.tmp,
+              'dn.twoD' = dn.two_D.tmp,
+              'luad.2D.rnaEasy' = luad.2D.rnaEasy.tmp,
+              'luad.3D.rnaEasy' = luad.3D.rnaEasy.tmp,
+              'luad.2D.exoTIC' = luad.2D.exoTIC.tmp))
+}
+
+
+
+
+#######
+```
+### CALL: build.signature.lists
+```{r}
+salmon.quant$exoTIC_2D$deseq$signatures <- 
+  extract.leading.edge(salmon.quant$exoTIC_2D$deseq$H.fgsea, salmon.quant$exoTIC_2D$deseq$de)
+
+salmon.quant$rnaEasy_2D$deseq$signatures <- 
+  extract.leading.edge(salmon.quant$rnaEasy_2D$deseq$H.fgsea, salmon.quant$rnaEasy_2D$deseq$de)
+
+salmon.quant$rnaEasy_3D$deseq$signatures <- 
+  extract.leading.edge(salmon.quant$rnaEasy_3D$deseq$H.fgsea, salmon.quant$rnaEasy_3D$deseq$de)
+
+kras_wt.vs.g12c_de_signatures <- 
+  extract.leading.edge(kras_wt.vs.g12c_de_h.fgsea, kras_wt.vs.g12c_de)
+
+
+signature.list <- build.signature.lists()
+  
+  
+de.agreement.list <- build.de.agreement.lists(salmon.quant$exoTIC_2D$deseq$de,
+                                          salmon.quant$rnaEasy_2D$deseq$de,
+                                          salmon.quant$rnaEasy_3D$deseq$de,
+                                          threshold = 1, padj_cutoff = 25)
+
+
+de.agreement.list %>% 
+  map(as.data.frame, .id = 'gene') %>% 
+  imap(~mutate(.x, meta_information = .y)) %>% 
+  bind_rows() %>% 
+  rename(`.x[[i]]` = 'gene') -> de.agreement.df
+
+
+signature.list$g12c %>% 
+  map(as.data.frame, .id = 'gene') %>% 
+  imap(~mutate(.x, meta_information = .y)) %>% 
+  bind_rows() %>% 
+  rename(`.x[[i]]` = 'gene') -> de.agreement.df
+
+
+
+
+list('exoTIC_2D' = filter(salmon.quant$exoTIC_2D$deseq$de, log2FoldChange >= 1)$gene,
+     'rnaEasy_2D' = filter(salmon.quant$rnaEasy_2D$deseq$de, log2FoldChange >= 1)$gene,
+     'rnaEasy_3D' = filter(salmon.quant$rnaEasy_3D$deseq$de, log2FoldChange >= 1)$gene,
+     'luad_G12C' = filter(kras_wt.vs.g12c_de, log2FoldChange >= 1)$gene) %>%
+# list('exoTIC_2D' = filter(salmon.quant$exoTIC_2D$deseq$de, gene %in% 
+#                             salmon.quant$exoTIC_2D$deseq$signatures$e2f.signature)$gene,
+#      'rnaEasy_2D' = filter(salmon.quant$rnaEasy_2D$deseq$de, gene %in%
+#                            salmon.quant$rnaEasy_2D$deseq$signatures$e2f.signature)$gene,
+#      'rnaEasy_3D' = filter(salmon.quant$rnaEasy_3D$deseq$de, gene %in%
+#                            salmon.quant$rnaEasy_3D$deseq$signatures$e2f.signature)$gene,
+#      'luad_G12C' = filter(kras_wt.vs.g12c_de, gene %in% 
+#                             kras_wt.vs.g12c_de_signatures$e2f.signature)$gene) %>% 
+  map(as.data.frame, .id = 'gene') %>% 
+  imap(~mutate(.x, meta_information = .y)) %>% 
+  bind_rows() %>% 
+  rename(`.x[[i]]` = 'gene')-> de.agreement.df
+
+de.agreement.df %>% 
+  group_by(gene) %>% 
+  summarize(pathway = list(meta_information)) %>% 
+  ggplot(aes(pathway)) +
+  geom_bar(fill = 'black', color = 'white') +
+  # geom_hline(yintercept = seq(5, 50, 5), color = 'white') +
+  ggupset::scale_x_upset(order_by = 'degree') + xlab('') + ylab('genes in set') +
+  geom_text(stat='count', aes(label=after_stat(count)), vjust=-0.5, color = 'black') #->upset.plt
+
+panel.save(figure = 4, name = 'myc_overlap_upset', width = 'double', height = 'double', plot.in = upset.plt)
+
+
+de.agreement.df %>% 
+  group_by(gene) %>% 
+  summarize(pathway = list(meta_information)) %>% mutate(name = paste(pathway)) %>% 
+  filter(name == "c(\"exoTIC_2D\", \"rnaEasy_2D\", \"rnaEasy_3D\", \"luad_G12C\")") -> tmp.df
+
+```
+## FUN: rerwip create.tcga.obj
+```{r}
+
+if (!file.exists(file.path(output.data.dir, 'tcga.data', 'luad.data.frame.tsv'))){
+    
+  toil.survival <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.survival.tsv.gz')) 
+  
+  luad.phenotypes <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.GDC_phenotype.tsv.gz')) %>% 
+    select(sample = submitter_id.samples, 
+           sample_type = sample_type.samples,
+           age = age_at_index.demographic,
+           sex = gender.demographic,
+           race = race.demographic)
+  
+  luad.mutect <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.mutect2_snv.tsv.gz')) %>% 
+    filter(gene %in% c('KRAS')) %>% 
+    select(sample = Sample_ID, gene, aa_change = Amino_Acid_Change) %>% 
+    pivot_wider(names_from = gene, values_from = aa_change) %>% 
+    mutate(across(.cols = where(is.list), paste)) 
+  
+  luad.phenotypes.merge <- luad.phenotypes %>% 
+    merge(luad.mutect, by = 'sample', all.x = T) %>% 
+    filter(sample_type %in% c('Primary Tumor', 'Solid Tissue Normal')) %>% 
+    merge(toil.survival, by = 'sample') %>% 
+    mutate(sample = str_sub(sample, end = str_length(sample) - 1)) %>% 
+    replace_na(list(KRAS = 'WT')) %>% 
+    mutate(KRAS = ifelse(sample_type == 'Solid Tissue Normal', 'WT_normal', KRAS))
+
+  toil.norm.counts <- read_csv(file.path(output.data.dir, 'tcga.data/toil.counts.csv'))
+  
+  norm.counts.tidy <- 
+    toil.norm.counts %>% 
+    select('ensg' = gene, contains('TCGA')) %>% 
+    discard(~sum(.x == 0)/length(.x) >= 0.8) %>% 
+    gather(sample, count, -ensg) 
+  
+  rm(toil.norm.counts)
+  
+  norm.counts.tidy.filt <- 
+    norm.counts.tidy %>% 
+    filter(sample %in% luad.phenotypes.merge$sample)
+  
+  norm.counts.tidy.filt.merge <- 
+    norm.counts.tidy.filt %>% 
+    merge(gen.24.names, by = 'ensg') %>%
+    select(-ensg)
+  
+  rm(norm.counts.tidy.filt)
+  
+  norm.counts.final <- 
+    norm.counts.tidy.filt.merge %>% 
+    merge(luad.phenotypes.merge, by = 'sample') %>% 
+    distinct()
+  
+  write_tsv(norm.counts.final, file = file.path(output.data.dir, 'tcga.data', 'luad.data.frame.tsv'))
+  
+} else if (file.exists(file.path(output.data.dir, 'tcga.data', 'luad.data.frame.tsv'))) {
+  
+  
+  toil.survival <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.survival.tsv.gz')) 
+
+  luad.phenotypes <- 
+    read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.GDC_phenotype.tsv.gz')) %>% 
+    select(sample = submitter_id.samples, 
+         sample_type = sample_type.samples,
+         age = age_at_index.demographic,
+         sex = gender.demographic,
+         race = race.demographic)
+
+  luad.mutect <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.mutect2_snv.tsv.gz')) %>% 
+    filter(gene %in% c('KRAS')) %>% 
+    select(sample = Sample_ID, gene, aa_change = Amino_Acid_Change) %>% 
+    pivot_wider(names_from = gene, values_from = aa_change) %>% 
+    mutate(across(.cols = where(is.list), paste)) 
+  
+  luad.phenotypes.merge <- luad.phenotypes %>% 
+    merge(luad.mutect, by = 'sample', all.x = T) %>% 
+    filter(sample_type %in% c('Primary Tumor', 'Solid Tissue Normal')) %>% 
+    merge(toil.survival, by = 'sample') %>% 
+    mutate(sample = str_sub(sample, end = str_length(sample) - 1)) %>% 
+    replace_na(list(KRAS = 'WT')) %>% 
+    mutate(KRAS = ifelse(sample_type == 'Solid Tissue Normal', 'WT_normal', KRAS))
+  
+  norm.counts.final <- read_tsv(file.path(output.data.dir, 'tcga.data', 'luad.data.frame.tsv'))
+}
+
+
+anno_colors <- list(
+  # sample_type = c(`Solid Tissue Normal` = 'white', `Primary Tumor` = 'black'),
+  KRAS = c(p.G12C = 'black', WT_normal = 'white'))
+
+
+norm.counts.final %>% 
+  filter(sample != 'TCGA-44-3917-01') %>% 
+  filter(KRAS %in% c('p.G12C', 'WT_normal')) %>% 
+  # merge(pathway.list %>% rename('.' = 'gene') %>%
+  #         group_by(gene) %>% summarise(pathway = list(pathway)), by = 'gene') %>%
+  filter(gene %in% de.agreement.list$up.consensus) %>%
+  # filter(gene %in% tmp.df$gene) %>% 
+  # mutate(pathway = paste(pathway)) %>%
+  # group_by(sample, pathway) %>% 
+  # summarize(count = mean(count)) %>% 
+  group_by(gene) %>%
+  # mutate(zscore = (count - mean(count) / sd(count))) %>%
+  mutate(count = scale(log(count+1), center = T)) %>%
+  select(sample, gene, count) %>%
+  pivot_wider(names_from = gene, values_from = count) %>%
+  # select(sample, gene, zscore) %>%
+  # pivot_wider(names_from = gene, values_from = zscore) %>%
+  distinct() %>% 
+  column_to_rownames('sample') %>% 
+  t() %>% as.data.frame() %>% 
+  pheatmap(show_rownames = T, show_colnames = F, annotation_colors = anno_colors, legend = T,
+           legend_breaks = c(seq(-4,5,1)),
+           annotation_col = luad.phenotypes.merge %>% select(sample, KRAS) %>% 
+             distinct() %>% filter(KRAS %in% c('p.G12C', 'WT_normal')) %>% 
+             filter(sample != 'TCGA-44-3917-01') %>% column_to_rownames('sample')) -> luad_consensus_heat
+
+save_pheatmap_pdf(luad_consensus_heat, filename = file.path(figure.dir, 'fig.4', 'exRNA_consensus_heatmap.pdf'), 
+                  width = panel.figure.width.in*1.5, height = panel.figure.height.in/2)
+
+norm.counts.final %>% 
+  # filter(gene %in% c(de.agreement.list$up.consensus)) %>%
+  filter(gene %in% tmp.df$gene) %>%
+  mutate(gene.set = 'up.consensus') %>%
+  filter(KRAS %in% c('p.G12C', 'WT_normal')) %>% 
+  group_by(sample, KRAS) %>% 
+  summarize(score = mean(count)) %>% 
+  ggplot(aes(reorder(KRAS, -score), score)) +
+  xlab('') +
+  geom_boxplot() + 
+  geom_sina() + stat_compare_means(method = 't.test', label.x.npc = 'center') -> score.plt
+
+panel.save(figure = 4, name = 'luad.consensus_score', height = 'single', width = 'single', 
+           plot.in = score.plt)
+
+
+t.test(score ~ factor(KRAS), data = tmp.df)$estimate
+
+broom::glance(t.test(score ~ factor(KRAS), data = tmp.df))
+
+norm.counts.final %>% 
+  filter(gene %in% c(de.agreement.list$up.consensus)) %>%
+  mutate(gene.set = 'up.consensus') %>%
+  filter(KRAS %in% c('p.G12C', 'WT_normal')) %>% 
+  group_by(sample, KRAS) %>% 
+  summarize(score = mean(count)) %>% 
+  mutate(KRAS = factor(KRAS, levels = c('WT_normal', 'p.G12C'))) %>% 
+  modelr::permute(1000, score) %>% 
+  mutate(models = map(perm, ~t.test(score ~ KRAS, data = .))) %>% 
+  mutate(tidy = map(models, broom::glance)) %>% 
+  unnest(tidy) -> permuted
+
+observed <- broom::glance(t.test(score ~ factor(KRAS), data = norm.counts.final %>% 
+  filter(gene %in% c(de.agreement.list$up.consensus)) %>%
+  mutate(gene.set = 'up.consensus') %>%
+  filter(KRAS %in% c('p.G12C', 'WT_normal')) %>% 
+  group_by(sample, KRAS), alternative = 'greater'))$estimate
+
+ggplot(permuted, aes(x = estimate)) + 
+  geom_histogram() + 
+  geom_vline(xintercept = observed)
+
+perm.p <- (sum(abs(permuted$estimate) > ifelse(observed > 0, observed, -observed)) + 1) / (1000+1)
+
+perm.p.df <- as_tibble(x = list('group1' = 'p.G12C', 'group2' = 'WT_normal', 'p' = round(perm.p, digits = 4)))
+
+abs(permuted$estimate) > .45
+
+p.est <- 1
+for (value in permuted$estimate){
+  if (abs(value) > observed){
+    p.est <<- p.est + 1
+  }
+}
+p.est/10001
+
+
+broom::glance()
+set.seed(1241)
+
+de.agreement.df %>% 
+  group_by(gene) %>% 
+  summarize(pathway = list(meta_information)) %>% mutate(name = paste(pathway)) %>% 
+  filter(name == "c(\"exoTIC_2D\", \"rnaEasy_2D\")") -> tmp.df
+
+myc.avg.counts.tidy.stratified <-
+  norm.counts.final %>%
+  filter(sample_type == 'Primary Tumor') %>%
+  # filter(gene %in% tmp.df$gene) %>%
+  filter(gene %in% c(de.agreement.list$up.consensus)) %>%
+  select(sample, count) %>% 
+  group_by(sample) %>%
+  summarize(avg.count = mean(count)) %>%
+  mutate(gene.set = 'exRNA') %>%
+  group_by(gene.set) %>%
+  mutate(stratum = ifelse(avg.count >= quantile(avg.count, 0.66),
+                          'top-third', ifelse(avg.count <= quantile(avg.count, 0.33),
+                                              'bottom-third', 'middle'))) %>%
+  filter(stratum != 'middle') %>%
+  spread(gene.set, stratum)
+
+surv.obj <- Surv(time = filter(luad.phenotypes.merge %>% select(sample, OS.time, OS) %>% distinct() , sample %in%
+                                 myc.avg.counts.tidy.stratified$sample)$OS.time,
+                 event = filter(luad.phenotypes.merge %>% select(sample, OS.time, OS) %>% distinct(), sample %in% 
+                                 myc.avg.counts.tidy.stratified$sample)$OS)
+
+surv.fit <- survfit(as.formula(surv.obj ~ myc.avg.counts.tidy.stratified$exRNA), 
+                    data = myc.avg.counts.tidy.stratified)
+
+ggsurvplot(surv.fit, 
+           pval = T, 
+           legend.title = "",
+           ggtheme = theme_set_fun() + theme(legend.position = c(0.25,0.95)),
+           pval.coord = c(0, 0.08),
+           palette = viridis(20, option = 'magma')[c(6,18)]) -> surv.plt
+
+panel.save(figure = 4, name = 'exRNA.survival_luad.consensus', height = 'single', width = 'single', 
+           plot.in = surv.plt$plot)
+
+```
+## FUN: toil.de.seq
+```{r}
+if (!file.exists(file.path(output.data.dir, 'luad_G12_v_normal_de.csv'))){
+  rstudioapi::jobRunScript(path = file.path(job.scripts.dir, 'toil.de.seq.R'), 
+                           importEnv = T,
+                           exportEnv = 'R_GlobalEnv')
+  
+  write_csv(kras_wt.vs.g12c_de, file.path(output.data.dir, 'luad_G12_v_normal_de.csv'))
+  
+} else {
+  kras_wt.vs.g12c_de <- read_csv(file.path(output.data.dir, 'luad_G12_v_normal_de.csv'))
+}
+```
+
+### boehmke classifier
+```{r}
+set.seed(984)
+
+norm.counts.final %>% 
+  # filter(gene %in% c(de.agreement.list$up.consensus,
+  #                    de.agreement.list$up.rnaEasy,
+  #                    de.agreement.list$up.twoD,
+  #                    de.agreement.list$dn.consensus,
+  #                    de.agreement.list$dn.rnaEasy,
+  #                    de.agreement.list$dn.twoD,
+  #                    signature.list$myc$consensus,
+  #                    signature.list$myc$consensus,
+  #                    signature.list$e2f$consensus,
+  #                    signature.list$g2m$consensus,
+  #                    signature.list$g12c$consensus)) %>%
+  # filter(gene %in% top_n(kras_wt.vs.g12c_de, 4000, -padj)$gene) %>%
+  filter(gene %in% tmp.df$gene) %>%
+  # filter(gene %in% de.agreement.list$up.consensus) %>%
+  select(gene, sample, count, sample_type, KRAS) %>%
+  # mutate(sample_type = as.factor(ifelse(sample_type == 'Solid Tissue Normal', 0, 1))) %>%
+  filter(sample %in% filter(luad.phenotypes.merge, grepl('p.G12|WT', KRAS))$sample) %>%
+  unite(col = 'tmp', c(sample_type, KRAS)) %>% filter(tmp != 'Solid Tissue Normal_WT') %>%
+  # unite(col = 'tmp', c(sample_type, KRAS)) %>% filter(tmp != 'Primary Tumor_WT') %>% 
+  separate(tmp, sep = '_', into = c('sample_type', 'KRAS')) %>% 
+  mutate(sample_type = as.factor(ifelse(grepl('WT', KRAS), "WT", "G12"))) %>% select(-KRAS) %>%
+  filter(sample != 'TCGA-44-3917-01') %>% 
+  mutate(count = log(count + 1)) %>% 
+  pivot_wider(names_from = gene, values_from = count, values_fn = mean) %>% 
+  column_to_rownames('sample') %>% 
+  # downSample(y = .$sample_type) %>%
+  # select(-Class) %>%
+  initial_split(prop = 0.65, strata = 'sample_type') -> toil.init.split
+
+toil.train.split <- training(toil.init.split)
+toil.test.split <- testing(toil.init.split)
+
+toil.train.split %>% 
+  select(sample_type) %>% 
+  table()
+
+tuneGrid <- expand.grid(alpha = 0:1, lambda = seq(0.00001, 1, length = 100))
+
+penalized_model <- caret::train(
+  sample_type ~ .,
+  data = toil.train.split,
+  method = 'glmnet',
+  family = 'binomial',
+  preProc = c('zv', 'center', 'scale'),
+  tuneGrid = tuneGrid,
+  trControl = trainControl(method = 'repeatedcv', 
+                           repeats = 5,
+                           number = 10, 
+                           sampling = 'down',
+                           verboseIter = T,
+                           summaryFunction = twoClassSummary,
+                           savePredictions = T,
+                           classProbs = T)
+)
+
+penalized_model
+ggplot(penalized_model)
+
+# eight_sig_model <- penalized_model
+
+
+vip(penalized_model) -> vip.plt
+
+panel.save(figure = 4, name = 'luad.consensus_GvWt_train_vip', height = 'single', width = 'single', 
+           plot.in = vip.plt)
+
+
+# vip::vi_shap(penalized_model, pred_wrapper = NULL)
+
+#####
+penalized_pred <- predict(penalized_model, toil.test.split)
+
+confusionMatrix(data = relevel(penalized_pred, ref = 'G12'),
+                reference = relevel(toil.test.split$sample_type, ref = 'G12'))
+#####
+salmon.quant$deseq$counts %>% 
+  select(-contains('exoTIC.3D'), -ensg) %>% 
+  filter(gene %in% colnames(toil.train.split)) %>% 
+  column_to_rownames('gene') %>% 
+  t() %>% as.data.frame() %>% 
+  rownames_to_column('sample') %>% 
+  mutate(sample_type = as.factor(ifelse(grepl('DMSO', sample), 'G12', 'WT'))) %>% 
+  column_to_rownames('sample') -> exRNA.test
+
+penalized_pred <- predict(penalized_model, exRNA.test)
+
+confusionMatrix(data = relevel(penalized_pred, ref = 'G12'),
+                reference = relevel(exRNA.test$sample_type, ref = 'G12'))
+
+####
+
+x <- MLeval::evalm(penalized_model)$roc
+
+x + theme_set_fun() -> train.auc.plt
+
+panel.save(figure = 4, name = 'luad.consensus_GvWt_auc', height = 'single', width = 'single', 
+           plot.in = train.auc.plt)
+
+predict(penalized_model, toil.test.split, type = 'prob') %>% 
+  select(`G12`) %>%
+  prediction(., toil.test.split$sample_type) %>% 
+  performance(measure = 'tpr', x.measure = 'fpr') -> penalized_performance
+
+penalized_performance_df <- data_frame('tpr' = unlist(penalized_performance@x.values), 
+                                       'fpr' = unlist(penalized_performance@y.values))
+
+penalized_performance_df %>% 
+  ggplot(aes(fpr, tpr)) + 
+    geom_line() -> test.auc.plt
+
+panel.save(figure = 4, name = 'luad.consensus_GvWt_test_auc', height = 'single', width = 'single', 
+           plot.in = test.auc.plt)
+
+penalized_performance_df -> pen.df
+
+```
+### Tx coverage
+```{r}
+salmon.quant$rnaEasy_all$deseq$tx.cov <- tx.ome.cov.plt(salmon.quant$rnaEasy_all$deseq$txi.counts)
+
+
+salmon.quant$rnaEasy_all$deseq$tx.cov %>% 
+  separate(names, sep = '[.]', into = c('platform', 'context', 'rep', 'condition')) %>% 
+  mutate(condition = factor(condition, levels = c('DMSO', 'AMG'))) %>% 
+  unite(col = 'condition', c('condition', 'context')) %>% 
+  mutate(condition = factor(condition, levels = c('DMSO_2D', 'AMG_2D', 'DMSO_3D', 'AMG_3D'))) %>% 
+  group_by(condition, platform, rep) %>% 
+  summarize(tot.tx.count = sum(biotype.count)) %>% 
+  ggplot(aes(condition, tot.tx.count)) + 
+  geom_boxplot(width = .3, position = position_dodge(width = 1), outlier.color = NA, alpha = 0.3) +
+  geom_sina(width = .3, alpha = 0.5, position = position_dodge(width = 1)) +
+  # ylim(6000, 16000) +
+  # scale_color_viridis_d() +
+  ylab('transcripts detected') + xlab('') + theme(legend.position = c(1,0.95)) #+
+  # stat_compare_means(comparisons = list(c('DMSO_2D', 'AMG_2D'), c('DMSO_2D', 'DMSO_3D'),
+  #                                       c('DMSO_3D', 'AMG_3D'), c('AMG_2D', 'AMG_3D')), method = 'wilcox.test')
+
+panel.save(figure = 1, name = 'rnaEasy_txome_count', height = 'single', width = 'single')
+
+
+salmon.quant$exoTIC_2D$deseq$tx.cov <- tx.ome.cov.plt(salmon.quant$exoTIC_2D$deseq$txi.counts)
+
+
+salmon.quant$exoTIC_2D$deseq$tx.cov %>% 
+  separate(names, sep = '[.]', into = c('platform', 'context', 'rep', 'condition')) %>% 
+  mutate(condition = factor(condition, levels = c('DMSO', 'AMG'))) %>% 
+  unite(col = 'condition', c('condition', 'context')) %>% 
+  mutate(condition = factor(condition, levels = c('DMSO_2D', 'AMG_2D'))) %>% 
+  group_by(condition, platform, rep) %>% 
+  summarize(tot.tx.count = sum(biotype.count)) %>% 
+  ggplot(aes(condition, tot.tx.count)) + 
+  geom_boxplot(width = .3, position = position_dodge(width = 1), outlier.color = NA, alpha = 0.3) +
+  geom_jitter(alpha = 0.5, position = position_dodge(width = 1)) +
+  # ylim(6000, 16000) +
+  # scale_color_viridis_d() +
+  ylab('transcripts detected') + xlab('') + theme(legend.position = c(1,0.95))
+
+panel.save(figure = 1, name = 'exoTIC_2D_txome_count', height = 'single', width = 'single')
+
+```
+
+# Figures
+
+
+
+## Fig 1.
+
+### A: Biotype distribution 
+```{r}
+biotype.dist <- function(tx.counts){
+  return(tx.counts %>% 
+    rownames_to_column('enst') %>% 
+    merge(gencode.35.tx.to.gene, by = 'enst') %>% 
+    gather(sample, count, -enst, -ensg:-biotype) %>% 
+    mutate(sample.parse = sample) %>% 
+    separate(sample.parse, sep = '[.]', 
+           into = c('platform', 'context', 'rep', 'condition')) %>% 
+    mutate(biotype = ifelse(biotype %in% c('lncRNA', 'Mt_rRNA', 'protein_coding', 'retained_intron',
+                                           'Alu', 'L1', 'ERV1'),
+                        biotype, 'other'),
+           biotype = factor(biotype, levels = c('protein_coding', 'retained_intron', 'Mt_rRNA', 'lncRNA', 'other'))) %>%
+    group_by(biotype, sample, condition) %>% 
+    summarise(count = sum(count)) %>% 
+    group_by(sample) %>% 
+    mutate(freq = count / sum(count)))
+}
+
+tot.biotype.dist <- function(tx.counts){
+  return(tx.counts %>% 
+    rownames_to_column('enst') %>% 
+    merge(total.tx.to.gene, by = 'enst') %>% 
+    gather(sample, count, -enst, -ensg:-biotype) %>% 
+    mutate(sample.parse = sample) %>% 
+    separate(sample.parse, sep = '[.]', 
+           into = c('platform', 'context', 'rep', 'condition')) %>% 
+    mutate(biotype = ifelse(biotype %in% c('lncRNA', 'Mt_rRNA', 'protein_coding', 'retained_intron',
+                                           'Alu', 'L1', 'ERV1'),
+                            biotype, 'other'),
+           biotype = factor(biotype, levels = c('protein_coding', 'retained_intron', 'Mt_rRNA', 'lncRNA', 'other',
+                            'Alu', 'L1', 'ERV1'))) %>% 
+    group_by(biotype, sample, condition) %>% 
+    summarise(count = sum(count)) %>% 
+    group_by(sample) %>% 
+    mutate(freq = count / sum(count)))
+}
+
+
+biotype.dist.plt <- function(tx.biotype.dist){
+  tx.biotype.dist %>% 
+    merge(metadata.df, by.x = 'sample', by.y = 'names') %>% 
+    distinct() %>% 
+    unite(condition, c(condition.x, context)) %>% 
+    mutate(condition = factor(condition, levels = c('DMSO_2D', 'AMG_2D', 'DMSO_3D', 'AMG_3D')),
+           tmp = sample) %>% 
+    separate(tmp, sep='[.]', into = c(NA, NA, 'rep', NA)) %>% 
+    ggplot(aes(rep, freq, fill = biotype, color = biotype)) +
+      geom_bar(stat = 'identity', color = 'white') +
+      scale_fill_viridis_d( direction = 1) +
+      scale_x_discrete(expand = c(0, 0.5)) +
+      xlab('') + ylab('% of total counts') +
+    facet_row(~condition, scales = 'free_x')
+}
+
+```
+####
+```{r}
+
+salmon.quant$rnaEasy_all$deseq$biotype.dist <- biotype.dist(salmon.quant$rnaEasy_all$deseq$txi.counts)
+
+biotype.dist.plt(salmon.quant$rnaEasy_all$deseq$biotype.dist)
+
+panel.save(figure = 1, name = 'rnaEasy_gencode_biotype_dist', width = 'medium', height = 'single')
+##
+salmon.quant$exoTIC_2D$deseq$biotype.dist <- biotype.dist(salmon.quant$exoTIC_2D$deseq$txi.counts)
+
+biotype.dist.plt(salmon.quant$exoTIC_2D$deseq$biotype.dist)
+
+panel.save(figure = 1, name = 'exoTIC_2D_gencode_biotype_dist', width = 'single', height = 'single')
+##
+salmon.quant$exoTIC_3D$deseq$biotype.dist <- biotype.dist(salmon.quant$exoTIC_3D$deseq$txi.counts)
+
+biotype.dist.plt(salmon.quant$exoTIC_3D$deseq$biotype.dist)
+
+panel.save(figure = 1, name = 'exoTIC_3D_gencode_biotype_dist', width = 'single', height = 'single')
+##
+ucsc.rmsk.salmon.quant$rnaEasy_all$deseq$biotype.dist <-
+  tot.biotype.dist(ucsc.rmsk.salmon.quant$rnaEasy_all$deseq$txi.counts)
+
+biotype.dist.plt(ucsc.rmsk.salmon.quant$rnaEasy_all$deseq$biotype.dist)
+
+panel.save(figure = 1, name = 'rnaEasy_gencode_biotype_dist', width = 'medium', height = 'single')
+##
+ucsc.rmsk.salmon.quant$exoTIC_2D$deseq$biotype.dist <-
+  tot.biotype.dist(ucsc.rmsk.salmon.quant$exoTIC_2D$deseq$txi.counts)
+
+biotype.dist.plt(ucsc.rmsk.salmon.quant$exoTIC_2D$deseq$biotype.dist)
+
+panel.save(figure = 1, name = 'exoTIC_2D_gencode_biotype_dist', width = 'single', height = 'single')
+##
+merge(salmon.quant$rnaEasy_all$deseq$biotype.dist, 
+      ucsc.rmsk.salmon.quant$rnaEasy_all$deseq$biotype.dist, by = c('biotype', 'sample')) %>% 
+  select(biotype, sample, condition = condition.x, gencode_freq = freq.x, total_freq = freq.y) %>% 
+  # filter_at(vars(contains('_freq')), all_vars(. >= 0.01)) %>% 
+  filter(biotype %in% c('protein_coding', 'Mt_rRNA', 'lncRNA', 'processed_transcript', 'nonsene_mediated_decay', 'retained_intron')) %>% 
+  mutate(freq_diff = total_freq - gencode_freq) %>% 
+  ggplot(aes(reorder(biotype, freq_diff), freq_diff, color = condition)) + 
+  scale_color_manual(values = c(viridis(1)[[1]], viridis(3)[[2]], viridis(5)[[5]])) +
+  geom_boxplot(position = position_dodge(width = 1)) + 
+  geom_sina(position = position_dodge(width = 1))
+
+
+```
+
+### A: Volcano
+```{r}
+gencode.de.volcano <- function(de.seq){
+  de.seq <- 
+    de.seq %>% filter(!grepl('^MT', gene)) %>% 
+    mutate(biotype = ifelse(gene %in% gencode.35.lnc.gene.names$gene, 'lncRNA','coding'),
+           padj = ifelse(padj == 0, min(filter(de.seq, padj != 0)$padj), padj))
+  x.max <- round(max(abs(de.seq$log2FoldChange)) + 0.5)
+  print(x.max)
+  label.max <- 0.01
+  ggplot(de.seq, 
+         aes(log2FoldChange, -log10(padj), 
+             color = biotype)) +
+      geom_point(alpha = 0.75, size = rel(2)) + 
+      geom_rug(size = rel(1), alpha = 0.15) + 
+      scale_x_continuous(limits = c(-x.max,x.max), expand = c(0,0.5),
+                         breaks = c(-x.max, -x.max/2, -1, 0, 1, x.max/2, x.max)) +
+      scale_color_manual(values = c(viridis(1)[[1]], viridis(3)[[2]], viridis(5)[[5]])) +
+      xlab('log2(Fold Change)') +
+      ylab('-log10(p.adj)') + 
+      geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) #+
+      # geom_text_repel(aes(label = ifelse(padj <= label.max & log2FoldChange <= -x.max/1.5| log2FoldChange >= x.max/1.5,
+      #                                    as.character(gene), '')),
+      # # geom_text_repel(aes(label = as.character(gene)),
+      #                         box.padding = unit('1', 'lines'),
+      #                         segment.color = 'grey',
+      #                         segment.alpha = 0.2,
+      #                         color = 'black',
+      #                         ylim = c(1, Inf), size = base_size/2, family = 'Helvetica')
+}
+
+fgsea.hallmark.de.volcano <- function(fgsea){
+  fgsea <- 
+    fgsea %>% filter(grepl('HALLMARK|SWEET', pathway))
+  x.max <- round(max(abs(fgsea$NES)) + 0.5)
+  ggplot(fgsea, 
+         aes(NES, -log10(padj), 
+             color = size, 
+             label = tolower(sub('HALLMARK', '', pathway)))) +
+      geom_point(alpha = 0.6) + 
+      geom_rug(size = rel(1), alpha = 0.6) + 
+      scale_size_continuous(name = 'genes') +
+      scale_x_continuous(limits = c(-x.max,x.max), expand = c(0,0.5),
+                         breaks = c(-x.max, -x.max/2, -1, 0, 1, x.max/2, x.max)) +
+      scale_color_viridis_c() +
+      xlab('NES') +
+      ylab('-log10(p.adj)') + 
+      geom_text_repel(box.padding = unit('0.8', 'lines'),
+                              segment.color = 'grey',
+                              segment.alpha = 0.2,
+                              color = 'black',
+                              ylim = c(2.0, Inf), size = rel(1.5))
+}
+```
+####
+```{r}
+
+gencode.de.volcano(salmon.quant$exoTIC_2D$deseq$de) + theme(legend.position = c(0.35, 0.95))
+panel.save(figure = 2, name = 'exoTIC_2D_gencode_volcano', width = 'single', height = 'single')
+##
+gencode.de.volcano(salmon.quant$exoTIC_3D$deseq$de) + theme(legend.position = c(0.95, 0.95))
+panel.save(figure = 2, name = 'exoTIC_3D_gencode_volcano', width = 'single', height = 'single')
+##
+gencode.de.volcano(salmon.quant$rnaEasy_2D$deseq$de) + theme(legend.position = c(0.35, 0.95))
+panel.save(figure = 1, name = 'rrnaEasy_2D_gencode_volcano', width = 'single', height = 'single')
+##
+gencode.de.volcano(salmon.quant$rnaEasy_3D$deseq$de) + theme(legend.position = c(0.35, 0.95))
+panel.save(figure = 1, name = 'rrnaEasy_3D_gencode_volcano', width = 'single', height = 'single')
+##
+gencode.de.volcano(kras_wt.vs.g12c_de) + theme(legend.position = c(0.35, 0.95))
+panel.save(figure = 1, name = 'kras_wt.vs.g12c_volcano', width = 'single', height = 'single')
+```
+
+## FUN: de.scatter
+```{r}
+de.scatter <- function(x.axis, y.axis, x.name, y.name){
+  
+  x.axis %>% 
+    merge(y.axis, by = 'gene') %>% 
+    mutate(biotype = ifelse(gene %in% gencode.35.lnc.gene.names$gene, 'lncRNA','coding')) %>% 
+    filter(!grepl('^RPS|^MT', gene)) %>% 
+    ggplot(aes(log2FoldChange.x, log2FoldChange.y, color = ifelse(abs(log2FoldChange.x) > 1 & abs(log2FoldChange.y) > 1,
+                                                                  biotype, '<1'))) + 
+      geom_point() +
+      xlab(x.name) + ylab(y.name) + 
+      geom_hline(yintercept = 0, linetype = 'dashed', alpha=0.2) + 
+      geom_hline(yintercept = c(-1,1), linetype = 'dashed', alpha=0.1) + 
+      geom_vline(xintercept = 0, linetype = 'dashed', alpha=0.2) +
+      geom_vline(xintercept = c(-1,1), linetype = 'dashed', alpha=0.1) + 
+      scale_color_manual(values = c( 'grey', viridis(1)[[1]], viridis(3)[[2]]), name = 'biotype')
+
+}
+```
+### 
+```{r}
+de.scatter(x.axis = salmon.quant$exoTIC_2D$deseq$de, 
+           y.axis = salmon.quant$rnaEasy_2D$deseq$de,
+           x.name = 'exoTIC_2D', y.name = 'rnaEasy_2D') + theme(legend.position = c(0.95, 0.20))
+panel.save(figure = 2, name = 'exoTIC_2DvrnaEasy_2D_gencode_scatter', width = 'single', height = 'double')
+##
+de.scatter(x.axis = salmon.quant$exoTIC_2D$deseq$de, 
+           y.axis = salmon.quant$rnaEasy_3D$deseq$de,
+           x.name = 'exoTIC_2D', y.name = 'rnaEasy_3D') + theme(legend.position = c(0.95, 0.20))
+panel.save(figure = 2, name = 'exoTIC_2DvrnaEasy_3D_gencode_scatter', width = 'single', height = 'double')
+##
+de.scatter(x.axis = salmon.quant$exoTIC_2D$deseq$de, 
+           y.axis = kras_wt.vs.g12c_de,
+           x.name = 'exoTIC_2D', y.name = 'luad_G12C') + theme(legend.position = c(0.95, 0.20))
+panel.save(figure = 2, name = 'exoTIC_2Dvluad_G12C_gencode_scatter', width = 'single', height = 'double')
+##
+de.scatter(x.axis = salmon.quant$rnaEasy_2D$deseq$de, 
+           y.axis = salmon.quant$rnaEasy_3D$deseq$de,
+           x.name = 'rnaEasy_2D', y.name = 'rnaEasy_3D') + theme(legend.position = c(0.95, 0.20))
+panel.save(figure = 1, name = 'rnaEasy_2Dv3D_gencode_scatter', width = 'single', height = 'double')
+##
+de.scatter(x.axis = salmon.quant$rnaEasy_2D$deseq$de, 
+           y.axis = kras_wt.vs.g12c_de,
+           x.name = 'rnaEasy_2D', y.name = 'luad_G12C') + theme(legend.position = c(0.95, 0.20))
+panel.save(figure = 1, name = 'rnaEasy_2Dvluad_G12C_gencode_scatter', width = 'single', height = 'double')
+##
+de.scatter(x.axis = salmon.quant$rnaEasy_3D$deseq$de, 
+           y.axis = kras_wt.vs.g12c_de,
+           x.name = 'rnaEasy_3D', y.name = 'luad_G12C') + theme(legend.position = c(0.95, 0.20))
+panel.save(figure = 1, name = 'rnaEasy_3Dvluad_G12C_gencode_scatter', width = 'single', height = 'double')
+```
+
+### GSEA Heatmaps
+```{r}
+
+salmon.quant$rnaEasy_2D$deseq$H.fgsea %>%
+  # select(pathway, padj, NES) %>% 
+  # mutate(experiment = 'exoTIC_2D') %>% 
+  # rbind(salmon.quant$rnaEasy_2D$deseq$H.fgsea %>% 
+  select(pathway, padj, NES) %>% 
+  mutate(experiment = 'rnaEasy_2D') %>% 
+  rbind(salmon.quant$rnaEasy_3D$deseq$H.fgsea %>% 
+    select(pathway, padj, NES) %>% 
+    mutate(experiment = 'rnaEasy_3D')) %>% 
+  filter(padj <= 0.05) %>% 
+  mutate(padj = -log10(padj)) %>% 
+  separate(pathway, sep = 'HALLMARK ', into = c(NA, 'pathway')) %>% 
+  select(-NES) %>% 
+  spread(experiment, padj) %>%
+  replace(is.na(.), 0) %>%
+  column_to_rownames('pathway') %>%
+  pheatmap(color = viridis(32, option = 'magma'), fontsize = 8, 
+           treeheight_row = 2, treeheight_col = 2) -> h.fgsea.rnaEasy.heatmap
+
+save_pheatmap_pdf(h.fgsea.rnaEasy.heatmap, filename = file.path(figure.dir, 'fig.1', 'h.fgsea.rnaEasy.heatmap.pdf'), 
+                  width = panel.figure.width.in, height = panel.figure.height.in/3)
+
+salmon.quant$rnaEasy_2D$deseq$H.fgsea %>%
+  select(pathway, padj, NES) %>% 
+  mutate(experiment = 'rnaEasy_2D') %>% 
+  rbind(salmon.quant$rnaEasy_3D$deseq$H.fgsea %>% 
+    select(pathway, padj, NES) %>% 
+    mutate(experiment = 'rnaEasy_3D')) %>% 
+  rbind(kras_wt.vs.g12c_de_h.fgsea %>% 
+        select(pathway, padj, NES) %>% 
+        mutate(experiment = 'luad_G1C')) %>%
+  filter(padj <= 0.05) %>% 
+  mutate(padj = -log10(padj)) %>% 
+  separate(pathway, sep = 'HALLMARK ', into = c(NA, 'pathway')) %>% 
+  select(-padj) %>% 
+  spread(experiment, NES) %>%
+  replace(is.na(.), 0) %>%
+  column_to_rownames('pathway') %>%
+  pheatmap(color = viridis(32, option = 'magma'), fontsize = 8, 
+           treeheight_row = 2, treeheight_col = 2) -> h.fgsea.rnaEasy_v_luad.heatmap
+
+save_pheatmap_pdf(h.fgsea.rnaEasy_v_luad.heatmap, filename = file.path(figure.dir, 'fig.1',
+                                                                       'h.fgsea.rnaEasy_v_luad.heatmap.pdf'), 
+                  width = panel.figure.width.in, height = panel.figure.height.in/2)
+
+
+kras_wt.vs.g12c_de_h.fgsea %>% 
+    select(pathway, padj) %>% 
+    filter(padj <= 0.05) %>% 
+    mutate(padj = -log10(padj)) %>% 
+    rename(padj = 'luad_G12C') %>% 
+  merge(salmon.quant$exoTIC_2D$deseq$H.fgsea %>%
+    select(pathway, padj) %>% 
+    filter(padj <= 0.05) %>% 
+    mutate(padj = -log10(padj)) %>% 
+    rename(padj = 'exoTIC_2D'), by = 'pathway') %>% 
+  merge(salmon.quant$rnaEasy_2D$deseq$H.fgsea %>% 
+    filter(padj <= 0.05) %>% 
+    mutate(padj = -log10(padj)) %>% 
+    select(pathway, padj) %>% 
+    rename(padj = 'rnaEasy_2D'), by = 'pathway') %>% 
+  merge(salmon.quant$rnaEasy_3D$deseq$H.fgsea %>%
+    filter(padj <= 0.05) %>% 
+    mutate(padj = -log10(padj)) %>% 
+    select(pathway, padj) %>%
+    rename(padj = 'rnaEasy_3D'), by = 'pathway') %>%
+  separate(pathway, sep = 'HALLMARK ', into = c(NA, 'pathway')) %>% 
+  gather(sample, padj, -pathway) %>% 
+  ggplot(aes(pathway, padj, fill = sample)) + 
+  geom_col(position = position_dodge(), color = 'white') + 
+  theme(legend.position = c(0.95,0.95)) + 
+  ylab('-log10(padj)') + xlab('') + 
+  scale_fill_viridis_d() + 
+  geom_hline(yintercept = seq(0,10, 2.5), color = 'white')
+
+panel.save(figure = 2, name = 'total_gsea_compare_bar', width = 'medium', height = 'single')
+
+```
+
+### D: Hclust
+```{r}
+gene.expression.hclust.plt <- function(gene.counts){
+  gene.counts %>% 
+    select(-ensg, gene, contains('.')) %>% 
+    # rownames_to_column('gene') %>% 
+    # filter(gene %in% c('KRAS', 'NRAS', 'MRAS', 'RRAS', 'HRAS')) %>%
+    filter(gene %in% g12c.marker.genes$induced) %>%
+    # filter(gene %in% salmon.quant$rnaEasy_2D$deseq$de$gene) %>% 
+    filter_at(vars(contains('.')), any_vars(. >= 10)) %>%
+    distinct() %>% 
+    gather(sample, count, -gene) %>% 
+    # mutate(sample.parse = sample) %>% 
+    # separate(sample.parse, sep = '[.]', 
+    #        into = c('platform', 'context', 'rep', 'condition')) %>%
+    # merge(merged.patient.metadata %>% select(patient, batch), by.x = 'patient', by.y = 'patient') %>% 
+    filter(!grepl('^MT', gene)) %>% 
+    mutate(count = log(count + 1),
+           count = scale(count, center = T)) %>% 
+    spread(sample, count) %>% 
+    column_to_rownames('gene') %>%
+    pheatmap(treeheight_row = 10, treeheight_col = 10, show_rownames = F, color = viridis(32, option = 'magma'))
+}
+
+
+tx.expression.hclust.plt <- function(tx.counts){
+  tx.counts %>% 
+    filter_at(vars(contains('.')), all_vars(. >= 1)) %>% 
+    gather(patient, count, -tx:-biotype) %>% 
+    filter(!grepl('^MT', gene)) %>% 
+    mutate(count = log(count),
+           count = scale(count, center = T)) %>% 
+    spread(patient, count) %>% 
+    column_to_rownames('tx') %>% 
+    select(-gene, -len, -biotype) %>% 
+    pheatmap(treeheight_row = 10, treeheight_col = 10,
+             show_rownames = F, color = viridis(32), 
+             border_color = NA)
+}
+
+```
+####
+```{r}
+gene.expression.hclust.plt(salmon.quant$rnaEasy_all$deseq$counts)
+
+
+salmon.quant$rnaEasy_all$deseq$counts %>% 
+  select(-ensg, gene, contains('.')) %>% 
+  filter(gene %in% g12c.marker.genes$induced) %>% 
+  gather(sample, count, -gene) %>% 
+  mutate(count = log(count + 1),
+         count = scale(count, center = T)) %>% 
+  pivot_wider(names_from = sample, values_from = count, values_fn = mean) %>% 
+  column_to_rownames('gene') %>%
+  pheatmap(treeheight_row = 10, treeheight_col = 10, show_rownames = F)
+
+
+salmon.quant$rnaEasy_all$deseq$counts %>% 
+  # separate(gene, sep = '_', into = c('gene', 'ensg')) %>% 
+  filter(gene %in% g12c.marker.genes$induced) %>%
+  unite(col = 'gene', sep = '_', c('gene', 'ensg')) %>%
+  filter_at(vars(contains('.')), any_vars(. >= 1)) %>%
+  column_to_rownames('gene') %>% 
+  as.matrix() %>% cor(method = 'pearson') %>% pheatmap(color = viridis(32, option = 'magma'))
+
+
+salmon.quant$deseq$counts %>% 
+  # separate(gene, sep = '_', into = c('gene', 'ensg')) %>% 
+  # filter(gene %in% gencode.35.lnc.gene.names$gene) %>%
+  unite(col = 'gene', sep = '_', c('gene', 'ensg')) %>%
+  filter_at(vars(contains('.')), any_vars(. >= 1)) %>%
+  column_to_rownames('gene') %>% 
+  as.matrix() %>% cor() -> norm.mtx
+
+norm.mtx[1,2] - batch.mtx[1,2] 
+
+norm.mtx - batch.mtx -> diff.mtx
+
+norm.mtx %>% pheatmap(color = viridis(32, option = 'magma'))
+
+
+salmon.quant$deseq$counts %>% 
+    rownames_to_column('gene') %>% 
+    filter(grepl('RAS', gene))
+
+```
+
+
+### E: TE volcano
+```{r}
+te.de.volcano <- function(de.seq){
+  de.seq <- 
+    de.seq %>% 
+    filter(!grepl('^MT', gene)) %>% 
+    merge(te.families.clades, by = 'gene', all.x = T) %>% 
+    mutate(clade = ifelse(gene %in% gencode.35.lnc.gene.names$gene, 'lncRNA', clade),
+           family = ifelse(is.na(family), 'gencode', family),
+           clade = ifelse(is.na(clade), 'gencode', clade))
+  
+  x.max <- round(max(abs(de.seq$log2FoldChange)))
+  label.max <- 0.01
+  print(head(de.seq %>% filter(clade %in% c('SINE', 'LTR', 'DNA', 'LINE'))))
+  
+  ggplot(de.seq %>% 
+           filter(clade %in% c('SINE', 'LTR', 'DNA', 'LINE')), 
+         aes(log2FoldChange, -log10(padj), color = clade)) +
+      geom_point(alpha = 0.3, size = rel(1)) + 
+      geom_rug(size = rel(1), alpha = 0.3) + 
+      scale_x_continuous(limits = c(-x.max,x.max), expand = c(0,0.5),
+                         breaks = c(-x.max/2, 0, x.max/2)) +
+      scale_color_viridis_d(direction = -1) +
+      xlab('log2(Fold Change)') +
+      ylab('-log10(FDR)') + 
+      geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
+      geom_text_repel(aes(label = ifelse(padj < label.max & log2FoldChange <= -x.max/0.5| log2FoldChange >= x.max/0.5,
+                                         as.character(gene), '')),
+                              box.padding = unit('0.8', 'lines'),
+                              segment.color = 'grey',
+                              segment.alpha = 0.2,
+                              color = 'black',
+                              ylim = c(2, Inf), size = rel(2)) + 
+    facet_wrap(~clade, nrow = 2, ncol = 2, shrink = T)
+}
+```
+####
+```{r}
+
+te.de.volcano(ucsc.rmsk.salmon.quant$exoTIC_2D$deseq$de)
+te.de.volcano(ucsc.rmsk.salmon.quant$exoTIC_3D$deseq$de %>% mutate(log2FoldChange = -log2FoldChange))
+te.de.volcano(ucsc.rmsk.salmon.quant$rnaEasy_2D$deseq$de)
+te.de.volcano(ucsc.rmsk.salmon.quant$rnaEasy_3D$deseq$de)
+
+
+te.de.volcano(ucsc.rmsk.salmon.quant$panc_v_covid$deseq$de)
+
+ucsc.rmsk.salmon.quant$rnaEasy_3D$deseq$de %>% 
+  merge(ucsc.rmsk.salmon.quant$exoTIC_2D$deseq$de, by = 'gene', all = T) %>% 
+    filter(!grepl('^MT', gene)) %>% 
+  merge(te.families.clades, by = 'gene', all.x = T) %>% 
+  mutate(clade = ifelse(gene %in% gencode.35.lnc.gene.names$gene, 'lncRNA', clade),
+         family = ifelse(is.na(family), 'gencode', family),
+         clade = ifelse(is.na(clade), 'gencode', clade)) %>% 
+  filter(clade %in% c('SINE', 'LTR', 'DNA', 'LINE')) %>% 
+  ggplot(aes(log2FoldChange.x, log2FoldChange.y, color = clade)) + 
+  geom_point() +
+  xlab('rnaEasy_3D') + ylab('exoTIC_2D') +
+  scale_color_viridis_d(direction = -1) +
+  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
+  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) +
+  facet_wrap(~clade, nrow = 2, ncol = 2, shrink = T)
+
+ucsc.rmsk.salmon.quant$panc_v_ctrl$deseq$de %>% mutate(log2FoldChange = -log2FoldChange) %>% 
+  merge(ucsc.rmsk.salmon.quant$kraskd_v_kras$deseq$de %>% mutate(log2FoldChange = -log2FoldChange), by = 'gene', all = T) %>% 
+    filter(!grepl('^MT', gene)) %>% 
+  merge(te.families.clades, by = 'gene', all.x = T) %>% 
+  mutate(clade = ifelse(gene %in% gencode.35.lnc.gene.names$gene, 'lncRNA', clade),
+         family = ifelse(is.na(family), 'gencode', family),
+         clade = ifelse(is.na(clade), 'gencode', clade)) %>% 
+  filter(clade %in% c('SINE', 'LTR', 'DNA', 'LINE')) %>% 
+  ggplot(aes(log2FoldChange.x, log2FoldChange.y, color = clade)) + 
+  geom_point() +
+  # geom_text_repel(aes(label = ifelse(abs(log2FoldChange.x) > 1 & abs(-log2FoldChange.y) > 1, gene, ''))) + 
+  geom_text_repel(aes(label = gene)) +
+  scale_color_viridis_d(direction = -1) +
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0) +
+  facet_wrap(~clade, nrow = 2, ncol = 2, shrink = T)
+    
+
+```
+
+### F: RNA editing
+```{r}
+rna.editing.summary <- read_csv(paste0(output.data.dir, 
+                                       'rna.editing.out/alu.total.bed/summary_dir/EditingIndex.csv')) %>% 
+  filter(StrandDecidingMethod == 'RefSeqThenMMSites') %>%
+  #separate(Sample, sep = '[.]', into = c('condition', 'rep')) %>% 
+  select(Sample, noise = 'A2CEditingIndex',  signal = 'A2GEditingIndex') %>% 
+  filter(!grepl('intra|exo', Sample)) %>% 
+  mutate(condition = ifelse(grepl('panc', Sample), 'panc', 'ctrl'),
+         Sample = sub('.sorted', '', Sample)) %>% 
+  filter(Sample %in% tx.patient.biotype.sample.detection.count$sample)
+
+rna.editing.summary <- read_csv(paste0(output.data.dir, 
+                                       'rna.editing.out/alu.total.bed/summary_dir/EditingIndex.csv')) %>% 
+  filter(StrandDecidingMethod == 'RefSeqThenMMSites') %>%
+  filter(grepl('intra|exo', Sample)) %>% 
+  separate(Sample, sep = '[.]', into = c('condition', 'rep', 'context', NA)) %>% 
+  select(condition, rep, context, noise = 'A2CEditingIndex',  signal = 'A2GEditingIndex')
+ 
+
+ggplot(rna.editing.summary,
+       aes(reorder(context, signal), signal, color = condition)) + 
+  geom_point() +
+  geom_point(reorder(context, signal), noise, color = condition, shape = 'diamond', alpha = 0.4) + 
+  xlab('') + ylab('A-to-I Editing') + 
+  scale_x_discrete(expand = c(0,0.5)) + 
+  theme(axis.text.x = element_text(hjust = 1, angle = 40))
+
+ggplot(rna.editing.summary,
+       aes(condition, signal, color = context)) + 
+  geom_boxplot(position = position_dodge(width = 1)) +  
+  stat_compare_means(method = "t.test", label.y = 1.7) +
+  geom_sina(position = position_dodge(width = 1)) +
+  xlab('ALU TOTAL') + ylab('A-to-I Editing') + 
+  scale_x_discrete(expand = c(0,0.5)) + 
+  scale_y_continuous(limits = c(0,2), breaks = c(0,0.25,0.3,0.35,0.4,0.45,0.5,1,1.5,2))
+```
+
+### Nanosight profiles
+```{r}
+
+exoTIC.3D.nanosight.df %>%
+  ggplot(aes(size, y = mean, ymin = mean - sd, 
+             ymax = mean + sd, group = condition, 
+             fill = condition, color = condition)) + 
+  geom_ribbon(alpha = 0.25, linetype = 'dotted') + 
+  geom_line(size = (rel(1))) +
+  geom_vline(xintercept = seq(0,350,50), linetype = 'dashed', alpha = 0.15) +
+  scale_x_continuous(limits = c(0, 350), breaks = c(0,50,100,150,200,250,300,350)) +
+  scale_color_manual('condition', values = c(viridis(3)[1], viridis(3)[2])) +
+  scale_fill_manual('condition', values = c(viridis(3)[1], viridis(3)[2]), guide = F) + 
+  stat_peaks(size = (rel(4))) + 
+  stat_peaks(geom='text', vjust = -2, ignore_threshold = 0.45, size = rel(4)) +
+  ylab('million particles per mL') +
+  xlab('size (nm)') +
+  # ylim(0, 80) +
+  ggtitle('exoTIC 3D') +
+  geom_segment(x = 30, xend = 150, y = 60, yend = 60, color = 'black') -> exoTIC.3D.nanosight.plt
+
+exoTIC.2D.nanosight.df %>%
+  ggplot(aes(size, y = mean, ymin = mean - sd, 
+             ymax = mean + sd, group = condition, 
+             fill = condition, color = condition)) + 
+  geom_ribbon(alpha = 0.25, linetype = 'dotted') + 
+  geom_line(size = (rel(1))) +
+  geom_vline(xintercept = seq(0,350,50), linetype = 'dashed', alpha = 0.15) +
+  scale_x_continuous(limits = c(0, 350), breaks = c(0,50,100,150,200,250,300,350)) +
+  scale_color_manual('condition', values = c(viridis(3)[1], viridis(3)[2])) +
+  scale_fill_manual('condition', values = c(viridis(3)[1], viridis(3)[2]), guide = F) + 
+  stat_peaks(size = (rel(4))) +
+  stat_peaks(geom='text', vjust = -2, ignore_threshold = 0.45, size = rel(4)) +
+  ylab('million particles per mL') +
+  xlab('size (nm)') +
+  # ylim(0, 80) +
+  ggtitle('exoTIC 2D') +
+  geom_segment(x = 30, xend = 150, y = 80, yend = 80, color = 'black') -> exoTIC.2D.nanosight.plt
+
+
+
+rnaEasy.amg.nanosight.df %>%
+  filter(context == '2d') %>% 
+  ggplot(aes(size, y = value, group = dose, 
+             fill = dose, color = dose)) + 
+  geom_line(size = (rel(1))) +
+  geom_vline(xintercept = seq(0,350,50), linetype = 'dashed', alpha = 0.15) +
+  scale_x_continuous(limits = c(0, 350), breaks = c(0,50,100,150,200,250,300,350)) +
+  scale_color_viridis_d() +
+  scale_fill_viridis_d(guide = F) + 
+  stat_peaks(size = (rel(4))) + 
+  stat_peaks(geom='text', vjust = 2, ignore_threshold = 0.45, size = rel(4), color = 'black') +
+  ylab('million particles per mL') +
+  xlab('size (nm)') +
+  # ylim(0, 80) +
+  geom_segment(x = 30, xend = 150, y = 850, yend = 850, color = 'black') -> rnaEasy.amg.nanosight.plt
+
+
+rnaEasy.dmso.nanosight.df %>%
+  filter(context != '2d') %>% 
+  group_by(size, context) %>%
+  mutate(mean = (mean(value))/1e6,
+         sd = (sd(value))/1e6) %>% 
+  ggplot(aes(size, y = mean, ymin = mean - sd, 
+             ymax = mean + sd, group = context, 
+             fill = context, color = context)) + 
+  geom_ribbon(alpha = 0.25, linetype = 'dotted') + 
+  geom_line(size = (rel(1))) +
+  geom_vline(xintercept = seq(0,350,50), linetype = 'dashed', alpha = 0.15) +
+  scale_x_continuous(limits = c(0, 350), breaks = c(0,50,100,150,200,250,300,350)) +
+  scale_color_manual('condition', values = c(viridis(3)[1], viridis(3)[2])) +
+  scale_fill_manual('condition', values = c(viridis(3)[1], viridis(3)[2]), guide = F) +
+  stat_peaks(size = (rel(4))) + 
+  stat_peaks(geom='text', vjust = 2, ignore_threshold = 0.45, size = rel(4), color = 'black') +
+  ylab('million particles per mL') +
+  xlab('size (nm)') +
+  geom_segment(x = 30, xend = 150, y = 1500, yend = 1500, color = 'black') -> rnaEasy.dmso.nanosight.plt
+
+```
+#### 
+```{r}
+exoTIC.2D.nanosight.plt
+panel.save(name = 'exoTIC_2D_nanosight_dist', 
+           figure = 'supplement', width = 'medium', height = 'single')
+
+rnaEasy.amg.nanosight.plt
+panel.save(name = 'rnaEasy_2D_nanosight_dist', 
+           figure = 'supplement', width = 'medium', height = 'single')
+
+rnaEasy.dmso.nanosight.plt
+panel.save(name = 'rnaEasy_3D_nanosight_dist', 
+           figure = 'supplement', width = 'medium', height = 'single')
+
+```
+
+
+## Fig. 2
+### rerwip PCA
+```{r}
+set.seed(234)
+### Gencode PCA
+gene.patient.normalized.counts.pca <-
+  # patient.plasma.quant$gene$te.locus.gencode.34.salmon.out %>% 
+  # dds.gxi.df %>%
+  # dds.gxi.norm.counts %>% 
+  ucsc.rmsk.salmon.quant$exoTIC_all$deseq$gxi.vst.counts %>%
+  select(!contains('exoTIC.3D')) %>%
+  # salmon.quant$covid_v_ctrl$deseq$counts %>%
+  # vds.gxi.df %>% 
+  # select(-gene, -biotype) %>% 
+  # merge(gencode.35.tx.to.gene %>% select('ensg', 'gene') %>% distinct(), by = 'gene') %>%
+  filter_at(vars(contains('AMG')), all_vars(. >= 5)) %>%
+  rownames_to_column('gene') %>%
+  # select(-ensg) #%>%
+  # distinct() %>%
+  # filter(gene %in% filter(yang.ts.score.gtex, tissue == 'Pancreas')$gene) %>% 
+  # filter(! gene %in% gencode.35.tx.to.gene$gene) %>%
+  # filter(gene %in% c(salmon.quant$covid_v_ctrl$deseq$de$gene)) %>%
+  # filter(gene %in% c(ucsc.rmsk.salmon.quant$panc_v_ctrl$deseq$de$gene)) %>%
+  # filter(grepl('^Alu|^LTR|^L1|^L2|^MER|^HERV', gene)) %>%
+  # filter(gene %in% filter(te.families.clades, clade %in% c('SINE', "LINE", 'LTR'))$gene) %>%
+  # merge(gencode.35.tx.to.gene %>% select(ensg, gene), by = 'ensg') %>%
+  distinct() %>% 
+  # mutate(gene = paste0(gene, '_', ensg)) %>%
+  # select(gene, contains('.')) %>% 
+  # filter(!grepl('^RP|^MT|)n', gene)) %>% #, ! gene %in% patient.plasma.quant$rfe.gender.profile$optVariables) %>%
+  # filter(gene %in% filter(panc1.intra.quant$de.seq$te.locus.gencode.34.salmon.out, log2FoldChange <= -1)$gene) %>%
+  mutate(gene.cv = rowSds(as.matrix(select(., contains('.'))))/rowMeans(select(., contains('.')))) %>% 
+  filter(gene.cv >= median(gene.cv)) %>%
+  select(-gene.cv) %>%
+  column_to_rownames('gene') %>%
+  # select(-ensg) %>% 
+  t() %>% 
+  as.data.frame() %>% 
+  prcomp(scale=T, center = T)
+
+gene.patient.normalized.counts.pca <-
+  norm.counts.final %>%
+  filter(sample_type != 'Solid Tissue Normal') %>% 
+  # filter(gene %in% tmp.df$gene) %>%
+  filter(gene %in% c(de.agreement.list$up.consensus,
+                     de.agreement.list$up.rnaEasy,
+                     de.agreement.list$up.twoD,
+                     de.agreement.list$dn.consensus,
+                     de.agreement.list$dn.rnaEasy,
+                     de.agreement.list$dn.twoD)) %>%
+  # filter(KRAS %in% c('p.G12C', 'WT_normal')) %>%
+  select(sample, count, gene) %>%
+  mutate(count = log(count + 1),
+         count = scale(count, center = T)) %>%
+  pivot_wider(names_from = gene, values_from = count, values_fn = mean) %>%
+  column_to_rownames('sample') %>%
+  t() %>% as.data.frame() %>%
+  rownames_to_column('gene') %>%
+  mutate(gene.cv = rowSds(as.matrix(select(., contains('-'))))/rowMeans(select(., contains('-')))) %>%
+  filter(gene.cv >= median(gene.cv)) %>%
+  select(-gene.cv) %>%
+  column_to_rownames('gene') %>%
+  t() %>% as.data.frame() %>%
+  prcomp(scale=T, center = T)
+  
+summary(gene.patient.normalized.counts.pca)
+pcs.of.interest <- apply(gene.patient.normalized.counts.pca$x, 2, var)
+pcs.props <-  pcs.of.interest/sum(pcs.of.interest)
+cumsum(pcs.props)[c(1,2)]
+
+as.data.frame(pcs.props) %>% 
+  rownames_to_column('pc') %>% 
+  mutate(pc = as.numeric(sub('PC', '', pc))) %>% 
+  ggplot(aes(pc, pcs.props)) + 
+  geom_col()
+ 
+# convert output to dataframe
+pca.out <- as.data.frame(gene.patient.normalized.counts.pca$x) %>% 
+  rownames_to_column('patient')
+
+# summarize PC contributions
+pca.out.summary <- 
+  as.data.frame(summary(gene.patient.normalized.counts.pca)$importance) %>% 
+  rownames_to_column('metric') %>% 
+  gather(pc, value, -metric) %>% 
+  spread(metric, value)
+# summarize PC contributions
+pca.out.contributions <- 
+  as.data.frame(gene.patient.normalized.counts.pca$rotation) %>% 
+  rownames_to_column('tx') %>% 
+  gather(pc, contrib, -tx) %>% 
+  group_by(pc) %>% 
+  #merge(gencode.reference,
+  #      by.x = 'tx',
+  #      by.y = 'gene.name') %>% 
+  group_by(pc) %>% 
+  mutate(contrib = abs(contrib),
+         rel.contrib = contrib/sum(contrib))
+
+# plot PC1 and PC2
+pca.out %>% 
+  merge(luad.phenotypes.merge, by.x = 'patient', by.y = 'sample') %>%
+  mutate(KRAS = ifelse(grepl('p.G12', KRAS), 'G12', ifelse(is.na(KRAS), 'n/a', 'normal_WT'))) %>%
+  # separate(patient, sep = '[.]',
+  #          into = c('platform', 'context', 'rep', 'condition')) %>%
+  # ggplot(aes(PC1, PC2,
+  #            color = condition, shape = context)) + 
+    ggplot(aes(PC1, PC2,
+             color = KRAS)) + 
+    geom_point(size = rel(4), alpha = 0.6) + 
+    # scale_size_continuous(range = c(0.1, 2.5), breaks = c(0,5,10,15,20)) + 
+    xlab(paste('PC1', round(cumsum(pcs.props)[1], digits = 3), sep = ' ')) +
+    ylab(paste('PC2', round(cumsum(pcs.props)[2] - cumsum(pcs.props)[1], digits = 3), sep = ' ')) +
+    scale_color_manual(name = 'condition', values = viridis(3)[c(1,2,3)]) +
+    scale_fill_aaas() +
+    geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
+    geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25)
+
+panel.save(figure = 4, name = 'luad_G12C_v_normal_WT_pca', width = 'single', height = 'single')
+
+
+
+# pca.out %>% 
+#   # rownames_to_column('sample') %>%
+#   # merge(current.meta.data, by = 'patient') %>% 
+#   # mutate(batch = as.factor(batch)) #%>% 
+#   # merge(merge(unsplice.df, splice.df, by = 'sample') %>% 
+#   #         mutate(unsplice_rate = unsplice_count / (unsplice_count + splice_count)),
+#   merge(unsplice.df,
+#         by.x = 'patient', by.y = 'sample') %>% 
+#   #separate(sample, sep = '[.]', into = c(NA, 'condition', NA)) %>% 
+#   ggplot(aes(PC1, PC2,
+#              color = unsplice_rate)) + 
+#     geom_point(size = rel(2)) + 
+#     scale_size_continuous(range = c(0.1, 2.5), breaks = c(0,5,10,15,20)) + 
+#     xlab(paste('PC1', round(cumsum(pcs.props)[1], digits = 3), sep = ' ')) +
+#     ylab(paste('PC2', round(cumsum(pcs.props)[2] - cumsum(pcs.props)[1], digits = 3), sep = ' ')) +
+#     # scale_color_viridis_c(name = 'batch', alpha = 0.6) + 
+#     scale_color_gsea() +
+#     geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
+#     geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) + 
+#     theme(legend.position = 'right',
+#             legend.key.width = unit(0.125,'cm'),
+#             legend.key.height = unit(0.4, 'cm')) 
+
+
+
+# print top contibutors per PC
+pca.out.contributions %>%
+  group_by(pc) %>%
+  filter(pc %in% c("PC1","PC2")) %>% 
+  select(pc, rel.contrib, tx) %>% 
+  # mutate(contrib = abs(contrib)) %>% 
+  top_n(5, wt = rel.contrib) %>% 
+  arrange(pc, -rel.contrib)
+```
+
+
+```{r}
+library(uwot)
+
+set.seed(234)
+
+pca_umap <- as.data.frame(umap(pca.out, n_neighbors = 4, learning_rate = 0.5, init = "random"))
+
+rownames(pca_umap) <- pca.out$patient
+
+pca_umap %>% 
+  rownames_to_column('sample') %>% 
+  merge(luad.phenotypes.merge, by = 'sample') -> uwot.gencode.plot
+  # mutate(condition = sample) %>% 
+  # separate(condition, sep = '[.]', into = c('platform', 'context', NA, 'condition')) -> uwot.gencode.plot
+
+norm.counts.final %>% 
+  filter(gene %in% de.agreement.list$up.consensus) %>% 
+  mutate(gene.set = 'up.consensus') %>% 
+  group_by(sample) %>% 
+  summarize(count = mean(count)) %>% 
+  mutate(count = scale(log(count + 1))) -> up.consensus.avg.count
+
+ggplot(uwot.gencode.plot %>% merge(up.consensus.avg.count, by = 'sample'),
+       aes(V1,V2, color = count, shape = KRAS)) +
+  geom_point() +
+  ylab('U2') + 
+  xlab('U1') +
+  geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.5, size = 0.25) + 
+  geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.5, size = 0.25) + 
+  # scale_color_manual(name = 'condition', values = viridis(3)[c(1,2,3)]) +
+  scale_color_viridis_c() +
+  theme(legend.position = 'right',
+        legend.spacing = unit(0, 'in')) + theme(legend.position = c(0.95, 0.25))
+
+ggplot(uwot.gencode.plot, 
+       aes(V1, 
+           V2, 
+           color = unsplice_rate,
+           label = patient)) +
+  geom_point() +
+  ylab('U2') + 
+  xlab('U1') +
+  geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.5, size = 0.25) + 
+  geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.5, size = 0.25) + 
+  # ggrepel::geom_text_repel(segment.color = NA,
+  #                          point.padding = NA)  +
+  # scale_color_manual(name = 'condition',
+  #                    values = c('#37b578ff', '#440154ff')) +
+  # scale_color_viridis_d() +
+  scale_color_gsea() +
+  theme(legend.position = 'right',
+        legend.spacing = unit(0, 'in'))
+
+```
+
+#### rerwip Gencode Kmeans
+```{r}
+set.seed(234)
+
+pca.for.clustering <- 
+  pca.out %>% 
+  select(patient, PC1:PC5) %>%
+  column_to_rownames('patient')
+
+# pca.for.clustering <- 
+#   pca_umap
+
+
+elbow.plt(pca.for.clustering)
+
+kmeans(pca.for.clustering, 5, nstart = 50) -> pca.k.means
+
+pca.for.clustering %>% 
+  rownames_to_column('patient') %>% 
+  merge(current.meta.data, by.x = 'patient', by.y = 'patient') %>% 
+  mutate(cluster = factor(pca.k.means$cluster)) ->
+  pca.for.clustering
+
+pca.for.clustering %>% 
+  ggplot(aes(PC1, 
+             PC2, 
+             color = cluster, 
+             # shape = condition,
+             label = patient)) +
+             # label = paste(paste(patient, sep = '.'),
+             #               paste0(diabetes, '-', gender, '-', age,'yrs'),
+             #               sep = ', '))) + 
+  geom_point(size = rel(2)) + 
+  geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
+  geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) + 
+  xlab(paste('PC1', round(cumsum(pcs.props)[1], digits = 3), sep = ' ')) +
+  ylab(paste('PC2', round(cumsum(pcs.props)[2] - cumsum(pcs.props)[1], 
+                          digits = 3), sep = ' ')) +
+  scale_color_viridis_d() #+ 
+  # ggrepel::geom_text_repel(size = rel(3),
+  #                          point.padding = 0.1,
+  #                         box.padding = 0.2,
+  #                         segment.color = NA,
+  #                         color = 'black')
+
+# panel.save(2, 'gender.filter.pca.kmeans.4')
+```
+### rerwip  NMF
+```{r}
+library(NMF)
+set.seed(123)
+salmon.tx.norm.for.nmf <- 
+  ucsc.rmsk.salmon.quant$panc_v_ctrl$deseq$counts %>%
+  rownames_to_column('gene') %>% 
+  filter(gene %in% filter(ucsc.rmsk.salmon.quant$panc_v_ctrl$deseq$de, log2FoldChange <= -1)$gene) %>% 
+  #filter_at(vars(contains('.')), all_vars(. >= 10)) %>% 
+  # filter(gene %in% gen.34.lnc.names$gene, 
+  #        gene %in% filter(patient.plasma.quant$de.seq$gencode.34.salmon.out, log2FoldChange > 1)$gene) %>%
+  filter(!grepl('^RP|^HB|^MT|TMSB4X', gene)) %>%
+  # filter(gene %in% filter(yang.ts.score.gtex, ! tissue %in% c('Cells', 'Whole Blood', 'Testis', 'Ovary', 'Uterus'))$gene) %>% 
+  filter_at(vars(contains('.')), any_vars(. >= 1)) %>% 
+  column_to_rownames('gene') %>% 
+  t() %>% 
+  as.data.frame()
+
+# salmon.tx.norm.for.nmf <- 
+#   patient.plasma.quant$gene$gencode.34.salmon.out %>% 
+#   #filter_at(vars(contains('.')), all_vars(. >= 10)) %>% 
+#   # filter(gene %in% gen.34.lnc.names$gene) %>% 
+#   filter(!grepl('^HB|^MT|^S100|TMSB4X', gene)) %>% 
+#   filter(gene %in% filter(yang.ts.score.gtex, ! tissue %in% c('Cells', 'Whole Blood', 'Testis', 'Ovary'))$gene) %>% 
+#   filter_at(vars(contains('.')), any_vars(. >= 10)) %>% 
+#   gather(sample, count, -gene) %>% 
+#   merge(yang.ts.score.gtex, by = 'gene') %>% 
+#   group_by(sample, tissue) %>% 
+#   summarise(mean.counts = mean(count)) %>% 
+#   spread(tissue, mean.counts) %>% 
+#   column_to_rownames('sample') 
+
+caret::nearZeroVar(salmon.tx.norm.for.nmf)
+
+for(n in seq(2,5)){
+  nmf.out <- nmf(salmon.tx.norm.for.nmf, n, nrun = 10)
+  fit(nmf.out)
+  print(paste(n, cophcor(nmf.out), sep = ':'))
+}
+
+nmf.out <- nmf(salmon.tx.norm.for.nmf, 5, nrun = 10)
+
+as.data.frame(as.table(featureScore(nmf.out)[extractFeatures(nmf.out, 30L, 'list')[[1]]])) #%>% 
+  merge(collison.subtype.genes,
+        by.x = 'Var1',
+        by.y = 'Genes') %>% 
+  mutate(group = 'one') %>% 
+  gather(type, score, -Var1, -group, -Freq) %>% 
+  mutate(weighted.score = Freq * score) %>% 
+  group_by(group, type) %>% 
+  summarise(tot.score = mean(weighted.score) * 100)  -> group.1.nmf
+
+as.data.frame(as.table(featureScore(nmf.out)[extractFeatures(nmf.out, 10L)[[2]]])) #%>% 
+  merge(collison.subtype.genes,
+        by.x = 'Var1',
+        by.y = 'Genes') %>% 
+  mutate(group = 'two') %>% 
+  gather(type, score, -Var1, -group, -Freq) %>% 
+  mutate(weighted.score = Freq * score) %>% 
+  group_by(group, type) %>% 
+  summarise(tot.score = mean(weighted.score) * 100) -> group.2.nmf
+
+  
+NMF::extractFeatures(nmf.out, method = 'max', nodups = T)
+
+print(coef(nmf.out))
+
+as.data.frame(coef(nmf.out)) %>% 
+  rownames_to_column('basis') %>% 
+  gather(gene, freq, -basis) %>% 
+  group_by(gene) %>% 
+  top_n(1, freq) %>% 
+  group_by(basis) %>% 
+  top_n(5, freq) %>% 
+  
+
+as.data.frame(coef(nmf.out)) %>% 
+  rownames_to_column('basis') %>% 
+  gather(gene, freq, -basis) %>% 
+  merge(yang.ts.score.gtex, by = 'gene') %>% 
+  group_by(basis, tissue) %>% 
+  summarise(mean.freq = sum(freq)) %>% 
+  group_by(basis) %>% 
+  mutate(frac = mean.freq/sum(mean.freq)) %>% 
+  select(-mean.freq) %>%
+  ggplot(aes(reorder(tissue, -frac), frac, fill = basis)) + 
+  geom_col(position = 'dodge') + theme(axis.text.x = element_text(angle = 40, hjust = 1))
+  # spread(tissue, frac) %>% 
+  # column_to_rownames('basis') %>% 
+  # t() %>% as.data.frame() %>% rownames_to_column('tissue') 
+  # mutate(diff = `1` - `2`) %>% 
+  # ggplot(aes(reorder(tissue, -diff), diff)) + 
+  # geom_col() + theme(axis.text.x = element_text(angle = 40, hjust = 1))
+
+as.data.frame(coef(nmf.out)) %>% 
+  rownames_to_column('basis') %>% 
+  gather(gene, freq, -basis) %>% 
+  merge(yang.ts.score.gtex, by = 'gene') %>% 
+  filter(tissue == 'Spleen') %>% 
+  arrange(-freq) %>% 
+  select(gene, basis, freq) %>% 
+  spread(basis, freq) %>% 
+  mutate(diff = `1` - `2`) %>% 
+  arrange(-diff)
+
+as.data.frame(coef(nmf.out)) %>% 
+  rownames_to_column('basis') %>% 
+  gather(tissue, freq, -basis) %>% 
+  # merge(yang.ts.score.gtex, by = 'gene') %>% 
+  # filter(tissue == 'Spleen') %>% 
+  arrange(-freq) %>% 
+  # select(gene, basis, freq) %>% 
+  ggplot(aes(reorder(tissue, -freq),freq, fill = basis)) + 
+  geom_col(position = 'dodge') +
+  theme(axis.text.x = element_text(angle = 40, hjust = 1))
+  
+
+
+qqnorm(featureScore(nmf.out))
+qqline(featureScore(nmf.out))
+basismap(nmf.out)
+coefmap(nmf.out)
+```
+### F: TE Family dist
+```{r}
+te.only.anno.counts %>% 
+  gather(sample, count, -gene, -family, -clade) %>% 
+  separate(sample, sep = '[.]', into = c(NA, 'condition', NA)) %>% 
+  group_by(condition, family) %>% 
+  summarise(count = sum(count)) %>% 
+  group_by(condition) %>% 
+  mutate(freq = count / sum(count)) %>% 
+  top_n(4, freq) -> te.family.dist.plt
+
+ggplot(te.family.dist.plt,
+       aes(family, freq, fill = condition, color = condition)) + 
+  geom_bar(position = position_dodge(width = .95), stat = 'identity') +
+  scale_fill_viridis_d(alpha = 0.6) +
+  scale_color_viridis_d() + 
+  scale_x_discrete(expand = c(0, 0.5)) +
+  geom_hline(yintercept = seq(0,1,0.25), color = 'white') + 
+  xlab('') + ylab('% of total te-aligned reads')
+
+# panel.save(1, 'f.te.family.compare')
+  
+```  
+
+### G: Tx length dist
+```{r}
+tx.normalized.counts %>% 
+  gather(sample, count, -tx:-biotype) %>% 
+  separate(sample, sep = '[.]', into = c(NA, 'condition', NA)) %>% 
+  mutate(len = as.numeric(len)) %>% 
+  group_by(tx, condition) %>% 
+  summarize(count = sum(count), len = median(len)) %>% 
+  filter(count > 0, 
+         len <= 10000) %>% 
+  ungroup() %>% 
+  group_by(condition) %>% 
+  mutate(freq = count / sum(count)) -> tx.len.dist.plt
+
+ggplot(tx.len.dist.plt, 
+        aes(len, log(count + 1), fill = condition, color = condition)) + 
+  geom_col(size = rel(0.8)) +
+  scale_x_continuous(expand = c(0, 0.5), n.breaks = 15) +
+  scale_fill_viridis_d(alpha = 0.6) +
+  scale_color_viridis_d() + 
+  geom_hline(yintercept = seq(0,200,40), color = 'white') + 
+  xlab('transcript length') + ylab('log(normalized counts + 1)')
+
+panel.save(1, 'g.tx.len.dist', width = 'double')
+```
+
+### H: Mapping rates 
+```{r}
+patient.read.mapping %>% 
+  filter(patient %in% colnames(patient.plasma.quant$gene$gencode.34.salmon.out)) %>% 
+  gather(approach, rate, -patient) %>% 
+  ggplot(aes(patient, rate, fill = approach)) + 
+  geom_bar(stat = 'identity', position = 'dodge') +
+  scale_fill_viridis_d(direction = -1) +
+  scale_color_viridis_d(direction = -1) + 
+  geom_hline(yintercept = seq(0,1,0.25), color = 'white') +
+  scale_x_discrete(expand = c(0, 0.5)) +
+  xlab('') + ylab('# of detected genes') + 
+  theme(axis.text.x = element_text(angle = 40, hjust = 1))
+panel.save('supplement', 'patient.mapping.rate.compare', width = 'double')
+
+patient.star.unique.mapping %>% 
+  # filter(patient %in% colnames(patient.plasma.quant$gene$gencode.34.salmon.out)) %>% 
+  mutate(context = ifelse(grepl('intra', patient), 'intra', 
+                          ifelse(grepl('exo', patient), 'exo',
+                                 'plasma'))) %>% 
+  ggplot(aes(reorder(patient, -unique.reads/1e6), unique.reads/1e6,fill = mapping_rate)) + 
+  geom_bar(stat = 'identity', position = 'dodge') +
+  scale_fill_viridis_c(direction = -1) +
+  scale_color_viridis_c(direction = -1) + 
+  #geom_hline(yintercept = seq(0,6,1), color = 'white') +
+  scale_x_discrete(expand = c(0, 0.5)) +
+  xlab('') + ylab('millions of reads (uniquely mapped)') + 
+  theme(axis.text.x = element_text(angle = 40, hjust = 1)) + 
+  facet_col(~context, scales = 'free')
+panel.save('supplement', 'all.data.star.rate.and.amount', width = 'double', height = 'double')
+
+
+patient.star.detailed.mapping %>% 
+  mutate(condition = ifelse(grepl('panc', patient), 'panc', 'ctrl')) %>% 
+  filter(patient %in% colnames(patient.plasma.quant$gene$gencode.34.salmon.out)) %>%
+  ggplot(aes(reorder(condition, -multi_map_rate), multi_map_rate)) + 
+  # geom_bar(stat = 'identity') +
+  geom_sina() + 
+  geom_boxplot(fill = NA) +
+  scale_fill_viridis_c(direction = -1) +
+  scale_color_viridis_c(direction = -1) + 
+  #geom_hline(yintercept = seq(0,6,1), color = 'white') +
+  scale_x_discrete(expand = c(0, 0.5)) +
+  xlab('') + ylab('STAR multimapping rate')
+panel.save('supplement', 'patient.multi.mapping.rate.dist', width = 'single', height = 'single')
+
+```
+
+
+
+

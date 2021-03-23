@@ -1,0 +1,948 @@
+cmd: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale exo /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx
++ ./trimmomaticRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl exo
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+cmd: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl
+output: rnaEASY.aale.1.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
++ [[ ! -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/quant.sf ]]
++ mkdir /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl
++ '[' -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_output_single_end.fq.gz ']'
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl
++ trim_fwd=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_output_forward_paired.fq.gz
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl
++ trim_rev=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_output_reverse_paired.fq.gz
++ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx --libType A -1 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+Version Info: ### PLEASE UPGRADE SALMON ###
+### A newer version of salmon with important bug fixes and improvements is available. ####
+###
+The newest version, available at https://github.com/COMBINE-lab/salmon/releases
+contains new features, improvements, and bug fixes; please upgrade at your
+earliest convenience.
+###
+Sign up for the salmon mailing list to hear about new versions, features and updates at:
+https://oceangenomics.com/subscribe
+###
+### salmon (selective-alignment-based) v1.3.0
+### [ program ] => salmon 
+### [ command ] => quant 
+### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx }
+### [ libType ] => { A }
+### [ mates1 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_output_forward_paired.fq.gz }
+### [ mates2 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_output_reverse_paired.fq.gz }
+### [ threads ] => { 8 }
+### [ validateMappings ] => { }
+### [ gcBias ] => { }
+### [ seqBias ] => { }
+### [ recoverOrphans ] => { }
+### [ rangeFactorizationBins ] => { 4 }
+### [ output ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST }
+Logs will be written to /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.ctrl/rnaEASY.aale.1.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/logs
+[2021-03-09 13:03:44.281] [jointLog] [info] setting maxHashResizeThreads to 8
+[2021-03-09 13:03:44.281] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
+[2021-03-09 13:03:44.281] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
+[2021-03-09 13:03:44.281] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
+[2021-03-09 13:03:44.281] [jointLog] [info] parsing read library format
+[2021-03-09 13:03:44.281] [jointLog] [info] There is 1 library.
+[2021-03-09 13:03:44.552] [jointLog] [info] Loading pufferfish index
+[2021-03-09 13:03:44.568] [jointLog] [info] Loading dense pufferfish index.
+-----------------------------------------
+| Loading contig table | Time = 133.11 s
+-----------------------------------------
+size = 45242875
+-----------------------------------------
+| Loading contig offsets | Time = 330.7 ms
+-----------------------------------------
+-----------------------------------------
+| Loading reference lengths | Time = 56.704 ms
+-----------------------------------------
+-----------------------------------------
+| Loading mphf table | Time = 3.0766 s
+-----------------------------------------
+size = 4021293735
+Number of ones: 45242874
+Number of ones per inventory item: 512
+Inventory entries filled: 88365
+-----------------------------------------
+| Loading contig boundaries | Time = 17.739 s
+-----------------------------------------
+size = 4021293735
+-----------------------------------------
+| Loading sequence | Time = 1.3073 s
+-----------------------------------------
+size = 2664007515
+-----------------------------------------
+| Loading positions | Time = 14.889 s
+-----------------------------------------
+size = 4995330008
+-----------------------------------------
+| Loading reference sequence | Time = 2.2967 s
+-----------------------------------------
+-----------------------------------------
+| Loading reference accumulative lengths | Time = 104.9 ms
+-----------------------------------------
+[2021-03-09 13:06:37.553] [jointLog] [info] done
+[2021-03-09 13:06:37.553] [jointLog] [info] Index contained 5,387,677 targets
+[2021-03-09 13:07:31.166] [jointLog] [info] Number of decoys : 182
+[2021-03-09 13:07:31.166] [jointLog] [info] First decoy index : 5,188,991 
+
+
+
+
+[2021-03-09 13:07:40.606] [jointLog] [info] Automatically detected most likely library type as IU
+[A[32mprocessed[31m 500,000 [32mfragments[0m
+hits: 1,252,195, hits per frag:  2.61702[A[32mprocessed[31m 1,000,000 [32mfragments[0m
+hits: 2,530,427, hits per frag:  2.54847[A[32mprocessed[31m 1,500,000 [32mfragments[0m
+hits: 3,797,026, hits per frag:  2.60019[A[32mprocessed[31m 2,000,000 [32mfragments[0m
+hits: 5,078,184, hits per frag:  2.5657[A[32mprocessed[31m 2,500,000 [32mfragments[0m
+hits: 6,356,682, hits per frag:  2.56976[A[32mprocessed[31m 3,000,000 [32mfragments[0m
+hits: 7,624,645, hits per frag:  2.55123[A[32mprocessed[31m 3,500,000 [32mfragments[0m
+hits: 8,884,975, hits per frag:  2.55924[A[32mprocessed[31m 4,000,000 [32mfragments[0m
+hits: 10,156,622, hits per frag:  2.54934[A[32mprocessed[31m 4,500,000 [32mfragments[0m
+hits: 11,405,366, hits per frag:  2.54983[A[32mprocessed[31m 5,000,000 [32mfragments[0m
+hits: 12,655,145, hits per frag:  2.54381[A[32mprocessed[31m 5,500,000 [32mfragments[0m
+hits: 13,918,521, hits per frag:  2.54662[A[32mprocessed[31m 6,000,000 [32mfragments[0m
+hits: 15,192,583, hits per frag:  2.53829[A[32mprocessed[31m 6,500,000 [32mfragments[0m
+hits: 16,448,904, hits per frag:  2.54046[A[32mprocessed[31m 7,000,000 [32mfragments[0m
+hits: 17,699,481, hits per frag:  2.53556[A[32mprocessed[31m 7,500,000 [32mfragments[0m
+hits: 18,971,169, hits per frag:  2.53816[A[32mprocessed[31m 8,000,000 [32mfragments[0m
+hits: 20,237,179, hits per frag:  2.53406
+
+
+
+
+
+
+
+[2021-03-09 13:33:09.053] [jointLog] [info] Computed 715,679 rich equivalence classes for further processing
+[2021-03-09 13:33:09.053] [jointLog] [info] Counted 5,583,991 total reads in the equivalence classes 
+[2021-03-09 13:33:09.065] [jointLog] [info] Number of orphans recovered using orphan rescue : 518,630
+[2021-03-09 13:33:09.065] [jointLog] [info] Number of mappings discarded because of alignment score : 63,751,525
+[2021-03-09 13:33:09.065] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,872,645
+[2021-03-09 13:33:09.065] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,416,766
+[2021-03-09 13:33:09.065] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 137,053
+[2021-03-09 13:33:09.065] [jointLog] [info] Mapping rate = 67.1038%
+
+[2021-03-09 13:33:09.065] [jointLog] [info] finished quantifyLibrary()
+[2021-03-09 13:33:09.148] [jointLog] [info] Starting optimizer
+[2021-03-09 13:33:15.878] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
+[2021-03-09 13:33:16.342] [jointLog] [info] iteration = 0 | max rel diff. = 91.0688
+[2021-03-09 13:33:20.795] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
+[2021-03-09 13:37:16.562] [jointLog] [info] Computed expected counts (for bias correction)
+[2021-03-09 13:37:16.562] [jointLog] [info] processed bias for 0.0% of the transcripts
+[2021-03-09 13:37:25.611] [jointLog] [info] processed bias for 10.0% of the transcripts
+[2021-03-09 13:37:38.937] [jointLog] [info] processed bias for 20.0% of the transcripts
+[2021-03-09 13:37:51.037] [jointLog] [info] processed bias for 30.0% of the transcripts
+[2021-03-09 13:38:01.712] [jointLog] [info] processed bias for 40.0% of the transcripts
+[2021-03-09 13:38:15.790] [jointLog] [info] processed bias for 50.0% of the transcripts
+[2021-03-09 13:38:28.671] [jointLog] [info] processed bias for 60.0% of the transcripts
+[2021-03-09 13:38:41.413] [jointLog] [info] processed bias for 70.0% of the transcripts
+[2021-03-09 13:38:53.267] [jointLog] [info] processed bias for 80.0% of the transcripts
+[2021-03-09 13:39:42.424] [jointLog] [info] processed bias for 90.0% of the transcripts
+[2021-03-09 13:40:33.808] [jointLog] [info] processed bias for 100.0% of the transcripts
+[2021-03-09 13:40:33.816] [jointLog] [info] processed bias for 100.0% of the transcripts
+[2021-03-09 13:41:17.028] [jointLog] [info] iteration = 100 | max rel diff. = 20.6568
+[2021-03-09 13:42:04.544] [jointLog] [info] iteration = 200 | max rel diff. = 15.7093
+[2021-03-09 13:42:49.833] [jointLog] [info] iteration = 300 | max rel diff. = 0.919607
+[2021-03-09 13:43:31.559] [jointLog] [info] iteration = 400 | max rel diff. = 2.41068
+[2021-03-09 13:44:13.479] [jointLog] [info] iteration = 500 | max rel diff. = 0.0228418
+[2021-03-09 13:44:55.848] [jointLog] [info] iteration = 600 | max rel diff. = 0.0200953
+[2021-03-09 13:45:37.499] [jointLog] [info] iteration = 700 | max rel diff. = 0.103447
+[2021-03-09 13:45:53.374] [jointLog] [info] iteration = 739 | max rel diff. = 0.00211957
+[2021-03-09 13:45:55.267] [jointLog] [info] Finished optimizer
+[2021-03-09 13:45:55.267] [jointLog] [info] writing output 
+
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras exo
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+cmd: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras
+output: rnaEASY.aale.1.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
++ [[ ! -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/quant.sf ]]
++ mkdir /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras
++ '[' -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_output_single_end.fq.gz ']'
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras
++ trim_fwd=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_output_forward_paired.fq.gz
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras
++ trim_rev=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_output_reverse_paired.fq.gz
++ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx --libType A -1 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+Version Info: ### PLEASE UPGRADE SALMON ###
+### A newer version of salmon with important bug fixes and improvements is available. ####
+###
+The newest version, available at https://github.com/COMBINE-lab/salmon/releases
+contains new features, improvements, and bug fixes; please upgrade at your
+earliest convenience.
+###
+Sign up for the salmon mailing list to hear about new versions, features and updates at:
+https://oceangenomics.com/subscribe
+###
+### salmon (selective-alignment-based) v1.3.0
+### [ program ] => salmon 
+### [ command ] => quant 
+### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx }
+### [ libType ] => { A }
+### [ mates1 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_output_forward_paired.fq.gz }
+### [ mates2 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_output_reverse_paired.fq.gz }
+### [ threads ] => { 8 }
+### [ validateMappings ] => { }
+### [ gcBias ] => { }
+### [ seqBias ] => { }
+### [ recoverOrphans ] => { }
+### [ rangeFactorizationBins ] => { 4 }
+### [ output ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST }
+Logs will be written to /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.1.kras/rnaEASY.aale.1.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/logs
+[2021-03-09 13:46:28.567] [jointLog] [info] setting maxHashResizeThreads to 8
+[2021-03-09 13:46:28.567] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
+[2021-03-09 13:46:28.567] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
+[2021-03-09 13:46:28.567] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
+[2021-03-09 13:46:28.567] [jointLog] [info] parsing read library format
+[2021-03-09 13:46:28.567] [jointLog] [info] There is 1 library.
+[2021-03-09 13:46:28.844] [jointLog] [info] Loading pufferfish index
+[2021-03-09 13:46:28.857] [jointLog] [info] Loading dense pufferfish index.
+-----------------------------------------
+| Loading contig table | Time = 130.24 s
+-----------------------------------------
+size = 45242875
+-----------------------------------------
+| Loading contig offsets | Time = 223.35 ms
+-----------------------------------------
+-----------------------------------------
+| Loading reference lengths | Time = 34.961 ms
+-----------------------------------------
+-----------------------------------------
+| Loading mphf table | Time = 2.4112 s
+-----------------------------------------
+size = 4021293735
+Number of ones: 45242874
+Number of ones per inventory item: 512
+Inventory entries filled: 88365
+-----------------------------------------
+| Loading contig boundaries | Time = 18.629 s
+-----------------------------------------
+size = 4021293735
+-----------------------------------------
+| Loading sequence | Time = 1.519 s
+-----------------------------------------
+size = 2664007515
+-----------------------------------------
+| Loading positions | Time = 15.027 s
+-----------------------------------------
+size = 4995330008
+-----------------------------------------
+| Loading reference sequence | Time = 1.9895 s
+-----------------------------------------
+-----------------------------------------
+| Loading reference accumulative lengths | Time = 75.806 ms
+-----------------------------------------
+[2021-03-09 13:49:19.051] [jointLog] [info] done
+[2021-03-09 13:49:19.052] [jointLog] [info] Index contained 5,387,677 targets
+[2021-03-09 13:50:10.715] [jointLog] [info] Number of decoys : 182
+[2021-03-09 13:50:10.715] [jointLog] [info] First decoy index : 5,188,991 
+
+
+
+
+[2021-03-09 13:50:34.228] [jointLog] [info] Automatically detected most likely library type as IU
+[A[32mprocessed[31m 500,000 [32mfragments[0m
+hits: 751,878, hits per frag:  1.54162[A[32mprocessed[31m 1,000,000 [32mfragments[0m
+hits: 1,532,351, hits per frag:  1.58407[A[32mprocessed[31m 1,500,000 [32mfragments[0m
+hits: 2,344,395, hits per frag:  1.59921[A[32mprocessed[31m 2,000,000 [32mfragments[0m
+hits: 3,120,403, hits per frag:  1.58635[A[32mprocessed[31m 2,500,000 [32mfragments[0m
+hits: 3,864,206, hits per frag:  1.56823[A[32mprocessed[31m 3,000,000 [32mfragments[0m
+hits: 4,625,216, hits per frag:  1.55313[A[32mprocessed[31m 3,500,000 [32mfragments[0m
+hits: 5,380,087, hits per frag:  1.53782[A[32mprocessed[31m 4,000,000 [32mfragments[0m
+hits: 6,141,193, hits per frag:  1.53814[A[32mprocessed[31m 4,500,000 [32mfragments[0m
+hits: 6,904,740, hits per frag:  1.54529[A[32mprocessed[31m 5,000,000 [32mfragments[0m
+hits: 7,641,970, hits per frag:  1.53735[A[32mprocessed[31m 5,500,000 [32mfragments[0m
+hits: 8,416,853, hits per frag:  1.54098
+
+
+
+
+
+
+
+[2021-03-09 14:16:15.676] [jointLog] [info] Computed 958,389 rich equivalence classes for further processing
+[2021-03-09 14:16:15.676] [jointLog] [info] Counted 3,065,689 total reads in the equivalence classes 
+[2021-03-09 14:16:15.687] [jointLog] [info] Number of orphans recovered using orphan rescue : 532,429
+[2021-03-09 14:16:15.687] [jointLog] [info] Number of mappings discarded because of alignment score : 67,954,766
+[2021-03-09 14:16:15.687] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,872,318
+[2021-03-09 14:16:15.687] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,568,182
+[2021-03-09 14:16:15.687] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 130,477
+[2021-03-09 14:16:17.351] [jointLog] [warning] Only 3065689 fragments were mapped, but the number of burn-in fragments was set to 5000000.
+The effective lengths have been computed using the observed mappings.
+
+[2021-03-09 14:16:17.351] [jointLog] [info] Mapping rate = 52.4738%
+
+[2021-03-09 14:16:17.351] [jointLog] [info] finished quantifyLibrary()
+[2021-03-09 14:16:17.483] [jointLog] [info] Starting optimizer
+[2021-03-09 14:16:23.800] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
+[2021-03-09 14:16:24.241] [jointLog] [info] iteration = 0 | max rel diff. = 57.0474
+[2021-03-09 14:16:28.685] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
+[2021-03-09 14:21:11.083] [jointLog] [info] Computed expected counts (for bias correction)
+[2021-03-09 14:21:11.083] [jointLog] [info] processed bias for 0.0% of the transcripts
+[2021-03-09 14:21:26.774] [jointLog] [info] processed bias for 10.0% of the transcripts
+[2021-03-09 14:21:46.407] [jointLog] [info] processed bias for 20.0% of the transcripts
+[2021-03-09 14:22:06.951] [jointLog] [info] processed bias for 30.0% of the transcripts
+[2021-03-09 14:22:27.360] [jointLog] [info] processed bias for 40.0% of the transcripts
+[2021-03-09 14:22:49.685] [jointLog] [info] processed bias for 50.0% of the transcripts
+[2021-03-09 14:23:09.976] [jointLog] [info] processed bias for 60.0% of the transcripts
+[2021-03-09 14:23:33.107] [jointLog] [info] processed bias for 70.0% of the transcripts
+[2021-03-09 14:24:05.656] [jointLog] [info] processed bias for 80.0% of the transcripts
+[2021-03-09 14:24:41.434] [jointLog] [info] processed bias for 90.0% of the transcripts
+[2021-03-09 14:25:15.499] [jointLog] [info] processed bias for 100.0% of the transcripts
+[2021-03-09 14:25:58.253] [jointLog] [info] iteration = 100 | max rel diff. = 13.1493
+[2021-03-09 14:26:45.656] [jointLog] [info] iteration = 200 | max rel diff. = 1.27974
+[2021-03-09 14:27:33.034] [jointLog] [info] iteration = 300 | max rel diff. = 0.101437
+[2021-03-09 14:27:54.506] [jointLog] [info] iteration = 346 | max rel diff. = 0.0059568
+[2021-03-09 14:27:56.415] [jointLog] [info] Finished optimizer
+[2021-03-09 14:27:56.415] [jointLog] [info] writing output 
+
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl exo
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+cmd: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl
+output: rnaEASY.aale.2.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
++ [[ ! -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/quant.sf ]]
++ mkdir /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl
++ '[' -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_output_single_end.fq.gz ']'
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl
++ trim_fwd=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_output_forward_paired.fq.gz
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl
++ trim_rev=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_output_reverse_paired.fq.gz
++ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx --libType A -1 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+Version Info: ### PLEASE UPGRADE SALMON ###
+### A newer version of salmon with important bug fixes and improvements is available. ####
+###
+The newest version, available at https://github.com/COMBINE-lab/salmon/releases
+contains new features, improvements, and bug fixes; please upgrade at your
+earliest convenience.
+###
+Sign up for the salmon mailing list to hear about new versions, features and updates at:
+https://oceangenomics.com/subscribe
+###
+### salmon (selective-alignment-based) v1.3.0
+### [ program ] => salmon 
+### [ command ] => quant 
+### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx }
+### [ libType ] => { A }
+### [ mates1 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_output_forward_paired.fq.gz }
+### [ mates2 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_output_reverse_paired.fq.gz }
+### [ threads ] => { 8 }
+### [ validateMappings ] => { }
+### [ gcBias ] => { }
+### [ seqBias ] => { }
+### [ recoverOrphans ] => { }
+### [ rangeFactorizationBins ] => { 4 }
+### [ output ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST }
+Logs will be written to /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.ctrl/rnaEASY.aale.2.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/logs
+[2021-03-09 14:28:31.382] [jointLog] [info] setting maxHashResizeThreads to 8
+[2021-03-09 14:28:31.382] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
+[2021-03-09 14:28:31.382] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
+[2021-03-09 14:28:31.382] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
+[2021-03-09 14:28:31.382] [jointLog] [info] parsing read library format
+[2021-03-09 14:28:31.382] [jointLog] [info] There is 1 library.
+[2021-03-09 14:28:31.637] [jointLog] [info] Loading pufferfish index
+[2021-03-09 14:28:31.648] [jointLog] [info] Loading dense pufferfish index.
+-----------------------------------------
+| Loading contig table | Time = 108.52 s
+-----------------------------------------
+size = 45242875
+-----------------------------------------
+| Loading contig offsets | Time = 204.04 ms
+-----------------------------------------
+-----------------------------------------
+| Loading reference lengths | Time = 32.631 ms
+-----------------------------------------
+-----------------------------------------
+| Loading mphf table | Time = 2.153 s
+-----------------------------------------
+size = 4021293735
+Number of ones: 45242874
+Number of ones per inventory item: 512
+Inventory entries filled: 88365
+-----------------------------------------
+| Loading contig boundaries | Time = 16.04 s
+-----------------------------------------
+size = 4021293735
+-----------------------------------------
+| Loading sequence | Time = 1.1933 s
+-----------------------------------------
+size = 2664007515
+-----------------------------------------
+| Loading positions | Time = 12.231 s
+-----------------------------------------
+size = 4995330008
+-----------------------------------------
+| Loading reference sequence | Time = 1.5369 s
+-----------------------------------------
+-----------------------------------------
+| Loading reference accumulative lengths | Time = 63.262 ms
+-----------------------------------------
+[2021-03-09 14:30:53.661] [jointLog] [info] done
+[2021-03-09 14:30:53.661] [jointLog] [info] Index contained 5,387,677 targets
+[2021-03-09 14:31:39.100] [jointLog] [info] Number of decoys : 182
+[2021-03-09 14:31:39.100] [jointLog] [info] First decoy index : 5,188,991 
+
+
+
+
+[2021-03-09 14:31:48.137] [jointLog] [info] Automatically detected most likely library type as IU
+[A[32mprocessed[31m 500,000 [32mfragments[0m
+hits: 1,153,539, hits per frag:  2.36174[A[32mprocessed[31m 1,000,000 [32mfragments[0m
+hits: 2,325,935, hits per frag:  2.37244[A[32mprocessed[31m 1,500,000 [32mfragments[0m
+hits: 3,513,806, hits per frag:  2.36407[A[32mprocessed[31m 2,000,000 [32mfragments[0m
+hits: 4,685,244, hits per frag:  2.38222[A[32mprocessed[31m 2,500,000 [32mfragments[0m
+hits: 5,840,505, hits per frag:  2.34565[A[32mprocessed[31m 3,000,000 [32mfragments[0m
+hits: 7,002,947, hits per frag:  2.34537[A[32mprocessed[31m 3,500,000 [32mfragments[0m
+hits: 8,145,000, hits per frag:  2.33518[A[32mprocessed[31m 4,000,000 [32mfragments[0m
+hits: 9,326,354, hits per frag:  2.35115[A[32mprocessed[31m 4,500,000 [32mfragments[0m
+hits: 10,463,246, hits per frag:  2.34248[A[32mprocessed[31m 5,000,000 [32mfragments[0m
+hits: 11,622,761, hits per frag:  2.33438[A[32mprocessed[31m 5,500,000 [32mfragments[0m
+hits: 12,791,514, hits per frag:  2.32584
+
+
+
+
+
+
+
+[2021-03-09 14:47:37.591] [jointLog] [info] Computed 660,565 rich equivalence classes for further processing
+[2021-03-09 14:47:37.591] [jointLog] [info] Counted 3,649,467 total reads in the equivalence classes 
+[2021-03-09 14:47:37.603] [jointLog] [info] Number of orphans recovered using orphan rescue : 399,903
+[2021-03-09 14:47:37.603] [jointLog] [info] Number of mappings discarded because of alignment score : 48,004,864
+[2021-03-09 14:47:37.603] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,414,778
+[2021-03-09 14:47:37.603] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,064,412
+[2021-03-09 14:47:37.603] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 94,364
+[2021-03-09 14:47:39.196] [jointLog] [warning] Only 3649467 fragments were mapped, but the number of burn-in fragments was set to 5000000.
+The effective lengths have been computed using the observed mappings.
+
+[2021-03-09 14:47:39.196] [jointLog] [info] Mapping rate = 64.1809%
+
+[2021-03-09 14:47:39.196] [jointLog] [info] finished quantifyLibrary()
+[2021-03-09 14:47:39.295] [jointLog] [info] Starting optimizer
+[2021-03-09 14:47:45.431] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
+[2021-03-09 14:47:45.880] [jointLog] [info] iteration = 0 | max rel diff. = 63.1194
+[2021-03-09 14:47:50.183] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
+[2021-03-09 14:51:31.593] [jointLog] [info] Computed expected counts (for bias correction)
+[2021-03-09 14:51:31.594] [jointLog] [info] processed bias for 0.0% of the transcripts
+[2021-03-09 14:51:46.260] [jointLog] [info] processed bias for 10.0% of the transcripts
+[2021-03-09 14:52:09.247] [jointLog] [info] processed bias for 20.0% of the transcripts
+[2021-03-09 14:52:25.953] [jointLog] [info] processed bias for 30.0% of the transcripts
+[2021-03-09 14:52:49.177] [jointLog] [info] processed bias for 40.0% of the transcripts
+[2021-03-09 14:53:09.027] [jointLog] [info] processed bias for 50.0% of the transcripts
+[2021-03-09 14:53:31.228] [jointLog] [info] processed bias for 60.0% of the transcripts
+[2021-03-09 14:53:50.531] [jointLog] [info] processed bias for 70.0% of the transcripts
+[2021-03-09 14:54:10.153] [jointLog] [info] processed bias for 80.0% of the transcripts
+[2021-03-09 14:54:37.081] [jointLog] [info] processed bias for 90.0% of the transcripts
+[2021-03-09 14:55:02.933] [jointLog] [info] processed bias for 100.0% of the transcripts
+[2021-03-09 14:55:42.885] [jointLog] [info] iteration = 100 | max rel diff. = 10.189
+[2021-03-09 14:56:27.838] [jointLog] [info] iteration = 200 | max rel diff. = 0.182625
+[2021-03-09 14:57:12.760] [jointLog] [info] iteration = 300 | max rel diff. = 0.150033
+[2021-03-09 14:57:57.837] [jointLog] [info] iteration = 400 | max rel diff. = 0.13312
+[2021-03-09 14:58:43.539] [jointLog] [info] iteration = 500 | max rel diff. = 0.0141147
+[2021-03-09 14:59:29.372] [jointLog] [info] iteration = 600 | max rel diff. = 0.501716
+[2021-03-09 14:59:55.716] [jointLog] [info] iteration = 658 | max rel diff. = 0.00739534
+[2021-03-09 14:59:57.595] [jointLog] [info] Finished optimizer
+[2021-03-09 14:59:57.595] [jointLog] [info] writing output 
+
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras exo
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+cmd: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras
+output: rnaEASY.aale.2.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
++ [[ ! -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/quant.sf ]]
++ mkdir /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras
++ '[' -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_output_single_end.fq.gz ']'
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras
++ trim_fwd=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_output_forward_paired.fq.gz
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras
++ trim_rev=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_output_reverse_paired.fq.gz
++ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx --libType A -1 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+Version Info: ### PLEASE UPGRADE SALMON ###
+### A newer version of salmon with important bug fixes and improvements is available. ####
+###
+The newest version, available at https://github.com/COMBINE-lab/salmon/releases
+contains new features, improvements, and bug fixes; please upgrade at your
+earliest convenience.
+###
+Sign up for the salmon mailing list to hear about new versions, features and updates at:
+https://oceangenomics.com/subscribe
+###
+### salmon (selective-alignment-based) v1.3.0
+### [ program ] => salmon 
+### [ command ] => quant 
+### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx }
+### [ libType ] => { A }
+### [ mates1 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_output_forward_paired.fq.gz }
+### [ mates2 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_output_reverse_paired.fq.gz }
+### [ threads ] => { 8 }
+### [ validateMappings ] => { }
+### [ gcBias ] => { }
+### [ seqBias ] => { }
+### [ recoverOrphans ] => { }
+### [ rangeFactorizationBins ] => { 4 }
+### [ output ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST }
+Logs will be written to /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.2.kras/rnaEASY.aale.2.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/logs
+[2021-03-09 15:00:32.213] [jointLog] [info] setting maxHashResizeThreads to 8
+[2021-03-09 15:00:32.213] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
+[2021-03-09 15:00:32.214] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
+[2021-03-09 15:00:32.214] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
+[2021-03-09 15:00:32.214] [jointLog] [info] parsing read library format
+[2021-03-09 15:00:32.214] [jointLog] [info] There is 1 library.
+[2021-03-09 15:00:32.454] [jointLog] [info] Loading pufferfish index
+[2021-03-09 15:00:32.463] [jointLog] [info] Loading dense pufferfish index.
+-----------------------------------------
+| Loading contig table | Time = 109.4 s
+-----------------------------------------
+size = 45242875
+-----------------------------------------
+| Loading contig offsets | Time = 222.45 ms
+-----------------------------------------
+-----------------------------------------
+| Loading reference lengths | Time = 32.126 ms
+-----------------------------------------
+-----------------------------------------
+| Loading mphf table | Time = 2.3083 s
+-----------------------------------------
+size = 4021293735
+Number of ones: 45242874
+Number of ones per inventory item: 512
+Inventory entries filled: 88365
+-----------------------------------------
+| Loading contig boundaries | Time = 16.138 s
+-----------------------------------------
+size = 4021293735
+-----------------------------------------
+| Loading sequence | Time = 1.2824 s
+-----------------------------------------
+size = 2664007515
+-----------------------------------------
+| Loading positions | Time = 12.679 s
+-----------------------------------------
+size = 4995330008
+-----------------------------------------
+| Loading reference sequence | Time = 1.5121 s
+-----------------------------------------
+-----------------------------------------
+| Loading reference accumulative lengths | Time = 63.946 ms
+-----------------------------------------
+[2021-03-09 15:02:56.140] [jointLog] [info] done
+[2021-03-09 15:02:56.140] [jointLog] [info] Index contained 5,387,677 targets
+[2021-03-09 15:03:42.715] [jointLog] [info] Number of decoys : 182
+[2021-03-09 15:03:42.715] [jointLog] [info] First decoy index : 5,188,991 
+
+
+
+
+[2021-03-09 15:03:54.704] [jointLog] [info] Automatically detected most likely library type as IU
+[A[32mprocessed[31m 500,000 [32mfragments[0m
+hits: 911,560, hits per frag:  1.94185[A[32mprocessed[31m 1,000,000 [32mfragments[0m
+hits: 1,847,860, hits per frag:  1.87982[A[32mprocessed[31m 1,500,000 [32mfragments[0m
+hits: 2,809,485, hits per frag:  1.9176[A[32mprocessed[31m 2,000,000 [32mfragments[0m
+hits: 3,760,702, hits per frag:  1.91432[A[32mprocessed[31m 2,500,000 [32mfragments[0m
+hits: 4,668,131, hits per frag:  1.88508[A[32mprocessed[31m 3,000,000 [32mfragments[0m
+hits: 5,622,591, hits per frag:  1.88376[A[32mprocessed[31m 3,500,000 [32mfragments[0m
+hits: 6,547,403, hits per frag:  1.88421[A[32mprocessed[31m 4,000,000 [32mfragments[0m
+hits: 7,448,120, hits per frag:  1.86755[A[32mprocessed[31m 4,500,000 [32mfragments[0m
+hits: 8,401,836, hits per frag:  1.8843[A[32mprocessed[31m 5,000,000 [32mfragments[0m
+hits: 9,283,101, hits per frag:  1.85878[A[32mprocessed[31m 5,500,000 [32mfragments[0m
+hits: 10,215,759, hits per frag:  1.86854[A[32mprocessed[31m 6,000,000 [32mfragments[0m
+hits: 11,157,797, hits per frag:  1.86518
+
+
+
+
+
+
+
+[2021-03-09 15:24:44.868] [jointLog] [info] Computed 709,795 rich equivalence classes for further processing
+[2021-03-09 15:24:44.868] [jointLog] [info] Counted 3,639,303 total reads in the equivalence classes 
+[2021-03-09 15:24:44.879] [jointLog] [info] Number of orphans recovered using orphan rescue : 554,538
+[2021-03-09 15:24:44.879] [jointLog] [info] Number of mappings discarded because of alignment score : 55,130,384
+[2021-03-09 15:24:44.879] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,888,728
+[2021-03-09 15:24:44.879] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,553,889
+[2021-03-09 15:24:44.879] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 115,001
+[2021-03-09 15:24:46.593] [jointLog] [warning] Only 3639303 fragments were mapped, but the number of burn-in fragments was set to 5000000.
+The effective lengths have been computed using the observed mappings.
+
+[2021-03-09 15:24:46.593] [jointLog] [info] Mapping rate = 57.6877%
+
+[2021-03-09 15:24:46.593] [jointLog] [info] finished quantifyLibrary()
+[2021-03-09 15:24:46.648] [jointLog] [info] Starting optimizer
+[2021-03-09 15:24:52.569] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
+[2021-03-09 15:24:52.989] [jointLog] [info] iteration = 0 | max rel diff. = 65.5299
+[2021-03-09 15:24:57.089] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
+[2021-03-09 15:28:53.559] [jointLog] [info] Computed expected counts (for bias correction)
+[2021-03-09 15:28:53.560] [jointLog] [info] processed bias for 0.0% of the transcripts
+[2021-03-09 15:29:14.847] [jointLog] [info] processed bias for 10.0% of the transcripts
+[2021-03-09 15:29:36.521] [jointLog] [info] processed bias for 20.0% of the transcripts
+[2021-03-09 15:29:59.733] [jointLog] [info] processed bias for 30.0% of the transcripts
+[2021-03-09 15:30:22.600] [jointLog] [info] processed bias for 40.0% of the transcripts
+[2021-03-09 15:30:41.225] [jointLog] [info] processed bias for 50.0% of the transcripts
+[2021-03-09 15:31:02.589] [jointLog] [info] processed bias for 60.0% of the transcripts
+[2021-03-09 15:31:22.937] [jointLog] [info] processed bias for 70.0% of the transcripts
+[2021-03-09 15:31:39.943] [jointLog] [info] processed bias for 80.0% of the transcripts
+[2021-03-09 15:31:52.976] [jointLog] [info] processed bias for 90.0% of the transcripts
+[2021-03-09 15:32:06.918] [jointLog] [info] processed bias for 100.0% of the transcripts
+[2021-03-09 15:32:47.032] [jointLog] [info] iteration = 100 | max rel diff. = 6.95918
+[2021-03-09 15:33:31.799] [jointLog] [info] iteration = 200 | max rel diff. = 9.50899
+[2021-03-09 15:34:16.877] [jointLog] [info] iteration = 300 | max rel diff. = 0.771629
+[2021-03-09 15:35:01.487] [jointLog] [info] iteration = 400 | max rel diff. = 0.739948
+[2021-03-09 15:35:46.067] [jointLog] [info] iteration = 500 | max rel diff. = 0.0307062
+[2021-03-09 15:36:29.857] [jointLog] [info] iteration = 599 | max rel diff. = 0.00499068
+[2021-03-09 15:36:31.714] [jointLog] [info] Finished optimizer
+[2021-03-09 15:36:31.714] [jointLog] [info] writing output 
+
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl exo
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+cmd: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl
+output: rnaEASY.aale.3.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
++ [[ ! -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/quant.sf ]]
++ mkdir /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl
++ '[' -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_output_single_end.fq.gz ']'
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl
++ trim_fwd=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_output_forward_paired.fq.gz
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl
++ trim_rev=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_output_reverse_paired.fq.gz
++ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx --libType A -1 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+Version Info: ### PLEASE UPGRADE SALMON ###
+### A newer version of salmon with important bug fixes and improvements is available. ####
+###
+The newest version, available at https://github.com/COMBINE-lab/salmon/releases
+contains new features, improvements, and bug fixes; please upgrade at your
+earliest convenience.
+###
+Sign up for the salmon mailing list to hear about new versions, features and updates at:
+https://oceangenomics.com/subscribe
+###
+### salmon (selective-alignment-based) v1.3.0
+### [ program ] => salmon 
+### [ command ] => quant 
+### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx }
+### [ libType ] => { A }
+### [ mates1 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_output_forward_paired.fq.gz }
+### [ mates2 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_output_reverse_paired.fq.gz }
+### [ threads ] => { 8 }
+### [ validateMappings ] => { }
+### [ gcBias ] => { }
+### [ seqBias ] => { }
+### [ recoverOrphans ] => { }
+### [ rangeFactorizationBins ] => { 4 }
+### [ output ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST }
+Logs will be written to /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.ctrl/rnaEASY.aale.3.ctrl_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/logs
+[2021-03-09 15:37:03.108] [jointLog] [info] setting maxHashResizeThreads to 8
+[2021-03-09 15:37:03.108] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
+[2021-03-09 15:37:03.108] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
+[2021-03-09 15:37:03.108] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
+[2021-03-09 15:37:03.108] [jointLog] [info] parsing read library format
+[2021-03-09 15:37:03.108] [jointLog] [info] There is 1 library.
+[2021-03-09 15:37:03.272] [jointLog] [info] Loading pufferfish index
+[2021-03-09 15:37:03.273] [jointLog] [info] Loading dense pufferfish index.
+-----------------------------------------
+| Loading contig table | Time = 109.89 s
+-----------------------------------------
+size = 45242875
+-----------------------------------------
+| Loading contig offsets | Time = 200.12 ms
+-----------------------------------------
+-----------------------------------------
+| Loading reference lengths | Time = 38.45 ms
+-----------------------------------------
+-----------------------------------------
+| Loading mphf table | Time = 2.1473 s
+-----------------------------------------
+size = 4021293735
+Number of ones: 45242874
+Number of ones per inventory item: 512
+Inventory entries filled: 88365
+-----------------------------------------
+| Loading contig boundaries | Time = 16.44 s
+-----------------------------------------
+size = 4021293735
+-----------------------------------------
+| Loading sequence | Time = 1.1686 s
+-----------------------------------------
+size = 2664007515
+-----------------------------------------
+| Loading positions | Time = 12.046 s
+-----------------------------------------
+size = 4995330008
+-----------------------------------------
+| Loading reference sequence | Time = 1.4951 s
+-----------------------------------------
+-----------------------------------------
+| Loading reference accumulative lengths | Time = 60.91 ms
+-----------------------------------------
+[2021-03-09 15:39:26.798] [jointLog] [info] done
+[2021-03-09 15:39:26.798] [jointLog] [info] Index contained 5,387,677 targets
+[2021-03-09 15:40:12.116] [jointLog] [info] Number of decoys : 182
+[2021-03-09 15:40:12.117] [jointLog] [info] First decoy index : 5,188,991 
+
+
+
+
+[2021-03-09 15:40:23.546] [jointLog] [info] Automatically detected most likely library type as IU
+[A[32mprocessed[31m 500,000 [32mfragments[0m
+hits: 1,031,534, hits per frag:  2.13233[A[32mprocessed[31m 1,000,000 [32mfragments[0m
+hits: 2,084,912, hits per frag:  2.09004[A[32mprocessed[31m 1,500,000 [32mfragments[0m
+hits: 3,179,900, hits per frag:  2.14539[A[32mprocessed[31m 2,000,000 [32mfragments[0m
+hits: 4,199,092, hits per frag:  2.10461[A[32mprocessed[31m 2,500,000 [32mfragments[0m
+hits: 5,277,734, hits per frag:  2.13041[A[32mprocessed[31m 3,000,000 [32mfragments[0m
+hits: 6,309,875, hits per frag:  2.12366[A[32mprocessed[31m 3,500,000 [32mfragments[0m
+hits: 7,323,299, hits per frag:  2.10094[A[32mprocessed[31m 4,000,000 [32mfragments[0m
+hits: 8,366,702, hits per frag:  2.10273[A[32mprocessed[31m 4,500,000 [32mfragments[0m
+hits: 9,376,914, hits per frag:  2.09207[A[32mprocessed[31m 5,000,000 [32mfragments[0m
+hits: 10,435,684, hits per frag:  2.08769
+
+
+
+
+
+
+
+[2021-03-09 16:01:13.216] [jointLog] [info] Computed 838,190 rich equivalence classes for further processing
+[2021-03-09 16:01:13.216] [jointLog] [info] Counted 3,215,773 total reads in the equivalence classes 
+[2021-03-09 16:01:13.228] [jointLog] [info] Number of orphans recovered using orphan rescue : 433,761
+[2021-03-09 16:01:13.228] [jointLog] [info] Number of mappings discarded because of alignment score : 60,551,840
+[2021-03-09 16:01:13.228] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,436,622
+[2021-03-09 16:01:13.228] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,130,054
+[2021-03-09 16:01:13.228] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 96,659
+[2021-03-09 16:01:14.845] [jointLog] [warning] Only 3215773 fragments were mapped, but the number of burn-in fragments was set to 5000000.
+The effective lengths have been computed using the observed mappings.
+
+[2021-03-09 16:01:14.845] [jointLog] [info] Mapping rate = 60.7877%
+
+[2021-03-09 16:01:14.845] [jointLog] [info] finished quantifyLibrary()
+[2021-03-09 16:01:14.882] [jointLog] [info] Starting optimizer
+[2021-03-09 16:01:21.218] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
+[2021-03-09 16:01:21.702] [jointLog] [info] iteration = 0 | max rel diff. = 55.9348
+[2021-03-09 16:01:26.302] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
+[2021-03-09 16:06:16.169] [jointLog] [info] Computed expected counts (for bias correction)
+[2021-03-09 16:06:16.169] [jointLog] [info] processed bias for 0.0% of the transcripts
+[2021-03-09 16:06:37.351] [jointLog] [info] processed bias for 10.0% of the transcripts
+[2021-03-09 16:07:00.274] [jointLog] [info] processed bias for 20.0% of the transcripts
+[2021-03-09 16:07:22.996] [jointLog] [info] processed bias for 30.0% of the transcripts
+[2021-03-09 16:07:44.890] [jointLog] [info] processed bias for 40.0% of the transcripts
+[2021-03-09 16:08:14.075] [jointLog] [info] processed bias for 50.0% of the transcripts
+[2021-03-09 16:08:38.554] [jointLog] [info] processed bias for 60.0% of the transcripts
+[2021-03-09 16:09:01.825] [jointLog] [info] processed bias for 70.0% of the transcripts
+[2021-03-09 16:09:19.179] [jointLog] [info] processed bias for 80.0% of the transcripts
+[2021-03-09 16:09:53.426] [jointLog] [info] processed bias for 90.0% of the transcripts
+[2021-03-09 16:10:19.025] [jointLog] [info] processed bias for 100.0% of the transcripts
+[2021-03-09 16:11:01.407] [jointLog] [info] iteration = 100 | max rel diff. = 11.7718
+[2021-03-09 16:11:48.103] [jointLog] [info] iteration = 200 | max rel diff. = 15.9077
+[2021-03-09 16:12:35.692] [jointLog] [info] iteration = 300 | max rel diff. = 0.147926
+[2021-03-09 16:13:23.747] [jointLog] [info] iteration = 400 | max rel diff. = 0.0365406
+[2021-03-09 16:13:59.411] [jointLog] [info] iteration = 474 | max rel diff. = 0.00383788
+[2021-03-09 16:14:01.329] [jointLog] [info] Finished optimizer
+[2021-03-09 16:14:01.329] [jointLog] [info] writing output 
+
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras exo
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+cmd: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx 2021-03-09-13.03.43-PST
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras
+output: rnaEASY.aale.3.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
++ [[ ! -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/quant.sf ]]
++ mkdir /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras
++ '[' -f /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_output_single_end.fq.gz ']'
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras
++ trim_fwd=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_output_forward_paired.fq.gz
+++ basename /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras
++ trim_rev=/public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_output_reverse_paired.fq.gz
++ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx --libType A -1 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST
+Version Info: ### PLEASE UPGRADE SALMON ###
+### A newer version of salmon with important bug fixes and improvements is available. ####
+###
+The newest version, available at https://github.com/COMBINE-lab/salmon/releases
+contains new features, improvements, and bug fixes; please upgrade at your
+earliest convenience.
+###
+Sign up for the salmon mailing list to hear about new versions, features and updates at:
+https://oceangenomics.com/subscribe
+###
+### salmon (selective-alignment-based) v1.3.0
+### [ program ] => salmon 
+### [ command ] => quant 
+### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx }
+### [ libType ] => { A }
+### [ mates1 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_output_forward_paired.fq.gz }
+### [ mates2 ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_output_reverse_paired.fq.gz }
+### [ threads ] => { 8 }
+### [ validateMappings ] => { }
+### [ gcBias ] => { }
+### [ seqBias ] => { }
+### [ recoverOrphans ] => { }
+### [ rangeFactorizationBins ] => { 4 }
+### [ output ] => { /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST }
+Logs will be written to /public/groups/kimlab/aale.resub/data/2021-03-08_AALE_resubmission/rnaEASY.aale/rnaEASY.aale.3.kras/rnaEASY.aale.3.kras_sel.align.gencode.v35.ucsc.rmsk.salmon.v1.3.0.sidx_2021-03-09-13.03.43-PST/logs
+[2021-03-09 16:14:37.035] [jointLog] [info] setting maxHashResizeThreads to 8
+[2021-03-09 16:14:37.035] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
+[2021-03-09 16:14:37.035] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
+[2021-03-09 16:14:37.035] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
+[2021-03-09 16:14:37.035] [jointLog] [info] parsing read library format
+[2021-03-09 16:14:37.035] [jointLog] [info] There is 1 library.
+[2021-03-09 16:14:37.222] [jointLog] [info] Loading pufferfish index
+[2021-03-09 16:14:37.223] [jointLog] [info] Loading dense pufferfish index.
+-----------------------------------------
+| Loading contig table | Time = 116.99 s
+-----------------------------------------
+size = 45242875
+-----------------------------------------
+| Loading contig offsets | Time = 207.68 ms
+-----------------------------------------
+-----------------------------------------
+| Loading reference lengths | Time = 33.243 ms
+-----------------------------------------
+-----------------------------------------
+| Loading mphf table | Time = 2.3083 s
+-----------------------------------------
+size = 4021293735
+Number of ones: 45242874
+Number of ones per inventory item: 512
+Inventory entries filled: 88365
+-----------------------------------------
+| Loading contig boundaries | Time = 17.039 s
+-----------------------------------------
+size = 4021293735
+-----------------------------------------
+| Loading sequence | Time = 1.2436 s
+-----------------------------------------
+size = 2664007515
+-----------------------------------------
+| Loading positions | Time = 12.751 s
+-----------------------------------------
+size = 4995330008
+-----------------------------------------
+| Loading reference sequence | Time = 1.5739 s
+-----------------------------------------
+-----------------------------------------
+| Loading reference accumulative lengths | Time = 63.651 ms
+-----------------------------------------
+[2021-03-09 16:17:09.468] [jointLog] [info] done
+[2021-03-09 16:17:09.468] [jointLog] [info] Index contained 5,387,677 targets
+[2021-03-09 16:17:56.170] [jointLog] [info] Number of decoys : 182
+[2021-03-09 16:17:56.170] [jointLog] [info] First decoy index : 5,188,991 
+
+
+
+
+[2021-03-09 16:18:09.953] [jointLog] [info] Automatically detected most likely library type as IU
+[A[32mprocessed[31m 500,000 [32mfragments[0m
+hits: 897,899, hits per frag:  1.84339[A[32mprocessed[31m 1,000,000 [32mfragments[0m
+hits: 1,833,764, hits per frag:  1.90688[A[32mprocessed[31m 1,500,001 [32mfragments[0m
+hits: 2,812,277, hits per frag:  1.92426[A[32mprocessed[31m 2,000,000 [32mfragments[0m
+hits: 3,774,531, hits per frag:  1.90032[A[32mprocessed[31m 2,500,000 [32mfragments[0m
+hits: 4,673,652, hits per frag:  1.8791[A[32mprocessed[31m 3,000,000 [32mfragments[0m
+hits: 5,627,079, hits per frag:  1.87977[A[32mprocessed[31m 3,500,000 [32mfragments[0m
+hits: 6,540,963, hits per frag:  1.87405[A[32mprocessed[31m 4,000,000 [32mfragments[0m
+hits: 7,426,195, hits per frag:  1.87362[A[32mprocessed[31m 4,500,000 [32mfragments[0m
+hits: 8,394,183, hits per frag:  1.87979[A[32mprocessed[31m 5,000,000 [32mfragments[0m
+hits: 9,277,024, hits per frag:  1.86007[A[32mprocessed[31m 5,500,000 [32mfragments[0m
+hits: 10,205,608, hits per frag:  1.86196[A[32mprocessed[31m 6,000,000 [32mfragments[0m
+hits: 11,146,415, hits per frag:  1.86183
+
+
+
+
+
+
+
+[2021-03-09 16:48:04.599] [jointLog] [info] Computed 936,371 rich equivalence classes for further processing
+[2021-03-09 16:48:04.599] [jointLog] [info] Counted 3,583,117 total reads in the equivalence classes 
+[2021-03-09 16:48:04.610] [jointLog] [info] Number of orphans recovered using orphan rescue : 593,189
+[2021-03-09 16:48:04.610] [jointLog] [info] Number of mappings discarded because of alignment score : 72,968,522
+[2021-03-09 16:48:04.610] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,928,379
+[2021-03-09 16:48:04.610] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,585,159
+[2021-03-09 16:48:04.610] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 112,011
+[2021-03-09 16:48:06.216] [jointLog] [warning] Only 3583117 fragments were mapped, but the number of burn-in fragments was set to 5000000.
+The effective lengths have been computed using the observed mappings.
+
+[2021-03-09 16:48:06.216] [jointLog] [info] Mapping rate = 56.3123%
+
+[2021-03-09 16:48:06.216] [jointLog] [info] finished quantifyLibrary()
+[2021-03-09 16:48:06.274] [jointLog] [info] Starting optimizer
+[2021-03-09 16:48:12.972] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
+[2021-03-09 16:48:13.417] [jointLog] [info] iteration = 0 | max rel diff. = 65.4128
+[2021-03-09 16:48:17.823] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
+[2021-03-09 16:52:48.066] [jointLog] [info] Computed expected counts (for bias correction)
+[2021-03-09 16:52:48.066] [jointLog] [info] processed bias for 0.0% of the transcripts
+[2021-03-09 16:53:03.702] [jointLog] [info] processed bias for 10.0% of the transcripts
+[2021-03-09 16:53:22.119] [jointLog] [info] processed bias for 20.0% of the transcripts
+[2021-03-09 16:53:41.712] [jointLog] [info] processed bias for 30.0% of the transcripts
+[2021-03-09 16:53:58.413] [jointLog] [info] processed bias for 40.0% of the transcripts
+[2021-03-09 16:54:15.967] [jointLog] [info] processed bias for 50.0% of the transcripts
+[2021-03-09 16:54:34.029] [jointLog] [info] processed bias for 60.0% of the transcripts
+[2021-03-09 16:54:59.547] [jointLog] [info] processed bias for 70.0% of the transcripts
+[2021-03-09 16:55:18.466] [jointLog] [info] processed bias for 80.0% of the transcripts
+[2021-03-09 16:55:38.466] [jointLog] [info] processed bias for 90.0% of the transcripts
+[2021-03-09 16:56:31.048] [jointLog] [info] processed bias for 100.0% of the transcripts
+[2021-03-09 16:56:31.098] [jointLog] [info] processed bias for 100.0% of the transcripts
+[2021-03-09 16:57:14.114] [jointLog] [info] iteration = 100 | max rel diff. = 14.5943
+[2021-03-09 16:58:01.846] [jointLog] [info] iteration = 200 | max rel diff. = 3.43232
+[2021-03-09 16:58:49.218] [jointLog] [info] iteration = 300 | max rel diff. = 0.367591
+[2021-03-09 16:59:37.128] [jointLog] [info] iteration = 400 | max rel diff. = 0.0315826
+[2021-03-09 17:00:24.957] [jointLog] [info] iteration = 500 | max rel diff. = 0.0959487
+[2021-03-09 17:00:46.960] [jointLog] [info] iteration = 546 | max rel diff. = 0.00951111
+[2021-03-09 17:00:48.980] [jointLog] [info] Finished optimizer
+[2021-03-09 17:00:48.980] [jointLog] [info] writing output 
+
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x

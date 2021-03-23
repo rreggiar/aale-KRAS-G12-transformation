@@ -1,0 +1,463 @@
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec/ intra /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_v12 intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_v12
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_v12
+output: intra.hbec.1.mut2_kras_v12_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_wt intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_wt
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_wt
+output: intra.hbec.1.mut2_kras_wt_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_lacz intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_lacz
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_lacz
+output: intra.hbec.1.mut2_lacz_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.mut2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_v12 intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_v12
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_v12
+output: intra.hbec.1.wt2_kras_v12_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_wt intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_wt
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_wt
+output: intra.hbec.1.wt2_kras_wt_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_lacz intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_lacz
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_lacz
+output: intra.hbec.1.wt2_lacz_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.1.wt2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_v12 intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_v12
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_v12
+output: intra.hbec.2.mut2_kras_v12_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_wt intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_wt
+trimmomatic: 0.39
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_wt
+output: intra.hbec.2.mut2_kras_wt_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/H_S16_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/H_S16_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/H_S16_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/H_S16_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/H_S16_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/H_S16_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/intra.hbec.2.mut2_lacz_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/intra.hbec.2.mut2_lacz_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/intra.hbec.2.mut2_lacz_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/intra.hbec.2.mut2_lacz_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/H_S16_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/H_S16_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/intra.hbec.2.mut2_lacz_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/intra.hbec.2.mut2_lacz_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/intra.hbec.2.mut2_lacz_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/intra.hbec.2.mut2_lacz_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 69817046 Both Surviving: 68491293 (98.10%) Forward Only Surviving: 968793 (1.39%) Reverse Only Surviving: 286419 (0.41%) Dropped: 70541 (0.10%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz
+output: intra.hbec.2.mut2_lacz_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.mut2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12 intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/K_S19_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/K_S19_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/K_S19_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/K_S19_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/K_S19_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/K_S19_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/intra.hbec.2.wt2_kras_v12_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/intra.hbec.2.wt2_kras_v12_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/intra.hbec.2.wt2_kras_v12_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/intra.hbec.2.wt2_kras_v12_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/K_S19_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/K_S19_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/intra.hbec.2.wt2_kras_v12_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/intra.hbec.2.wt2_kras_v12_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/intra.hbec.2.wt2_kras_v12_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/intra.hbec.2.wt2_kras_v12_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 80206547 Both Surviving: 78391200 (97.74%) Forward Only Surviving: 1402402 (1.75%) Reverse Only Surviving: 333480 (0.42%) Dropped: 79465 (0.10%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12
+output: intra.hbec.2.wt2_kras_v12_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/I_S17_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/I_S17_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/I_S17_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/I_S17_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/I_S17_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/I_S17_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/intra.hbec.2.wt2_kras_wt_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/intra.hbec.2.wt2_kras_wt_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/intra.hbec.2.wt2_kras_wt_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/intra.hbec.2.wt2_kras_wt_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/I_S17_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/I_S17_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/intra.hbec.2.wt2_kras_wt_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/intra.hbec.2.wt2_kras_wt_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/intra.hbec.2.wt2_kras_wt_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/intra.hbec.2.wt2_kras_wt_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 67172249 Both Surviving: 65435281 (97.41%) Forward Only Surviving: 1384776 (2.06%) Reverse Only Surviving: 271788 (0.40%) Dropped: 80404 (0.12%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt
+output: intra.hbec.2.wt2_kras_wt_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/G_S15_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/G_S15_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/G_S15_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/G_S15_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/G_S15_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/G_S15_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/intra.hbec.2.wt2_lacz_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/intra.hbec.2.wt2_lacz_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/intra.hbec.2.wt2_lacz_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/intra.hbec.2.wt2_lacz_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/G_S15_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/G_S15_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/intra.hbec.2.wt2_lacz_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/intra.hbec.2.wt2_lacz_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/intra.hbec.2.wt2_lacz_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/intra.hbec.2.wt2_lacz_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 68837013 Both Surviving: 67660701 (98.29%) Forward Only Surviving: 852855 (1.24%) Reverse Only Surviving: 266649 (0.39%) Dropped: 56808 (0.08%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz
+output: intra.hbec.2.wt2_lacz_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.2.wt2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12 intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/R_S26_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/R_S26_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/R_S26_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/R_S26_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/R_S26_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/R_S26_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/intra.hbec.3.mut2_kras_v12_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/intra.hbec.3.mut2_kras_v12_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/intra.hbec.3.mut2_kras_v12_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/intra.hbec.3.mut2_kras_v12_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/R_S26_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/R_S26_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/intra.hbec.3.mut2_kras_v12_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/intra.hbec.3.mut2_kras_v12_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/intra.hbec.3.mut2_kras_v12_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/intra.hbec.3.mut2_kras_v12_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 62738700 Both Surviving: 61513152 (98.05%) Forward Only Surviving: 926373 (1.48%) Reverse Only Surviving: 232336 (0.37%) Dropped: 66839 (0.11%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12
+output: intra.hbec.3.mut2_kras_v12_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/P_S24_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/P_S24_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/P_S24_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/P_S24_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/P_S24_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/P_S24_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/intra.hbec.3.mut2_kras_wt_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/intra.hbec.3.mut2_kras_wt_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/intra.hbec.3.mut2_kras_wt_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/intra.hbec.3.mut2_kras_wt_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/P_S24_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/P_S24_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/intra.hbec.3.mut2_kras_wt_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/intra.hbec.3.mut2_kras_wt_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/intra.hbec.3.mut2_kras_wt_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/intra.hbec.3.mut2_kras_wt_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 74430069 Both Surviving: 72874737 (97.91%) Forward Only Surviving: 1167742 (1.57%) Reverse Only Surviving: 307646 (0.41%) Dropped: 79944 (0.11%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt
+output: intra.hbec.3.mut2_kras_wt_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/N_S22_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/N_S22_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/N_S22_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/N_S22_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/N_S22_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/N_S22_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/intra.hbec.3.mut2_lacz_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/intra.hbec.3.mut2_lacz_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/intra.hbec.3.mut2_lacz_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/intra.hbec.3.mut2_lacz_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/N_S22_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/N_S22_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/intra.hbec.3.mut2_lacz_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/intra.hbec.3.mut2_lacz_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/intra.hbec.3.mut2_lacz_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/intra.hbec.3.mut2_lacz_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 60928592 Both Surviving: 59682268 (97.95%) Forward Only Surviving: 934807 (1.53%) Reverse Only Surviving: 243462 (0.40%) Dropped: 68055 (0.11%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz
+output: intra.hbec.3.mut2_lacz_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.mut2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12 intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/Q_S25_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/Q_S25_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/Q_S25_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/Q_S25_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/Q_S25_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/Q_S25_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/intra.hbec.3.wt2_kras_v12_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/intra.hbec.3.wt2_kras_v12_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/intra.hbec.3.wt2_kras_v12_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/intra.hbec.3.wt2_kras_v12_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/Q_S25_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/Q_S25_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/intra.hbec.3.wt2_kras_v12_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/intra.hbec.3.wt2_kras_v12_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/intra.hbec.3.wt2_kras_v12_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/intra.hbec.3.wt2_kras_v12_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 59500868 Both Surviving: 58469819 (98.27%) Forward Only Surviving: 741048 (1.25%) Reverse Only Surviving: 235178 (0.40%) Dropped: 54823 (0.09%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12
+output: intra.hbec.3.wt2_kras_v12_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_v12/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/O_S23_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/O_S23_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/O_S23_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/O_S23_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/O_S23_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/O_S23_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/intra.hbec.3.wt2_kras_wt_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/intra.hbec.3.wt2_kras_wt_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/intra.hbec.3.wt2_kras_wt_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/intra.hbec.3.wt2_kras_wt_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/O_S23_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/O_S23_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/intra.hbec.3.wt2_kras_wt_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/intra.hbec.3.wt2_kras_wt_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/intra.hbec.3.wt2_kras_wt_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/intra.hbec.3.wt2_kras_wt_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 62879937 Both Surviving: 61490436 (97.79%) Forward Only Surviving: 1068370 (1.70%) Reverse Only Surviving: 252008 (0.40%) Dropped: 69123 (0.11%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt
+output: intra.hbec.3.wt2_kras_wt_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_kras_wt/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz intra
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz
+trimmomatic: 0.39
++ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/M_S21_L002_R1_001.fastq.gz
+read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/M_S21_L002_R1_001.fastq.gz
++ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/M_S21_L002_R2_001.fastq.gz
+read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/M_S21_L002_R2_001.fastq.gz
++ echo 'Trimming fastq'
+Trimming fastq
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz
+++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz
++ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/M_S21_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/M_S21_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/intra.hbec.3.wt2_lacz_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/intra.hbec.3.wt2_lacz_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/intra.hbec.3.wt2_lacz_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/intra.hbec.3.wt2_lacz_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+TrimmomaticPE: Started with arguments:
+ -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/M_S21_L002_R1_001.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/M_S21_L002_R2_001.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/intra.hbec.3.wt2_lacz_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/intra.hbec.3.wt2_lacz_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/intra.hbec.3.wt2_lacz_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/intra.hbec.3.wt2_lacz_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 72643676 Both Surviving: 71190516 (98.00%) Forward Only Surviving: 1089638 (1.50%) Reverse Only Surviving: 283386 (0.39%) Dropped: 80136 (0.11%)
+TrimmomaticPE: Completed successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-22-23.29.56-PDT
+salmon version: salmon 1.3.0
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz
+output: intra.hbec.3.wt2_lacz_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-22-23.29.56-PDT
+++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*' -name quant.sf
+find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.hbec//intra.hbec.3.wt2_lacz/*/public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/*’: No such file or directory
++ [[ -f '' ]]
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
