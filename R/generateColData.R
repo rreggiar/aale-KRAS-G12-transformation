@@ -25,14 +25,15 @@ parse.input <- function(data.path, output.name){
     files <- dir(file.path(data.path))
 
     # names(files) <- files
-
-    print(files)
-
     output.files <- list.files(data.path, full.names = TRUE)
     names(output.files) <- output.files
+
+    print('output.files:')
+    print(output.files)
+    quit()
+
     output.files.samples <- list.files(output.files, full.names = TRUE)
     names(output.files.samples) <- output.files.samples
-    print(output.files.samples)
 
 
     # creates empty df to fill with sample info
