@@ -43,7 +43,7 @@ function runSalmon() {
 	outputDir="$3"
 	outputPath="$inputDir"/"$outputDir"
 
-  	outpathGrob=$(echo "$inputDir"/*"$salmonIndex"*)
+  	outpathGrob=$(echo "$inputDir"/*"$(basename "$salmonIndex")"*)
 
   	echo "$outpathGrob"
 	
