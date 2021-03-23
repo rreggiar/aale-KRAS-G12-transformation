@@ -30,8 +30,7 @@ parse.input <- function(data.path, output.name){
 
     print('output.files:')
     print(output.files)
-    quit()
-
+    
     output.files.samples <- list.files(output.files, full.names = TRUE)
     names(output.files.samples) <- output.files.samples
 
