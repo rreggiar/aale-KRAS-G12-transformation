@@ -80,7 +80,7 @@ output.name <- paths.in[3]
 txome.tsv <- paths.in[4]
 
 
-outpath <- file.path("/public/groups/kimlab/aale.resub/output.data/")
+outpath <- file.path("/public/groups/kimlab/aale-KRAS-G12-transformation/output.data/")
 
 
 print('parse input dir')
