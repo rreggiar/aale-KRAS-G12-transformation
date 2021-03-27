@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ## metadata file is useful to identify samples and label after import
-
+metadata_run_csv="$1"
 # extract first column 
-for sra in $(cut -d, -f1 "SraRunTable.txt.csv" | tail -n +2); do
+for sra in $(cut -d, -f1 "$metadata_run_csv" | tail -n +2); do
 
   echo "$sra"
   # --split-files: split paired-end fastq files into respective read files
