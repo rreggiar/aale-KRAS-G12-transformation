@@ -35,23 +35,23 @@ suppressPackageStartupMessages({
   library(viridis)
   library(patchwork)
   library(fgsea)
-  library(caret)
+  # library(caret)
   library(msigdbr)
   library(matrixStats)
-  library(NMF)
-  library(rsample)
-  library(vip)
-  library(ROCR)
-  library(glmnet)
-  library(mlbench)
+  # library(NMF)
+  # library(rsample)
+  # library(vip)
+  # library(ROCR)
+  # library(glmnet)
+  # library(mlbench)
   library(tximeta)
   library(SummarizedExperiment)
   library(rjson)
   library(HDF5Array)
   library(DESeq2)
-  library(ggpmisc)
-  library(survival)
-  library(survminer)
+  # library(ggpmisc)
+  # library(survival)
+  # library(survminer)
 })
 suppressMessages(loadfonts())
 ```
@@ -1002,6 +1002,307 @@ panel.save(figure = 'hbec',
            name = 'mapping.rate.compare', width = 'single', height = 'double', mapping.rate_comp)
 
 ```
+
+
+## FUN: Single Cell
+```{r}
+library(Seurat)
+library(tximeta)
+library(tximeta)
+
+kras_alevin <- file.path(output.data.dir, 
+                         'alevin_kras.fastq_sel.align.gencode.v35.salmon.v1.3.0.sidx',
+                         'alevin/quants_mat.gz')
+ctrl_alevin <- file.path(output.data.dir, 
+                         'alevin_ctrl.fastq_sel.align.gencode.v35.salmon.v1.3.0.sidx',
+                         'alevin/quants_mat.gz')
+
+kras_alevin_txi <- tximeta(kras_alevin, type = 'alevin', alevinArgs=list(filterBarcodes=TRUE))
+ctrl_alevin_txi <- tximeta(ctrl_alevin, type = 'alevin', alevinArgs=list(filterBarcodes=TRUE))
+
+```
+###
+```{r}
+kras_alevin_sc <- 
+  Seurat::CreateSeuratObject(counts = kras_alevin_txi$counts, min.cells = 3, min.features = 200, project = 'kras')
+ctrl_alevin_sc <- 
+  Seurat::CreateSeuratObject(counts = ctrl_alevin_txi$counts, min.cells = 3, min.features = 200, project = 'ctrl')
+```
+###
+```{r}
+aale_sc <- merge(kras_alevin_sc, ctrl_alevin_sc, add.cell.ids=c('aale_kras', 'aale_ctrl'))
+```
+###
+```{r}
+aale_sc[["percent.mt"]] <- PercentageFeatureSet(aale_sc, pattern = "^MT-")
+
+# plot1 <- FeatureScatter(aale_sc, feature1 = "nCount_RNA", feature2 = "percent.mt")
+# plot2 <- FeatureScatter(aale_sc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+# plot2
+```
+###
+```{r}
+aale_sc <- subset(aale_sc, subset = nFeature_RNA > 2100 & percent.mt < 7.5)
+VlnPlot(aale_sc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+aale_sc <- NormalizeData(aale_sc)
+```
+###
+```{r}
+set.seed(123)
+aale_sc <- FindVariableFeatures(aale_sc, selection.method = "vst", nfeatures = 2000)
+
+# Identify the 10 most highly variable genes
+top10 <- head(VariableFeatures(aale_sc), 10)
+
+# plot variable features with and without labels
+plot1 <- VariableFeaturePlot(aale_sc)
+plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+plot2
+```
+###
+```{r}
+all.genes <- rownames(aale_sc)
+aale_sc <- ScaleData(aale_sc, features = all.genes)
+# aale_sc <- ScaleData(aale_sc, features = salmon.quant$aale$deseq$de$gene)
+```
+###
+```{r}
+aale_sc <- RunPCA(aale_sc, features = VariableFeatures(object = aale_sc))
+
+# aale_sc <- RunPCA(aale_sc, features = salmon.quant$aale$deseq$de$gene)
+
+# Examine and visualize PCA results a few different ways
+print(aale_sc[["pca"]], dims = 1:5, nfeatures = 5)
+
+# VizDimLoadings(aale_sc, dims = 1:8, reduction = "pca")
+
+DimPlot(aale_sc, reduction = "pca")
+
+# DimHeatmap(aale_sc, dims = 1:15, cells = 500, balanced = TRUE)
+```
+###
+```{r}
+s.genes <- cc.genes$s.genes
+g2m.genes <- cc.genes$g2m.genes
+
+aale_sc_cc <- CellCycleScoring(aale_sc, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)
+RidgePlot(aale_sc_cc, features = c("PCNA", "TOP2A", "MCM6", "MKI67"), ncol = 2)
+
+aale_sc_cc <- RunPCA(aale_sc_cc, features = c(s.genes, g2m.genes))
+DimPlot(aale_sc_cc, group.by = 'orig.ident')
+
+```
+###
+```{r}
+aale_sc <- JackStraw(aale_sc, num.replicate = 100, dims = 50)
+aale_sc <- ScoreJackStraw(aale_sc, dims = 1:50)
+```
+###
+```{r}
+JackStrawPlot(aale_sc, dims = 1:40)
+```
+###
+```{r}
+dims = 30
+
+# dims = 15
+set.seed(123)
+aale_sc <- FindNeighbors(aale_sc, dims = 1:dims)
+aale_sc <- FindClusters(aale_sc, resolution = 0.6)
+```
+###
+```{r}
+set.seed(123)
+
+aale_sc <- RunUMAP(aale_sc, dims = 1:dims, n.neighbors = 10)
+
+DimPlot(aale_sc, reduction = "umap", group.by = 'orig.ident') /
+DimPlot(aale_sc, reduction = "umap", label = T) /
+FeaturePlot(aale_sc, features = c('KRAS', 'ISG15')) + theme_set_fun()
+```
+###w
+```{r}
+set.seed(123)
+
+aale.markers <- FindAllMarkers(aale_sc, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
+aale.markers %>%
+    group_by(cluster) %>%
+    filter(p_val_adj < 0.05) -> aale.markers
+
+FindMarkers(aale_sc, ident.1 = 5,# ident.2 = c(0,3,6),
+# FindMarkers(aale_sc, ident.1 = 3,# ident.2 = c(8,0,6),
+            min.pct = 0.25, logfc.threshold = 0.25, only.pos = F) %>% 
+  filter(p_val_adj < 0.05) %>% 
+  rownames_to_column('gene') %>% 
+  mutate(rank = p_val * sin(avg_log2FC),
+         rank = scale(rank),
+         gene = as.character(gene)) -> clust.8.de
+
+summary(lm(data=clust.8.de %>% merge(salmon.quant$aale$deseq$de, by = 'gene'), 
+           formula = log2FoldChange ~ avg_log2FC))
+
+
+aale.markers %>% 
+  select(gene, avg_log2FC, cluster) %>% 
+  merge(salmon.quant$aale$deseq$de, by = 'gene') %>%
+  group_by(cluster) %>% 
+  do(broom::glance(lm(data=., formula = log2FoldChange ~ avg_log2FC)))
+
+
+
+  nest(avg_log2FC, log2FoldChange) %>% 
+  mutate(model = map(data, ~lm(avg_log2FC ~ log2FoldChange, data = .))) %>% 
+  mutate(tidy_model = map(model, broom::tidy)) %>% 
+  select(-data, -model) %>% unnest() %>% select(cluster, estimate, statistic, p.value) %>% unique()
+
+lm(avg_log2FC ~ log2FoldChange, clust.8.de %>% merge(salmon.quant$aale$deseq$de, by = 'gene'))
+
+
+clust.8.de %>% 
+  merge(salmon.quant$aale$deseq$de, by = 'gene') %>% 
+  ggplot(aes(avg_log2FC, log2FoldChange)) + 
+  geom_point() + 
+  geom_text_repel(aes(label = gene)) + 
+  geom_hline(yintercept = 0, color = 'grey', linetype = 'dotted') + 
+  geom_smooth(method = 'lm', state = 'line')
+
+clust.8.rnk <- 
+    clust.8.de$rank
+clust.8.rnk <- 
+  setNames(clust.8.de$rank, clust.8.de$gene)
+
+# run the GSEA implementation on the hallmark sets supplemented with custom sets
+print('fgsea')
+de.seq.fgsea.res <- 
+  fgsea(pathways = msig.df, 
+        stats = clust.8.rnk, eps = 0.0)
+
+print('padj filter and clean names')
+# convert to a tidy format, clean the names for display
+de.seq.fgsea.df <-
+  as_tibble(de.seq.fgsea.res) %>%
+  # filter(padj <= 0.05) %>%
+  mutate(pathway = gsub('_', ' ', pathway))
+
+FindMarkers(aale_sc, ident.1 = 3, ident.2 = c(8,0,6), 
+            min.pct = 0.25, logfc.threshold = 0.25, only.pos = T) %>% 
+  filter(p_val_adj < 0.05) %>% 
+  mutate(rank = scale(p_val_adj * sin(avg_log2FC))) -> clust.3.rnk
+
+FindMarkers(aale_sc, ident.1 = 2, ident.2 = c(5,4), 
+            min.pct = 0.25, logfc.threshold = 0.5, only.pos = T) %>% 
+  filter(p_val_adj < 0.05) %>% 
+  head()
+
+aale_sc[["umap"]]@cell.embeddings
+
+DoHeatmap(aale_sc, features = filter(aale.markers, avg_log2FC >= 1)$gene)
+
+FindMarkers(aale_sc, ident.1 = 2, ident.2 = c(1,3), min.pct = 0.25, logfc.threshold = 0.5, only.pos = T) %>% head()
+FindMarkers(aale_sc, ident.1 = 3, ident.2 = c(2,1), min.pct = 0.25, logfc.threshold = 0.5, only.pos = T) %>% head()
+
+FindMarkers(aale_sc, ident.1 = 5, ident.2 = c(0,4), min.pct = 0.25, logfc.threshold = 0.5, only.pos = T) %>% head()
+FindMarkers(aale_sc, ident.1 = 4, ident.2 = c(0,5), min.pct = 0.25, logfc.threshold = 0.5, only.pos = T) %>% head()
+FindMarkers(aale_sc, ident.1 = 0, ident.2 = c(5,4), min.pct = 0.25, logfc.threshold = 0.5, only.pos = T) %>% head()
+```
+### tidying normalized counts
+```{r}
+# extract scaled, normalized counts
+aale_sc_norm_counts <- as.data.frame(as.matrix(aale_sc[["RNA"]]@data))
+# extract barcodes
+aale_sc_barcode_counts <- 
+  as.data.frame(as.matrix(aale_sc@meta.data)) %>% 
+  rownames_to_column('barcode')
+
+# tidy 
+aale_sc_norm_counts_tidy <-
+  aale_sc_norm_counts %>% 
+  rownames_to_column('gene') %>% 
+  gather(barcode, norm.counts, -gene) 
+# pair barcodes and counts
+aale_sc_norm_counts_tidy_merge <- 
+  merge(aale_sc_norm_counts_tidy, aale_sc_barcode_counts, by = 'barcode')
+```
+### Calculate gene sets within the suerat counts matrix:
+```{r}
+## using seurat wrappers for GGPLOT functions to visualize the means of gene sets on a per cell/per cluster basis
+# make a copy so we don't overwrite everything above accidentallu
+gene.set.kras.aale.sc <- aale_sc  
+
+msig.df$HALLMARK_INTERFERON_GAMMA_RESPONSE %>% 
+  as.data.frame() %>% filter(`.` %in% salmon.quant$aale$deseq$de$gene) %>% 
+  unique() %>% rename(gene = '.') ->msig.df.h.ifna
+# add the gene set as an attribute of the single cell object (requires the SCexperiment library)
+add.gene.set.to.sc <- function(gene.set, name){
+  gene.set <- 
+    rownames(gene.set.kras.aale.sc[['RNA']]@data)[rownames(gene.set.kras.aale.sc[['RNA']]@data) %in% gene.set]
+  
+  # Get mean expression of genes of interest per cell
+  mean.exp <- 
+    colMeans(x = gene.set.kras.aale.sc[['RNA']]@data[rownames(gene.set.kras.aale.sc[['RNA']]@data) %in% gene.set, ], 
+             na.rm = TRUE)
+  # Add mean expression values in 'object@meta.data$gene.set.score'
+  name <- deparse(substitute(name))
+  gene.set.kras.aale.sc@meta.data[, `name`] <- mean.exp 
+  return(gene.set.kras.aale.sc)
+}
+
+# need to pass the name like this in order to use it as a string...unless I overcomplicated things
+# gene.set.kras.aale.sc <- add.gene.set.to.sc(liu.isg.signature, `liu.isg.signature`)
+# gene.set.kras.aale.sc <- add.gene.set.to.sc(kras.isg.signature, `kras.isg.signature`)
+gene.set.kras.aale.sc <- add.gene.set.to.sc(msig.df.h.ifna$gene, `msig.df.h.ifna`)
+# gene.set.kras.aale.sc <- add.gene.set.to.sc(msig.df.h.ifng, `msig.df.h.ifng`)
+# gene.set.kras.aale.sc <- add.gene.set.to.sc(kras.signal.up, `kras.signal.up`)
+# gene.set.kras.aale.sc <- add.gene.set.to.sc(rig.i.mda5.induction, `rig.i.mda5.induction`)
+# gene.set.kras.aale.sc <- add.gene.set.to.sc(alu.gene.set, `alu`)
+# gene.set.kras.aale.sc <- add.gene.set.to.sc(mer.gene.set, `mer`)
+# gene.set.kras.aale.sc <- add.gene.set.to.sc(line.gene.set, `line`)
+# gene.set.kras.aale.sc <- add.gene.set.to.sc(ltr.gene.set, `ltr`)
+
+
+
+
+# spread data into gene columns
+norm.counts.plot <- 
+  aale_sc_norm_counts_tidy %>% 
+  filter(gene %in% msig.df.h.ifna$gene) %>% 
+  merge(aale_sc_barcode_counts, by = 'barcode') %>% 
+  group_by(barcode, orig.ident, seurat_clusters) %>% 
+  summarize(mean = mean(norm.counts))
+
+
+norm.counts.plot %>% 
+  ggplot(aes(orig.ident, mean, color = seurat_clusters)) + 
+  geom_sina(alpha = 0.4, position = position_dodge(width = 1)) + 
+  geom_boxplot(fill = NA, outlier.colour = NA, position = position_dodge(width = 1))
+  
+norm.counts.plot %>% 
+  ggplot(aes(seurat_clusters, fill = orig.ident)) + 
+  geom_bar(position = 'dodge') 
+
+summary(norm.counts.plot)
+
+norm.counts.plot %>% 
+  gather(gene, count, -cluster, -barcode) %>% 
+  group_by(gene) %>% 
+  summarise(count = mean(count)) %>% 
+  # filter(! gene %in% aale.de.seq$gene) %>% 
+  top_n(20, count)
+
+# iterate through named list and create a column for each, populating with the avg counts of that set
+for(name in names(gene.set.list)){
+  norm.counts.plot[, name] <-
+  rowMeans(norm.counts.plot[, colnames(norm.counts.plot) %>% 
+                            subset(. %in% unlist(eval(gene.set.list[name])))])
+}
+
+# make a slimmer df to work with going forward
+norm.counts.plot.final <-
+  norm.counts.plot %>%
+  select(barcode, cluster, unlist(names(gene.set.list)))
+```
+
+
 
 
 # Figures
