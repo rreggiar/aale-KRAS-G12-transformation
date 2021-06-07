@@ -1036,14 +1036,17 @@ aale_sc <- merge(kras_alevin_sc, ctrl_alevin_sc, add.cell.ids=c('aale_kras', 'aa
 ```{r}
 aale_sc[["percent.mt"]] <- PercentageFeatureSet(aale_sc, pattern = "^MT-")
 
+aale_sc[["percent.KRAS"]] <- PercentageFeatureSet(aale_sc, pattern = "KRAS", assay = 'RNA')
+
 # plot1 <- FeatureScatter(aale_sc, feature1 = "nCount_RNA", feature2 = "percent.mt")
 # plot2 <- FeatureScatter(aale_sc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 # plot2
 ```
 ###
 ```{r}
-aale_sc <- subset(aale_sc, subset = nFeature_RNA > 2100 & percent.mt < 7.5)
-VlnPlot(aale_sc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(aale_sc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt","percent.KRAS"), ncol = 4)
+aale_sc <- subset(aale_sc, subset = nFeature_RNA > 2100 & percent.mt < 8)# & percent.KRAS > 0.00)
+VlnPlot(aale_sc, features = c("nFeature_RNA", "percent.KRAS", "percent.mt","percent.ISG15"), ncol = 4)
 aale_sc <- NormalizeData(aale_sc)
 ```
 ###
@@ -1078,7 +1081,7 @@ print(aale_sc[["pca"]], dims = 1:5, nfeatures = 5)
 
 DimPlot(aale_sc, reduction = "pca")
 
-# DimHeatmap(aale_sc, dims = 1:15, cells = 500, balanced = TRUE)
+DimHeatmap(aale_sc, dims = 1:15, cells = 500, balanced = TRUE)
 ```
 ###
 ```{r}
@@ -1103,9 +1106,9 @@ JackStrawPlot(aale_sc, dims = 1:40)
 ```
 ###
 ```{r}
-dims = 30
+# dims = 30
 
-# dims = 15
+dims = 30
 set.seed(123)
 aale_sc <- FindNeighbors(aale_sc, dims = 1:dims)
 aale_sc <- FindClusters(aale_sc, resolution = 0.6)
@@ -1114,12 +1117,17 @@ aale_sc <- FindClusters(aale_sc, resolution = 0.6)
 ```{r}
 set.seed(123)
 
-aale_sc <- RunUMAP(aale_sc, dims = 1:dims, n.neighbors = 10)
+aale_sc <- RunUMAP(aale_sc, dims = 1:dims, n.neighbors = 5)
 
 DimPlot(aale_sc, reduction = "umap", group.by = 'orig.ident') /
 DimPlot(aale_sc, reduction = "umap", label = T) /
 FeaturePlot(aale_sc, features = c('KRAS', 'ISG15')) + theme_set_fun()
 ```
+####
+```{r}
+
+```
+
 ###w
 ```{r}
 set.seed(123)
@@ -1129,34 +1137,30 @@ aale.markers %>%
     group_by(cluster) %>%
     filter(p_val_adj < 0.05) -> aale.markers
 
-FindMarkers(aale_sc, ident.1 = 5,# ident.2 = c(0,3,6),
-# FindMarkers(aale_sc, ident.1 = 3,# ident.2 = c(8,0,6),
-            min.pct = 0.25, logfc.threshold = 0.25, only.pos = F) %>% 
-  filter(p_val_adj < 0.05) %>% 
-  rownames_to_column('gene') %>% 
-  mutate(rank = p_val * sin(avg_log2FC),
-         rank = scale(rank),
-         gene = as.character(gene)) -> clust.8.de
-
-summary(lm(data=clust.8.de %>% merge(salmon.quant$aale$deseq$de, by = 'gene'), 
-           formula = log2FoldChange ~ avg_log2FC))
-
+aale.markers %>% 
+  select(gene, avg_log2FC, cluster) %>% 
+  merge(salmon.quant$aale$deseq$de, by = 'gene') %>%
+  group_by(cluster) %>% 
+  do(broom::glance(lm(data=., formula = log2FoldChange ~ avg_log2FC))) -> aale.markers.model
 
 aale.markers %>% 
   select(gene, avg_log2FC, cluster) %>% 
   merge(salmon.quant$aale$deseq$de, by = 'gene') %>%
   group_by(cluster) %>% 
-  do(broom::glance(lm(data=., formula = log2FoldChange ~ avg_log2FC)))
+  do(broom::tidy(lm(data=., formula = log2FoldChange ~ avg_log2FC))) %>% 
+  filter(term == 'avg_log2FC') -> aale.markers.model
 
+FindMarkers(aale_sc, ident.1 = 6, #ident.2 = c(3),
+# FindMarkers(aale_sc, ident.1 = 3,# ident.2 = c(8,0,6),
+            min.pct = 0.25, logfc.threshold = 0.25, only.pos = F) %>% 
+  filter(p_val_adj < 0.05) %>% 
+  rownames_to_column('gene') %>% 
+  mutate(rank = -log(p_val + 1) * sin(avg_log2FC),
+         rank = scale(rank),
+         gene = as.character(gene)) -> clust.8.de
 
-
-  nest(avg_log2FC, log2FoldChange) %>% 
-  mutate(model = map(data, ~lm(avg_log2FC ~ log2FoldChange, data = .))) %>% 
-  mutate(tidy_model = map(model, broom::tidy)) %>% 
-  select(-data, -model) %>% unnest() %>% select(cluster, estimate, statistic, p.value) %>% unique()
-
-lm(avg_log2FC ~ log2FoldChange, clust.8.de %>% merge(salmon.quant$aale$deseq$de, by = 'gene'))
-
+summary(lm(data=clust.8.de %>% merge(salmon.quant$aale$deseq$de, by = 'gene'), 
+           formula = log2FoldChange ~ avg_log2FC))
 
 clust.8.de %>% 
   merge(salmon.quant$aale$deseq$de, by = 'gene') %>% 
@@ -1164,6 +1168,7 @@ clust.8.de %>%
   geom_point() + 
   geom_text_repel(aes(label = gene)) + 
   geom_hline(yintercept = 0, color = 'grey', linetype = 'dotted') + 
+  geom_vline(xintercept = 0, color = 'grey', linetype = 'dotted') + 
   geom_smooth(method = 'lm', state = 'line')
 
 clust.8.rnk <- 
@@ -1194,7 +1199,10 @@ FindMarkers(aale_sc, ident.1 = 2, ident.2 = c(5,4),
   filter(p_val_adj < 0.05) %>% 
   head()
 
-aale_sc[["umap"]]@cell.embeddings
+aale_sc[["umap"]]@cell.embeddings %>% 
+  as.data.frame() %>% 
+  ggplot(aes(UMAP_1, UMAP_2)) + 
+  geom_point(alpha = 0.4)
 
 DoHeatmap(aale_sc, features = filter(aale.markers, avg_log2FC >= 1)$gene)
 
@@ -1203,7 +1211,7 @@ FindMarkers(aale_sc, ident.1 = 3, ident.2 = c(2,1), min.pct = 0.25, logfc.thresh
 
 FindMarkers(aale_sc, ident.1 = 5, ident.2 = c(0,4), min.pct = 0.25, logfc.threshold = 0.5, only.pos = T) %>% head()
 FindMarkers(aale_sc, ident.1 = 4, ident.2 = c(0,5), min.pct = 0.25, logfc.threshold = 0.5, only.pos = T) %>% head()
-FindMarkers(aale_sc, ident.1 = 0, ident.2 = c(5,4), min.pct = 0.25, logfc.threshold = 0.5, only.pos = T) %>% head()
+FindMarkers(aale_sc, ident.1 = 5, ident.2 = c(3), min.pct = 0.125, logfc.threshold = 0.5, only.pos = F) -> tmp.df
 ```
 ### tidying normalized counts
 ```{r}
@@ -1229,7 +1237,7 @@ aale_sc_norm_counts_tidy_merge <-
 # make a copy so we don't overwrite everything above accidentallu
 gene.set.kras.aale.sc <- aale_sc  
 
-msig.df$HALLMARK_INTERFERON_GAMMA_RESPONSE %>% 
+msig.df$HALLMARK_KRAS_SIGNALING_UP %>% 
   as.data.frame() %>% filter(`.` %in% salmon.quant$aale$deseq$de$gene) %>% 
   unique() %>% rename(gene = '.') ->msig.df.h.ifna
 # add the gene set as an attribute of the single cell object (requires the SCexperiment library)
@@ -1275,6 +1283,19 @@ norm.counts.plot %>%
   ggplot(aes(orig.ident, mean, color = seurat_clusters)) + 
   geom_sina(alpha = 0.4, position = position_dodge(width = 1)) + 
   geom_boxplot(fill = NA, outlier.colour = NA, position = position_dodge(width = 1))
+
+aale_sc[["umap"]]@cell.embeddings %>% 
+  as.data.frame() %>% 
+  rownames_to_column('barcode') %>% 
+  merge(norm.counts.plot, by = 'barcode') %>% 
+  ggplot(aes(UMAP_1, UMAP_2, color = mean)) + 
+  geom_point() + 
+  scale_color_viridis()
+
+atac_consensus_counts <- read_tsv(file.path(output.data.dir,
+'atac_out/bwa/mergedLibrary/macs/broadPeak/consensus/consensus_peaks.mLb.clN.featureCounts.txt'), skip = 1)
+atac_annotate_peaks <- read_tsv(file.path(output.data.dir,
+'atac_out/bwa/mergedLibrary/macs/broadPeak/consensus/consensus_peaks.mLb.clN.annotatePeaks.txt'))
   
 norm.counts.plot %>% 
   ggplot(aes(seurat_clusters, fill = orig.ident)) + 
@@ -1300,6 +1321,157 @@ for(name in names(gene.set.list)){
 norm.counts.plot.final <-
   norm.counts.plot %>%
   select(barcode, cluster, unlist(names(gene.set.list)))
+```
+
+### bisque
+```{r}
+library(BisqueRNA)
+library(Biobase)
+
+expand_grid(kras = colnames(salmon.quant$aale$deseq$counts)[grep("kras", colnames(salmon.quant$aale$deseq$counts))],
+            ctrl = colnames(salmon.quant$aale$deseq$counts)[grep("ctrl", colnames(salmon.quant$aale$deseq$counts))]
+            ) -> bulk.eset.grid
+
+bulk.eset.grid %>% 
+  pmap_df(function(kras, ctrl){
+  
+  print(kras)
+  print(ctrl)
+  
+  assay(salmon.quant$aale$gxi, 'counts') %>% 
+    as.data.frame() %>% 
+    rownames_to_column('ensg') %>% 
+    merge(gencode.35.tx.to.gene %>% select(ensg, gene) %>% unique(), by = 'ensg') %>% 
+    select(gene, contains('.')) %>% 
+    unique() %>% 
+    group_by(gene) %>% add_tally() %>% filter(n == 1) %>% select(-n) %>% 
+    select(gene, 'ctrl' = all_of(ctrl), 'kras' = all_of(kras)) %>% 
+    remove_rownames() %>% column_to_rownames('gene') %>% 
+    as.matrix() %>% Biobase::ExpressionSet(assayData = .) -> bulk.eset
+  
+  res <- BisqueRNA::ReferenceBasedDecomposition(bulk.eset, sc.eset, markers = NULL, use.overlap = F)
+  
+  return(res$bulk.props %>% as.data.frame() %>% rename(ctrl = 'ctrl', kras = 'kras') %>% rownames_to_column('cluster'))
+  
+}) -> bisque.rep.df
+
+
+DimPlot(aale_sc, reduction = "umap", group.by = 'orig.ident') /
+DimPlot(aale_sc, reduction = "umap", label = T) 
+
+bisque.rep.df %>% 
+  gather(condition, prop, -cluster) %>% 
+  ggplot(aes(cluster, prop, color = condition)) + 
+  geom_jitter(position = position_dodge(width = 1)) + 
+  geom_boxplot(position = position_dodge(width = 1), fill = NA, outlier.color = NA) + 
+  scale_color_viridis_d()
+
+aale_sc_barcode_counts %>% 
+  ggplot(aes(seurat_clusters, fill = orig.ident)) + 
+  geom_bar() + 
+  scale_fill_viridis_d()
+
+```
+
+### RNA velocity
+```{r}
+tximeta::loadLinkedTxome(file.path(reference.dir, "gencode.v35.annotation.expanded_docker.json"))
+
+kras_txi <- tximeta(coldata = data.frame(
+  names = 'aale_kras',
+  files = file.path(output.data.dir, 
+                         'alevin_kras.fastq_sel.align.gencode.v35.process.aware.salmon.v1.3.0.sidx',
+                         'alevin/quants_mat.gz'),
+  stringsAsFactors = F), type = 'alevin')
+
+ctrl_txi <- tximeta(coldata = data.frame(
+  names = 'aale_ctrl',
+  files = file.path(output.data.dir, 
+                         'alevin_ctrl.fastq_sel.align.gencode.v35.process.aware.salmon.v1.3.0.sidx',
+                         'alevin/quants_mat.gz'),
+  stringsAsFactors = F), type = 'alevin')
+
+aale_txi_splice <- cbind(kras_txi, ctrl_txi)
+
+
+cg <- read.delim(file.path(reference.dir, "gencode.v35.annotation.expanded.tsv"),
+                 header = TRUE, as.is = TRUE)
+## Rename the 'intron' column 'unspliced' to make assay names compatible with scVelo
+colnames(cg)[colnames(cg) == "intron"] <- "unspliced"
+kras_txi <- tximeta::splitSE(se = kras_txi, splitDf = cg, assayName = "counts")
+ctrl_txi <- tximeta::splitSE(ctrl_txi, cg, assayName = "counts")
+aale_txi_splice <- tximeta::splitSE(aale_txi_splice, cg, assayName = "counts")
+
+kras_txi <- as(kras_txi, "SingleCellExperiment")
+assays(kras_txi) <- list(
+    counts = assay(kras_txi, "spliced"),
+    spliced = assay(kras_txi, "spliced"),
+    unspliced = assay(kras_txi, "unspliced")
+)
+kras_txi <- scater::logNormCounts(kras_txi)
+kras_txi <- scater::runPCA(kras_txi)
+kras_txi <- scater::runUMAP(kras_txi, dimred = "PCA")
+
+spliced <- t(assay(kras_txi, "spliced"))
+unspliced <- t(assay(kras_txi, "unspliced"))
+umap <- reducedDim(kras_txi, "UMAP")
+pca <- reducedDim(kras_txi, "PCA")
+
+Matrix::writeMM(spliced, file.path(output.data.dir, 'kras_txi_sc_spliced.MM'))
+Matrix::writeMM(unspliced, file.path(output.data.dir, 'kras_txi_sc_unspliced.MM'))
+write.csv(umap, file.path(output.data.dir, 'kras_txi_sc_umap.MM'))
+write.csv(pca, file.path(output.data.dir, 'kras_txi_sc_pca.MM'))
+
+
+as.Seurat(kras_txi)
+
+ctrl_txi <- as(ctrl_txi, "SingleCellExperiment")
+
+splice_txi_sce <- cbind(kras_txi, ctrl_txi)
+assays(aale_txi_splice) <- list(
+    counts = assay(aale_txi_splice, "spliced"),
+    spliced = assay(aale_txi_splice, "spliced"),
+    unspliced = assay(aale_txi_splice, "unspliced")
+)
+
+aale_txi_splice <- scater::logNormCounts(aale_txi_splice)
+aale_txi_splice <- scater::runPCA(aale_txi_splice)
+
+tmp_txi = kras_txi
+assays(tmp_txi) <- list(
+    counts = assay(tmp_txi, "spliced")
+)
+
+tmp_txi <- scater::logNormCounts(tmp_txi)
+
+
+as.Seurat(tmp_txi)
+
+
+tmp_txi <- scater::runPCA(tmp_txi)
+tmp_txi <- scater::runUMAP(tmp_txi, dimred = "PCA")
+
+as.Seurat(tmp_txi)
+
+print(sum(assay(txis, "spliced")))
+print(sum(assay(txis, "unspliced")))
+
+spliced <- t(assay(tmp_txi, "spliced"))
+unspliced <- t(assay(tmp_txi, "unspliced"))
+umap <- reducedDim(tmp_txi, "UMAP")
+pca <- reducedDim(tmp_txi, "PCA")
+
+```
+###
+```{r}
+kras_splice_alevin_sc <- 
+  Seurat::CreateSeuratObject(counts = kras_txi$counts, min.cells = 3, min.features = 200, project = 'kras')
+ctrl_splice_alevin_sc <- 
+  Seurat::CreateSeuratObject(counts = ctrl_txi$counts, min.cells = 3, min.features = 200, project = 'ctrl')
+```
+###
+```{r}
+aale_sc <- merge(kras_alevin_sc, ctrl_alevin_sc, add.cell.ids=c('aale_kras', 'aale_ctrl'))
 ```
 
 
