@@ -1237,18 +1237,18 @@ ComplexHeatmap::Heatmap(t(toil_hm_counts),
                         show_row_names = F,
                         left_annotation = toil_sample_anno, 
                         bottom_annotation = gene_motif_anno, 
-                        heatmap_width = unit(panel.figure.width, 'mm'),
-                        heatmap_height = unit(panel.figure.height/2, 'mm'),
+                        # heatmap_width = unit(panel.figure.width, 'mm'),
+                        # heatmap_height = unit(panel.figure.height/2, 'mm'),
                         column_dend_height = unit(3, 'mm'),
-                        row_dend_width = unit(4, 'mm')) -> toil_hm_plt
-                        # height = unit((panel.figure.height/2)/1.33, 'mm'), 
-                        # width = unit((panel.figure.width)/1.619, 'mm')) #-> toil_hm_plt
+                        row_dend_width = unit(4.5, 'mm'),
+                        height = unit((panel.figure.height/2)/1.23, 'mm'),
+                        width = unit((panel.figure.width)/1.46, 'mm')) -> toil_hm_plt
 
 size = calc_ht_size(toil_hm_plt)
 size
 
 pdf(file = file.path(figure.dir, 'fig.1', 'toil_hm.pdf'),
-    width=unit(panel.figure.width, 'mm'), height=unit(panel.figure.height/2, 'mm'), family = 'Helvetica')
+    width=unit(size[1], 'mm'), height=unit(size[2], 'mm'), family = 'Helvetica')
 
 toil_hm_plt
 
