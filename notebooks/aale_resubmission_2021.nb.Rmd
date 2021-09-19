@@ -79,7 +79,7 @@ theme_set(theme_foundation(base_size = base_size,
                 axis.ticks.length.x.top = NULL, axis.ticks.length.x.bottom = NULL, 
                 axis.ticks.length.y = NULL, axis.ticks.length.y.left = NULL, 
                 axis.ticks.length.y.right = NULL,
-                strip.text = element_text(size = 8),
+                strip.text = element_text(size = rel(0.95), face = 'bold'),
                 strip.background = element_blank(),
                 legend.key.size= unit(0.08, "in"),
                 legend.spacing = unit(0, "in"),
@@ -1090,7 +1090,7 @@ salmon.quant$aale$intra$deseq$de %>%
   mutate(gene_set = factor(gene_set, levels = c('KRAS','IFN','ZNF', 'other'))) %>% 
   filter(padj < 0.05) %>% 
   ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
-  geom_point() + 
+  geom_point(alpha = 0.6) + 
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
                                                 padj < 0.0001 & gene_set != 'other', gene, ''))) +
   facet_col(~gene_set, scales = 'free_y') +
@@ -1105,9 +1105,9 @@ salmon.quant$hbec$lacz_v_v12$deseq$de %>%
 
 # salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
 salmon.quant$aale$intra$deseq$de %>% 
-  mutate(cell_line = 'aale') %>% 
+  mutate(cell_line = 'AALE') %>% 
   rbind(salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
-    mutate(cell_line = 'hbec')) %>% 
+    mutate(cell_line = 'HBEC')) %>% 
   filter(padj < 0.05) %>% 
   filter(gene %in% c(ifn_a, ifn_g)) %>% 
   mutate(IRF9 = ifelse(gene %in% irf9_fimo_results$gene, T, F)) %>%
@@ -1116,7 +1116,7 @@ salmon.quant$aale$intra$deseq$de %>%
   geom_jitter(alpha = 0.4, width = 0.15) +
   facet_col(~cell_line, scales = 'free_y') +
   # geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1, gene, ''))) +
-  stat_compare_means(label.x.npc = 0.55, label.y.npc = 0.06) + 
+  stat_compare_means(label.x.npc = 0.55, label.y.npc = 0.03) + 
   xlab('IRF9 motif')
   
 panel.save(figure = 1, name = 'facet_set_irf9_expression', width = 'single', height = 'single')
@@ -1239,10 +1239,10 @@ ComplexHeatmap::Heatmap(t(toil_hm_counts),
                         bottom_annotation = gene_motif_anno, 
                         # heatmap_width = unit(panel.figure.width, 'mm'),
                         # heatmap_height = unit(panel.figure.height/2, 'mm'),
-                        column_dend_height = unit(3, 'mm'),
-                        row_dend_width = unit(4.5, 'mm'),
-                        height = unit((panel.figure.height/2)/1.23, 'mm'),
-                        width = unit((panel.figure.width)/1.46, 'mm')) -> toil_hm_plt
+                        # column_dend_height = unit(3, 'mm'),
+                        # row_dend_width = unit(4.5, 'mm'),
+                        height = unit((panel.figure.height/2)/1.31, 'mm'),
+                        width = unit((panel.figure.width)/1.62, 'mm')) -> toil_hm_plt
 
 size = calc_ht_size(toil_hm_plt)
 size
