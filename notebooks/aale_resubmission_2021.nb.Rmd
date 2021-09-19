@@ -50,8 +50,8 @@ suppressPackageStartupMessages({
   library(HDF5Array)
   library(DESeq2)
   # library(ggpmisc)
-  # library(survival)
-  # library(survminer)
+  library(survival)
+  library(survminer)
 })
 suppressMessages(loadfonts())
 ```
@@ -876,12 +876,15 @@ library(GenomicRanges)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(BSgenome)
 
+ifn_g <- msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE
+ifn_a <- msig.df$HALLMARK_INTERFERON_GAMMA_RESPONSE
+
 options(meme_db = system.file(file.path(output.data.dir, 'referenc.data', 
                                         'HOCOMOCOv11_core_HUMAN_mono_meme_format.meme')))
 
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, log2FoldChange > 1, gene %in% c(ifn_g, ifn_a)) %>% 
-  filter(gene %in% filter(salmon.quant$hbec$hbec_v12$deseq$de, padj < 0.05, log2FoldChange < -1)$gene) %>%
+  # filter(gene %in% filter(salmon.quant$hbec$hbec_v12$deseq$de, padj < 0.05, log2FoldChange < -1)$gene) %>%
   select(gene_id) %>% unlist() %>% unname() -> de_list
 
 gr <- rowRanges(salmon.quant$gxi)
@@ -952,9 +955,6 @@ makeGRangesFromDataFrame(salmon.quant$gxi.bed %>%
 
 ```{r}
 
-ifn_g <- msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE
-ifn_a <- msig.df$HALLMARK_INTERFERON_GAMMA_RESPONSE
-
 salmon.quant$aale$intra$deseq$de %>%
   filter(padj < 0.05, log2FoldChange > 1, gene %in% c(ifn_g, ifn_a)) %>%
   filter(gene %in% filter(salmon.quant$hbec$hbec_v12$deseq$de, padj < 0.05, log2FoldChange < -1)$gene) %>%
@@ -1012,10 +1012,6 @@ ComplexHeatmap::Heatmap(hm_count_data, col = viridis(16, option = 'plasma'),
 ```
 
 ```{r}
-
-library(huxtable)
-library(flextable)
-
 msig.df[grepl('INTERFERON', names(msig.df))] %>% 
                              unlist() %>% unname() -> ifn_gene_list
 
@@ -1031,21 +1027,10 @@ salmon.quant$aale$intra$deseq$H.fgsea %>%
   arrange(-NES, padj) %>% 
   filter(!grepl('ZNF', pathway)) -> exp_tbl
 
-pdf(file.path(figure.dir, 'fig.1', 'test_table.pdf'), 
-    width = unit(panel.figure.width, 'mm'),
-    height = unit(panel.figure.height/3, 'mm'))
-
 exp_tbl %>% 
   select(pathway, padj, NES, coverage) %>% 
   mutate(padj = format(padj, scientific= T, digits = 2)) %>% 
   gridExtra::grid.table() 
-
-dev.off()
-
-ggsave(plot = test_table,
-       filename = file.path(figure.dir, 'fig.1', 'test_table.pdf'), 
-       width = panel.figure.width, 
-       height = panel.figure.height/3, units = 'mm')
 
 
 salmon.quant$aale$intra$deseq$de %>% 
@@ -1064,14 +1049,124 @@ salmon.quant$aale$intra$deseq$de %>%
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed')
 
 panel.save(figure = 1, name = 'facet_set_volcano', width = 'single', height = 'double')
-
-
-
-
-
-
 ```
 
+```{r}
+toil.survival <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.survival.tsv.gz')) 
+luad.phenotypes <- 
+  read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.GDC_phenotype.tsv.gz')) %>% 
+  select(sample = submitter_id.samples, 
+       sample_type = sample_type.samples,
+       stage = tumor_stage.diagnoses,
+       age = age_at_index.demographic,
+       sex = gender.demographic,
+       race = race.demographic)
+luad.mutect <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.mutect2_snv.tsv.gz')) %>% 
+  filter(gene %in% c('KRAS')) %>% 
+  select(sample = Sample_ID, gene, aa_change = Amino_Acid_Change) %>% 
+  pivot_wider(names_from = gene, values_from = aa_change) %>% 
+  mutate(across(.cols = where(is.list), paste)) 
+
+luad.phenotypes.merge <- luad.phenotypes %>% 
+  merge(luad.mutect, by = 'sample', all.x = T) %>% 
+  filter(sample_type %in% c('Primary Tumor', 'Solid Tissue Normal')) %>% 
+  merge(toil.survival, by = 'sample') %>% 
+  mutate(sample = str_sub(sample, end = str_length(sample) - 1)) %>% 
+  replace_na(list(KRAS = 'WT')) %>% 
+  mutate(KRAS = ifelse(sample_type == 'Solid Tissue Normal', 'WT_normal', KRAS))
+
+norm.counts.final <- read_tsv(file.path(output.data.dir, 'tcga.data', 'luad.data.frame.tsv'))
+```
+
+```{r}
+
+norm.counts.final %>% 
+  filter(sample != 'TCGA-44-3917-01') %>% 
+  filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
+
+working_toil_counts %>% 
+  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  # filter(gene %in% exo.above_1.list$surv$gene) %>%
+  # filter(gene %in% tmp.df$gene) %>% 
+  group_by(gene) %>%
+  mutate(count = scale(log1p(count), center = T)) %>%
+  select(sample, gene, count) %>%
+  pivot_wider(names_from = gene, values_from = count) %>%
+  distinct() %>% 
+  column_to_rownames('sample') %>% 
+  t() -> toil_hm_counts
+
+working_toil_counts %>% 
+  select(sample, 'G12D' = KRAS) %>%
+  distinct() %>% 
+  column_to_rownames('sample') %>% 
+  ComplexHeatmap::columnAnnotation(df = . , 
+                                   col = list(G12D = c('WT_normal' = 'white', 
+                                                       'p.G12D' = 'black')),
+                                   show_legend = F) -> toil_sample_anno
+
+
+
+working_toil_counts %>% 
+  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  select(gene) %>% 
+  distinct() %>% 
+  mutate(FOS = ifelse(gene %in% fos_fimo_results$gene, T, F),
+         ISRE = ifelse(gene %in% isre_fimo_results$gene, T, F)) %>% 
+  column_to_rownames('gene') %>% 
+  ComplexHeatmap::rowAnnotation(df =.,
+                                col = list(FOS = c('TRUE' = 'black', 'FALSE' = 'white'),
+                                           ISRE = c('TRUE' = 'black', 'FALSE' = 'white')),
+                                show_legend = F) -> gene_motif_anno
+
+ComplexHeatmap::Heatmap(toil_hm_counts, 
+                        name = 'z-score', 
+                        show_column_names = F,
+                        top_annotation = toil_sample_anno, 
+                        left_annotation = gene_motif_anno)
+
+working_toil_counts %>% 
+  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  ggplot(aes(KRAS, count)) + 
+  geom_boxplot(outlier.colour = NA, fill = NA) +
+  geom_point() + 
+  facet_wrap(~gene) + 
+  stat_compare_means(comparisons = list(c('p.G12D', 'WT_normal')), method = 'wilcox')
+```
+
+```{r}
+myc.avg.counts.tidy.stratified <-
+  norm.counts.final %>%
+  filter(sample_type == 'Primary Tumor') %>%
+  # filter(gene %in% tmp.df$gene) %>%
+  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  select(sample, count) %>% 
+  group_by(sample) %>%
+  summarize(avg.count = mean(count)) %>%
+  mutate(gene.set = 'toil_ifn') %>%
+  group_by(gene.set) %>%
+  mutate(stratum = ifelse(avg.count >= quantile(avg.count, 0.66),
+                          'top-third', ifelse(avg.count <= quantile(avg.count, 0.33),
+                                              'bottom-third', 'middle'))) %>%
+  filter(stratum != 'middle') %>%
+  spread(gene.set, stratum)
+
+surv.obj <- Surv(time = filter(luad.phenotypes.merge %>% select(sample, OS.time, OS) %>% distinct() , 
+                               sample %in% myc.avg.counts.tidy.stratified$sample)$OS.time,
+                 event = filter(luad.phenotypes.merge %>% select(sample, OS.time, OS) %>% distinct(), 
+                                sample %in% myc.avg.counts.tidy.stratified$sample)$OS)
+
+surv.fit <- survfit(as.formula(surv.obj ~ myc.avg.counts.tidy.stratified$toil_ifn), 
+                    data = myc.avg.counts.tidy.stratified)
+ggsurvplot(surv.fit,
+           pval = T, 
+           legend.title = "",
+           ggtheme = theme_set_fun() + theme(legend.position = c(0.45,0.95)),
+           pval.coord = c(0, 0.08),
+           palette = viridis(3)[c(2,1)]) -> surv.plt
+surv.plt
+
+```
 
 
 
