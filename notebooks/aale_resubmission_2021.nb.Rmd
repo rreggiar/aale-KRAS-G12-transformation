@@ -892,53 +892,88 @@ library(BSgenome)
 ifn_g <- msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE
 ifn_a <- msig.df$HALLMARK_INTERFERON_GAMMA_RESPONSE
 
-options(meme_db = system.file(file.path(output.data.dir, 'referenc.data', 
-                                        'HOCOMOCOv11_core_HUMAN_mono_meme_format.meme')))
+options(meme_db = file.path(output.data.dir, 'reference.data', 
+                            'HOCOMOCOv11_core_HUMAN_mono_meme_format.meme'))
 
 salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange > 1, gene %in% c(ifn_g, ifn_a)) %>% 
-  # filter(gene %in% filter(salmon.quant$hbec$hbec_v12$deseq$de, padj < 0.05, log2FoldChange < -1)$gene) %>%
+  filter(padj < 0.05, log2FoldChange > 0, gene %in% c(ifn_g, ifn_a)) %>% 
+  filter(gene %in% filter(salmon.quant$hbec$lacz_v_v12$deseq$de, padj < 0.05, log2FoldChange > 0)$gene) %>% 
   select(gene_id) %>% unlist() %>% unname() -> de_list
+
+salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange > 0) %>% #, gene %in% c(ifn_g, ifn_a)) %>% 
+  filter(!gene %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 0)$gene) %>% 
+  select(gene_id) %>% unlist() %>% unname() -> de_list_w_hbec
 
 gr <- rowRanges(salmon.quant$gxi)
 
 ifn_de_gr <- gr[names(gr) %in% de_list]
+ifn_de_gr_hbec <- gr[names(gr) %in% de_list_w_hbec]
+
+
 
 # values(gr) <- cbind(values(gr), Biostrings::letterFrequency(x = seqs, letters = "GC", as.prob = TRUE))
 # 
 # sub_gr <- 
 #   gr[values(gr)[, 'gene_id'] %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.01, log2FoldChange > 1)$gene_id]
 
-seqs <- getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_de_gr)
+# seqs <- getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_de_gr)
 
 promoter_seqs <- 
   GenomicFeatures::extractUpstreamSeqs(x = BSgenome.Hsapiens.UCSC.hg38, genes = ifn_de_gr, width = 1000)
 
+promoter_seqs_hbec <- 
+  GenomicFeatures::extractUpstreamSeqs(x = BSgenome.Hsapiens.UCSC.hg38, genes = ifn_de_gr_hbec, width = 1000)
+
 
 # dreme_results <- memes::runDreme(promoter_seqs, control = "shuffle")
 # 
-# tomTom_res <- memes::runAme(control = 'shuffle', 
-#                             input = promoter_seqs, 
-#                             database = file.path(output.data.dir, 'reference.data', 
-#                                         'HOCOMOCOv11_core_HUMAN_mono_meme_format.meme'))
+tomTom_res <- memes::runAme(control = promoter_seqs_hbec,
+                            input = promoter_seqs)
 
 isre_motif <- MotifDb::query(MotifDb::MotifDb, "ISRE") %>% 
   universalmotif::convert_motifs()
 
 isre_motif <- isre_motif[[1]]
 
+irf9_motif <- MotifDb::query(MotifDb::MotifDb, "IRF9_HUMAN.H11MO.0.C") %>% 
+  universalmotif::convert_motifs()
+
+irf1_motif <- MotifDb::query(MotifDb::MotifDb, "IRF1") %>% 
+  universalmotif::convert_motifs()
+
+irf1_motif <- irf1_motif[[3]]
+
 fos_motif <- MotifDb::query(MotifDb::MotifDb, "AP-1") %>% 
   universalmotif::convert_motifs()
 
-isre_fimo_results <- memes::runFimo(promoter_seqs, isre_motif, thresh = 1e-4) %>% 
-  as.data.frame() %>% 
-  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') %>%
-  select(gene) %>% distinct()
+stat2_motif <- MotifDb::query(MotifDb::MotifDb, 'STAT2_HUMAN.H11MO.0.A') %>% 
+  universalmotif::convert_motifs()
 
-fos_fimo_results <- memes::runFimo(promoter_seqs, fos_motif, thresh = 1e-4) %>% 
+isre_fimo_results <- memes::runFimo(promoter_seqs, isre_motif, thresh = 1e-3) %>% 
   as.data.frame() %>% 
-  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') %>%
-  select(gene) %>% distinct()
+  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id')
+  # select(gene) %>% distinct()
+
+irf1_fimo_results <- memes::runFimo(promoter_seqs, irf1_motif, thresh = 1e-5) %>% 
+  as.data.frame() %>% 
+  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id')
+  # select(gene) %>% distinct()
+
+fos_fimo_results <- memes::runFimo(promoter_seqs, fos_motif, thresh = 1e-6) %>% 
+  as.data.frame() %>% 
+  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') 
+  # select(gene) %>% distinct()
+
+stat2_fimo_results <- memes::runFimo(promoter_seqs, stat2_motif, thresh = 1e-3) %>% 
+  as.data.frame() %>% 
+  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') 
+  # select(gene) %>% distinct()
+
+irf9_fimo_results <- memes::runFimo(promoter_seqs, irf9_motif, thresh = 1e-3) %>% 
+  as.data.frame() %>% 
+  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') 
+  # select(gene) %>% distinct()
 
 # fimo_results %>% as.data.frame() %>% 
 #   merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') %>% 
@@ -1063,6 +1098,29 @@ salmon.quant$aale$intra$deseq$de %>%
 
 panel.save(figure = 1, name = 'facet_set_volcano', width = 'single', height = 'double')
 
+salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+   filter(padj < 0.05, log2FoldChange > 1) %>% 
+   select(gene) %>% unlist() %>% unname() -> hbec_up
+
+
+# salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+salmon.quant$aale$intra$deseq$de %>% 
+  mutate(cell_line = 'aale') %>% 
+  rbind(salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+    mutate(cell_line = 'hbec')) %>% 
+  filter(padj < 0.05) %>% 
+  filter(gene %in% c(ifn_a, ifn_g)) %>% 
+  mutate(IRF9 = ifelse(gene %in% irf9_fimo_results$gene, T, F)) %>%
+  ggplot(aes(IRF9, log2FoldChange)) + 
+  geom_boxplot(outlier.colour = NA, fill = NA) +
+  geom_jitter(alpha = 0.4, width = 0.15) +
+  facet_col(~cell_line, scales = 'free_y') +
+  # geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1, gene, ''))) +
+  stat_compare_means(label.x.npc = 0.55, label.y.npc = 0.06) + 
+  xlab('IRF9 motif')
+  
+panel.save(figure = 1, name = 'facet_set_irf9_expression', width = 'single', height = 'single')
+
 
 salmon.quant$aale$intra$deseq$de %>% 
   dplyr::rename('AALE' = log2FoldChange) %>% 
@@ -1072,11 +1130,24 @@ salmon.quant$aale$intra$deseq$de %>%
           dplyr::rename('HBEC' = log2FoldChange) %>% 
           filter(padj < 0.05) %>% 
           mutate(HBEC = HBEC), by = 'gene') %>% 
-  ggplot(aes(AALE, HBEC)) + 
+  mutate(ISRE = ifelse(gene %in% irf9_fimo_results$gene, T, F)) %>% 
+  ggplot(aes(AALE, HBEC, color = ISRE)) + 
   geom_point() + 
+  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
   geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
-  geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')))
+  geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')), show.legend = F) + 
+  theme(legend.position = c(0.99, 0.92))
+  
+  salmon.quant$aale$intra$deseq$de %>% 
+  dplyr::rename('AALE' = log2FoldChange) %>% 
+  filter(padj < 0.05,
+         gene %in% c(ifn_a, ifn_g)) %>% 
+  merge(salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+          dplyr::rename('HBEC' = log2FoldChange) %>% 
+          filter(padj < 0.05) %>% 
+          mutate(HBEC = HBEC), by = 'gene') %>% 
+    lm(AALE ~ HBEC, data = .) %>% summary()
 
 
 panel.save(figure = 1, name = 'de_scatter_ifn', width = 'single', height = 'single')
@@ -1147,7 +1218,7 @@ working_toil_counts %>%
   filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
   select(gene) %>% 
   distinct() %>% 
-  mutate(ISRE = ifelse(gene %in% isre_fimo_results$gene, T, F)) %>% 
+  mutate(ISRE = ifelse(gene %in% irf9_fimo_results$gene, T, F)) %>% 
   column_to_rownames('gene') %>% 
   ComplexHeatmap::columnAnnotation(df =.,
                                 col = list(ISRE = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
@@ -1164,7 +1235,7 @@ ComplexHeatmap::Heatmap(t(toil_hm_counts),
                         left_annotation = toil_sample_anno, 
                         bottom_annotation = gene_motif_anno, 
                         height = unit((panel.figure.height/2)/1.33, 'mm'), 
-                        width = unit((panel.figure.width)/1.619, 'mm')) -> toil_hm_plt
+                        width = unit((panel.figure.width)/1.619, 'mm')) #-> toil_hm_plt
 
 size = calc_ht_size(toil_hm_plt)
 size
