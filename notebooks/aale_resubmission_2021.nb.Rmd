@@ -173,7 +173,7 @@ chr.order <- c('chr1', 'chr2', 'chr3',
 panel.figure.width = 85
 panel.figure.width.medium = 114
 panel.figure.width.double = 174
-panel.figure.heigh = 279.4 
+panel.figure.height = 279.4 
 # panel.figure.width.in = 3.4252
 # panel.figure.height = 22.5
 # panel.figure.height.in = 8.858268
@@ -876,17 +876,57 @@ library(GenomicRanges)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(BSgenome)
 
-seqs <- getSeq(BSgenome.Hsapiens.UCSC.hg38, rowRanges(salmon.quant$gxi))
+options(meme_db = system.file(file.path(output.data.dir, 'referenc.data', 
+                                        'HOCOMOCOv11_core_HUMAN_mono_meme_format.meme')))
+
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange > 1, gene %in% c(ifn_g, ifn_a)) %>% 
+  filter(gene %in% filter(salmon.quant$hbec$hbec_v12$deseq$de, padj < 0.05, log2FoldChange < -1)$gene) %>%
+  select(gene_id) %>% unlist() %>% unname() -> de_list
 
 gr <- rowRanges(salmon.quant$gxi)
 
-values(gr) <- cbind(values(gr), Biostrings::letterFrequency(x = seqs, letters = "GC", as.prob = TRUE))
+ifn_de_gr <- gr[names(gr) %in% de_list]
 
-sub_gr <- 
-  gr[values(gr)[, 'gene_id'] %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.01, log2FoldChange > 1)$gene_id]
+# values(gr) <- cbind(values(gr), Biostrings::letterFrequency(x = seqs, letters = "GC", as.prob = TRUE))
+# 
+# sub_gr <- 
+#   gr[values(gr)[, 'gene_id'] %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.01, log2FoldChange > 1)$gene_id]
+
+seqs <- getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_de_gr)
+
+promoter_seqs <- 
+  GenomicFeatures::extractUpstreamSeqs(x = BSgenome.Hsapiens.UCSC.hg38, genes = ifn_de_gr, width = 1000)
 
 
-GenomicFeatures::extractUpstreamSeqs(x = BSgenome.Hsapiens.UCSC.hg38, genes = sub_gr, width = 1000)
+# dreme_results <- memes::runDreme(promoter_seqs, control = "shuffle")
+# 
+# tomTom_res <- memes::runAme(control = 'shuffle', 
+#                             input = promoter_seqs, 
+#                             database = file.path(output.data.dir, 'reference.data', 
+#                                         'HOCOMOCOv11_core_HUMAN_mono_meme_format.meme'))
+
+isre_motif <- MotifDb::query(MotifDb::MotifDb, "ISRE") %>% 
+  universalmotif::convert_motifs()
+
+isre_motif <- isre_motif[[1]]
+
+fos_motif <- MotifDb::query(MotifDb::MotifDb, "AP-1") %>% 
+  universalmotif::convert_motifs()
+
+isre_fimo_results <- memes::runFimo(promoter_seqs, isre_motif, thresh = 1e-4) %>% 
+  as.data.frame() %>% 
+  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') %>%
+  select(gene) %>% distinct()
+
+fos_fimo_results <- memes::runFimo(promoter_seqs, fos_motif, thresh = 1e-4) %>% 
+  as.data.frame() %>% 
+  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') %>%
+  select(gene) %>% distinct()
+
+# fimo_results %>% as.data.frame() %>% 
+#   merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') %>% 
+#   select(gene) %>% distinct()
 
 Biostrings::letterFrequency(x = seqs, letters = "GC", as.prob = TRUE)
 
@@ -909,6 +949,109 @@ makeGRangesFromDataFrame(salmon.quant$gxi.bed %>%
   filter(gene %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.01, log2FoldChange > 1)$gene))
 
 ```
+
+```{r}
+
+ifn_g <- msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE
+ifn_a <- msig.df$HALLMARK_INTERFERON_GAMMA_RESPONSE
+
+salmon.quant$aale$intra$deseq$de %>%
+  filter(padj < 0.05, log2FoldChange > 1, gene %in% c(ifn_g, ifn_a)) %>%
+  filter(gene %in% filter(salmon.quant$hbec$hbec_v12$deseq$de, padj < 0.05, log2FoldChange < -1)$gene) %>%
+  select(gene) %>% unlist() %>% unname() -> de_list
+
+hm_col_data <- 
+  salmon.quant$all_intra$deseq$counts[salmon.quant$all_intra$deseq$counts$gene %in%
+                                        de_list, 
+                                      !grepl('intra', 
+                                             colnames(salmon.quant$all_intra$deseq$counts))]
+
+
+hm_count_data <- 
+  salmon.quant$all_intra$deseq$counts[salmon.quant$all_intra$deseq$counts$gene %in%
+                                        de_list,
+                                      grepl('aale|wt2_kras_v12|wt2_lacz',
+                                          colnames(salmon.quant$all_intra$deseq$counts))]
+
+sample_col_data <- salmon.quant$all_intra$deseq$col.data %>% 
+  filter(names %in% colnames(hm_count_data)) %>% 
+  mutate(cell_line = names) %>% 
+  separate(cell_line, sep = '[.]', into = c(NA, 'cell_line', NA, NA)) %>% 
+  column_to_rownames('names')
+
+rownames(hm_count_data) <- hm_col_data$gene
+
+hm_count_data <- scale(t(log1p(hm_count_data)), center = T)
+
+side_ha <- ComplexHeatmap::rowAnnotation(df = sample_col_data %>% select(cell_line), 
+                                         col = list(cell_line = c('aale' = viridis(2)[1],
+                                                                  'hbec' = viridis(2)[2])), show_annotation_name = F)
+
+salmon.quant$all_intra$deseq$counts %>% 
+  filter(gene %in% de_list) %>% 
+  select(gene) %>% 
+  mutate(FOS = ifelse(gene %in% fos_fimo_results$gene, T, F),
+         ISRE = ifelse(gene %in% isre_fimo_results$gene, T, F)) %>% 
+  column_to_rownames('gene') -> motif_anno_df
+
+bottom_ha <- ComplexHeatmap::columnAnnotation(df = motif_anno_df,
+                                              col = list(FOS = c('TRUE' = 'black', 'FALSE' = 'white'),
+                                                         ISRE = c('TRUE' = 'black', 'FALSE' = 'white')))
+
+set.seed(129)
+
+ComplexHeatmap::Heatmap(hm_count_data, col = viridis(16, option = 'plasma'),
+                        name = 'z-score',
+                        width = panel.figure.width.double, 
+                        height = panel.figure.height,
+                        row_km = 2, row_title = c('WT', 'G12'),
+                        use_raster = T, show_row_names = F,
+                        left_annotation = side_ha,
+                        bottom_annotation = bottom_ha)
+  
+```
+
+```{r}
+
+msig.df[grepl('INTERFERON', names(msig.df))] %>% 
+                             unlist() %>% unname() -> ifn_gene_list
+
+msig.df[grepl('OXIDATIVE|XENOBIOTIC', names(msig.df))] %>% 
+                             unlist() %>% unname() -> metab_gene_list
+
+
+salmon.quant$aale$intra$deseq$H.fgsea %>% 
+  group_by(pathway) %>% 
+  mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
+         coverage = length(unlist(leadingEdge))) %>% 
+  arrange(-NES, padj)%>% View()
+
+kableExtra::kbl(exp_tbl %>% select(pathway, padj, NES, size))
+
+salmon.quant$aale$intra$deseq$de %>% 
+  mutate(padj = ifelse(padj == 0, 
+                       min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
+  mutate(gene_set = ifelse(gene %in% ifn_gene_list,'IFN', 'other'),
+         gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP, 'KRAS', gene_set),
+         gene_set = ifelse(gene %in% meta.data$trono.krab.znfs$gene, 'ZNF', gene_set)) %>% 
+  mutate(gene_set = factor(gene_set, levels = c('KRAS','IFN','ZNF', 'other'))) %>% 
+  filter(padj < 0.05) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
+  geom_point() + 
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
+                                                padj < 0.0001 & gene_set != 'other', gene, ''))) +
+  facet_col(~gene_set, scales = 'free_y') +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed')
+
+panel.save(figure = 1, name = 'facet_set_volcano', width = 'single', height = 'double')
+
+
+
+
+
+
+```
+
 
 
 
