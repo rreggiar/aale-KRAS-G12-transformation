@@ -1212,7 +1212,7 @@ working_toil_counts %>%
                                                        'p.G12D' = viridis(3)[2])),
                                    show_legend = F,
                                 annotation_name_side = 'bottom',
-                                simple_anno_size = unit(1.5, "mm")) -> toil_sample_anno
+                                simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
 
 
 
@@ -1227,7 +1227,7 @@ working_toil_counts %>%
                                 col = list(IRF9 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
                                 show_legend = F,
                                 annotation_name_side = 'right',
-                                simple_anno_size = unit(1.5, "mm")) -> gene_motif_anno
+                                simple_anno_size = unit(2.5, "mm")) -> gene_motif_anno
 
 
 
@@ -1241,8 +1241,8 @@ ComplexHeatmap::Heatmap(t(toil_hm_counts),
                         # heatmap_height = unit(panel.figure.height/2, 'mm'),
                         # column_dend_height = unit(3, 'mm'),
                         # row_dend_width = unit(4.5, 'mm'),
-                        height = unit((panel.figure.height/2)/1.31, 'mm'),
-                        width = unit((panel.figure.width)/1.62, 'mm')) -> toil_hm_plt
+                        height = unit((panel.figure.height/2)/1.325, 'mm'),
+                        width = unit((panel.figure.width)/1.645, 'mm')) -> toil_hm_plt
 
 size = calc_ht_size(toil_hm_plt)
 size
