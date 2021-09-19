@@ -1142,8 +1142,8 @@ ComplexHeatmap::Heatmap(t(toil_hm_counts),
                         show_row_names = F,
                         left_annotation = toil_sample_anno, 
                         bottom_annotation = gene_motif_anno, 
-                        height = unit((panel.figure.height/2)/1.247408, 'mm'), 
-                        width = unit((panel.figure.width)/1.376471, 'mm')) -> toil_hm_plt
+                        height = unit((panel.figure.height/2)/1.33, 'mm'), 
+                        width = unit((panel.figure.width)/1.619, 'mm')) -> toil_hm_plt
 
 size = calc_ht_size(toil_hm_plt)
 size
