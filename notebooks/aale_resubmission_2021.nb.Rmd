@@ -1100,10 +1100,10 @@ working_toil_counts %>%
   select(sample, 'G12D' = KRAS) %>%
   distinct() %>% 
   column_to_rownames('sample') %>% 
-  ComplexHeatmap::columnAnnotation(df = . , 
+  ComplexHeatmap::rowAnnotation(df = . , 
                                    col = list(G12D = c('WT_normal' = 'white', 
                                                        'p.G12D' = 'black')),
-                                   show_legend = F) -> toil_sample_anno
+                                   show_legend = T) -> toil_sample_anno
 
 
 
@@ -1111,19 +1111,26 @@ working_toil_counts %>%
   filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
   select(gene) %>% 
   distinct() %>% 
-  mutate(FOS = ifelse(gene %in% fos_fimo_results$gene, T, F),
-         ISRE = ifelse(gene %in% isre_fimo_results$gene, T, F)) %>% 
+  mutate(ISRE = ifelse(gene %in% isre_fimo_results$gene, T, F)) %>% 
   column_to_rownames('gene') %>% 
-  ComplexHeatmap::rowAnnotation(df =.,
-                                col = list(FOS = c('TRUE' = 'black', 'FALSE' = 'white'),
-                                           ISRE = c('TRUE' = 'black', 'FALSE' = 'white')),
-                                show_legend = F) -> gene_motif_anno
+  ComplexHeatmap::columnAnnotation(df =.,
+                                col = list(ISRE = c('TRUE' = 'black', 'FALSE' = 'white')),
+                                show_legend = F,
+                                annotation_name_side = 'left') -> gene_motif_anno
 
-ComplexHeatmap::Heatmap(toil_hm_counts, 
+pdf(file = file.path(figure.dir, 'fig.1', 'toil_hm.pdf'),
+    width=unit(panel.figure.width, 'mm'), height=unit(panel.figure.height/2, 'mm'), family = 'Helvetica')
+
+ComplexHeatmap::Heatmap(t(toil_hm_counts), 
                         name = 'z-score', 
-                        show_column_names = F,
-                        top_annotation = toil_sample_anno, 
-                        left_annotation = gene_motif_anno)
+                        show_row_names = F,
+                        right_annotation = toil_sample_anno, 
+                        bottom_annotation = gene_motif_anno) 
+
+dev.off()
+
+save_pheatmap_pdf(x = toil_hm, filename = 'test_hm.pdf', height = panel.figure.height/2, width = panel.figure.width)
+
 
 working_toil_counts %>% 
   filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
@@ -1163,7 +1170,7 @@ ggsurvplot(surv.fit,
            legend.title = "",
            ggtheme = theme_set_fun() + theme(legend.position = c(0.45,0.95)),
            pval.coord = c(0, 0.08),
-           palette = viridis(3)[c(2,1)]) -> surv.plt
+           palette = viridis(3)[c(2,1)])
 surv.plt
 
 ```
