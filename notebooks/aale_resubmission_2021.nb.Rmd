@@ -1062,6 +1062,27 @@ salmon.quant$aale$intra$deseq$de %>%
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed')
 
 panel.save(figure = 1, name = 'facet_set_volcano', width = 'single', height = 'double')
+
+
+salmon.quant$aale$intra$deseq$de %>% 
+  dplyr::rename('AALE' = log2FoldChange) %>% 
+  filter(padj < 0.05,
+         gene %in% c(ifn_a, ifn_g)) %>% 
+  merge(salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+          dplyr::rename('HBEC' = log2FoldChange) %>% 
+          filter(padj < 0.05) %>% 
+          mutate(HBEC = HBEC), by = 'gene') %>% 
+  ggplot(aes(AALE, HBEC)) + 
+  geom_point() + 
+  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
+  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
+  geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')))
+
+
+panel.save(figure = 1, name = 'de_scatter_ifn', width = 'single', height = 'single')
+
+
+
 ```
 
 ```{r}
