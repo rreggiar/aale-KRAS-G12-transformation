@@ -1189,10 +1189,12 @@ norm.counts.final %>%
   filter(sample != 'TCGA-44-3917-01') %>% 
   filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
 
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange > 3.5, gene %in% c(ifn_a, ifn_g)) -> aale_ifn
+
 working_toil_counts %>% 
   filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
-  # filter(gene %in% exo.above_1.list$surv$gene) %>%
-  # filter(gene %in% tmp.df$gene) %>% 
+  # filter(gene %in% aale_ifn$gene) %>%
   group_by(gene) %>%
   mutate(count = scale(log1p(count), center = T)) %>%
   select(sample, gene, count) %>%
@@ -1209,19 +1211,20 @@ working_toil_counts %>%
                                    col = list(G12D = c('WT_normal' = 'white', 
                                                        'p.G12D' = viridis(3)[2])),
                                    show_legend = F,
-                                annotation_name_side = 'top',
+                                annotation_name_side = 'bottom',
                                 simple_anno_size = unit(1.5, "mm")) -> toil_sample_anno
 
 
 
 working_toil_counts %>% 
   filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  # filter(gene %in% aale_ifn$gene) %>%
   select(gene) %>% 
   distinct() %>% 
-  mutate(ISRE = ifelse(gene %in% irf9_fimo_results$gene, T, F)) %>% 
+  mutate(IRF9 = ifelse(gene %in% irf9_fimo_results$gene, T, F)) %>% 
   column_to_rownames('gene') %>% 
   ComplexHeatmap::columnAnnotation(df =.,
-                                col = list(ISRE = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
+                                col = list(IRF9 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
                                 show_legend = F,
                                 annotation_name_side = 'right',
                                 simple_anno_size = unit(1.5, "mm")) -> gene_motif_anno
@@ -1234,14 +1237,18 @@ ComplexHeatmap::Heatmap(t(toil_hm_counts),
                         show_row_names = F,
                         left_annotation = toil_sample_anno, 
                         bottom_annotation = gene_motif_anno, 
-                        height = unit((panel.figure.height/2)/1.33, 'mm'), 
-                        width = unit((panel.figure.width)/1.619, 'mm')) #-> toil_hm_plt
+                        heatmap_width = unit(panel.figure.width, 'mm'),
+                        heatmap_height = unit(panel.figure.height/2, 'mm'),
+                        column_dend_height = unit(3, 'mm'),
+                        row_dend_width = unit(4, 'mm')) -> toil_hm_plt
+                        # height = unit((panel.figure.height/2)/1.33, 'mm'), 
+                        # width = unit((panel.figure.width)/1.619, 'mm')) #-> toil_hm_plt
 
 size = calc_ht_size(toil_hm_plt)
 size
 
 pdf(file = file.path(figure.dir, 'fig.1', 'toil_hm.pdf'),
-    width=unit(size[1], 'mm'), height=unit(size[2], 'mm'), family = 'Helvetica')
+    width=unit(panel.figure.width, 'mm'), height=unit(panel.figure.height/2, 'mm'), family = 'Helvetica')
 
 toil_hm_plt
 
