@@ -226,6 +226,19 @@ save_pheatmap_pdf <- function(x, filename, width=panel.figure.width, height=3) {
    grid::grid.draw(x$gtable)
    dev.off()
 }
+
+## https://jokergoo.github.io/2020/05/11/set-cell-width/height-in-the-heatmap/
+calc_ht_size = function(ht, unit = "mm") {
+    pdf(NULL)
+    ht = ComplexHeatmap::draw(ht)
+    w = ComplexHeatmap:::width(ht)
+    w = grid::convertX(w, unit, valueOnly = TRUE)
+    h = ComplexHeatmap:::height(ht)
+    h = grid::convertY(h, unit, valueOnly = TRUE)
+    dev.off()
+
+    c(w, h)
+}
 ```
 ## gene sets for filtering, identification
 ```{r gene set I/O}
@@ -1102,8 +1115,10 @@ working_toil_counts %>%
   column_to_rownames('sample') %>% 
   ComplexHeatmap::rowAnnotation(df = . , 
                                    col = list(G12D = c('WT_normal' = 'white', 
-                                                       'p.G12D' = 'black')),
-                                   show_legend = T) -> toil_sample_anno
+                                                       'p.G12D' = viridis(3)[2])),
+                                   show_legend = F,
+                                annotation_name_side = 'top',
+                                simple_anno_size = unit(1.5, "mm")) -> toil_sample_anno
 
 
 
@@ -1114,24 +1129,33 @@ working_toil_counts %>%
   mutate(ISRE = ifelse(gene %in% isre_fimo_results$gene, T, F)) %>% 
   column_to_rownames('gene') %>% 
   ComplexHeatmap::columnAnnotation(df =.,
-                                col = list(ISRE = c('TRUE' = 'black', 'FALSE' = 'white')),
+                                col = list(ISRE = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
                                 show_legend = F,
-                                annotation_name_side = 'left') -> gene_motif_anno
+                                annotation_name_side = 'right',
+                                simple_anno_size = unit(1.5, "mm")) -> gene_motif_anno
 
-pdf(file = file.path(figure.dir, 'fig.1', 'toil_hm.pdf'),
-    width=unit(panel.figure.width, 'mm'), height=unit(panel.figure.height/2, 'mm'), family = 'Helvetica')
+
+
 
 ComplexHeatmap::Heatmap(t(toil_hm_counts), 
                         name = 'z-score', 
                         show_row_names = F,
-                        right_annotation = toil_sample_anno, 
+                        left_annotation = toil_sample_anno, 
                         bottom_annotation = gene_motif_anno, 
-                        heatmap_height = unit(panel.figure.height/2, 'mm'), 
-                        heatmap_width = unit(panel.figure.width, 'mm')) 
+                        height = unit((panel.figure.height/2)/1.247408, 'mm'), 
+                        width = unit((panel.figure.width)/1.376471, 'mm')) -> toil_hm_plt
+
+size = calc_ht_size(toil_hm_plt)
+size
+
+pdf(file = file.path(figure.dir, 'fig.1', 'toil_hm.pdf'),
+    width=unit(size[1], 'mm'), height=unit(size[2], 'mm'), family = 'Helvetica')
+
+toil_hm_plt
 
 dev.off()
 
-save_pheatmap_pdf(x = toil_hm, filename = 'test_hm.pdf', height = panel.figure.height/2, width = panel.figure.width)
+# save_pheatmap_pdf(x = toil_hm, filename = 'test_hm.pdf', height = panel.figure.height/2, width = panel.figure.width)
 
 
 working_toil_counts %>% 
