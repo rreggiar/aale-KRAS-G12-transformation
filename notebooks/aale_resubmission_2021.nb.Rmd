@@ -1031,30 +1031,22 @@ salmon.quant$aale$intra$deseq$H.fgsea %>%
   arrange(-NES, padj) %>% 
   filter(!grepl('ZNF', pathway)) -> exp_tbl
 
-ht_exp <- as_huxtable(x = exp_tbl %>% select(pathway, padj, NES, coverage))
+pdf(file.path(figure.dir, 'fig.1', 'test_table.pdf'), 
+    width = unit(panel.figure.width, 'mm'),
+    height = unit(panel.figure.height/3, 'mm'))
 
 exp_tbl %>% 
   select(pathway, padj, NES, coverage) %>% 
   mutate(padj = format(padj, scientific= T, digits = 2)) %>% 
-  flextable() %>% 
-  font(fontname = 'helvetica') %>% 
-  fontsize(size = 10) %>% 
-  width(width = panel.figure.width, unit = 'mm') %>% 
-  height(height = panel.figure.height/3, unit = 'mm') %>% 
-  flextable::width(j = c('padj'), width = 0.6) %>% 
-  # flextable
-  save_as_image(path = file.path(figure.dir, 'fig.1', 'gsea_table.png'), webshot = 'webshot')
+  gridExtra::grid.table() 
 
-ht_exp %>% 
-  set_all_padding(4) %>% 
-      set_outer_padding(0) %>% 
-      set_number_format(2) %>% 
-      set_bold(row = 1, col = everywhere) %>% 
-      set_bottom_border(row = 1, col = everywhere) %>% 
-      set_width(0.4) %>% huxtable::print_screen()
+dev.off()
 
-kableExtra::kbl(exp_tbl %>% select(pathway, padj, NES, coverage)) %>% 
-  kableExtra::kable_paper(html_font = 'helvetica')
+ggsave(plot = test_table,
+       filename = file.path(figure.dir, 'fig.1', 'test_table.pdf'), 
+       width = panel.figure.width, 
+       height = panel.figure.height/3, units = 'mm')
+
 
 salmon.quant$aale$intra$deseq$de %>% 
   mutate(padj = ifelse(padj == 0, 
