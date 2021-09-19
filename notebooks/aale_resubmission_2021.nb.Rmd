@@ -1014,6 +1014,7 @@ ComplexHeatmap::Heatmap(hm_count_data, col = viridis(16, option = 'plasma'),
 ```{r}
 
 library(huxtable)
+library(flextable)
 
 msig.df[grepl('INTERFERON', names(msig.df))] %>% 
                              unlist() %>% unname() -> ifn_gene_list
@@ -1031,6 +1032,17 @@ salmon.quant$aale$intra$deseq$H.fgsea %>%
   filter(!grepl('ZNF', pathway)) -> exp_tbl
 
 ht_exp <- as_huxtable(x = exp_tbl %>% select(pathway, padj, NES, coverage))
+
+exp_tbl %>% 
+  select(pathway, padj, NES, coverage) %>% 
+  mutate(padj = format(padj, scientific= T, digits = 2)) %>% 
+  flextable() %>% 
+  font(fontname = 'helvetica') %>% 
+  fontsize(size = 10) %>% 
+  width(width = panel.figure.width, unit = 'mm') %>% 
+  height(height = panel.figure.height/3, unit = 'mm') %>% 
+  flextable::width(j = c('padj'), width = 0.6) %>% 
+  save_as_image(path = file.path(figure.dir, 'fig.1', 'gsea_table.pdf'))
 
 ht_exp %>% 
   set_all_padding(4) %>% 
