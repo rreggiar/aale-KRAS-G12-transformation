@@ -191,7 +191,7 @@ panel.save <- function(figure, name, width = 'single', height = 'single', plot.i
   if (height == 'single'){
     panel.height = panel.figure.height/3
   } else if (height == 'double'){
-    panel.height = panel.figure.height/2
+    panel.height = (panel.figure.height/3)*1.5
   } else{
     panel.height = panel.figure.height
   }
@@ -1013,6 +1013,8 @@ ComplexHeatmap::Heatmap(hm_count_data, col = viridis(16, option = 'plasma'),
 
 ```{r}
 
+library(huxtable)
+
 msig.df[grepl('INTERFERON', names(msig.df))] %>% 
                              unlist() %>% unname() -> ifn_gene_list
 
@@ -1023,10 +1025,23 @@ msig.df[grepl('OXIDATIVE|XENOBIOTIC', names(msig.df))] %>%
 salmon.quant$aale$intra$deseq$H.fgsea %>% 
   group_by(pathway) %>% 
   mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
-         coverage = length(unlist(leadingEdge))) %>% 
-  arrange(-NES, padj)%>% View()
+         coverage = round(length(unlist(leadingEdge))/size, 3),
+         NES = round(NES, 3)) %>% 
+  arrange(-NES, padj) %>% 
+  filter(!grepl('ZNF', pathway)) -> exp_tbl
 
-kableExtra::kbl(exp_tbl %>% select(pathway, padj, NES, size))
+ht_exp <- as_huxtable(x = exp_tbl %>% select(pathway, padj, NES, coverage))
+
+ht_exp %>% 
+  set_all_padding(4) %>% 
+      set_outer_padding(0) %>% 
+      set_number_format(2) %>% 
+      set_bold(row = 1, col = everywhere) %>% 
+      set_bottom_border(row = 1, col = everywhere) %>% 
+      set_width(0.4) %>% huxtable::print_screen()
+
+kableExtra::kbl(exp_tbl %>% select(pathway, padj, NES, coverage)) %>% 
+  kableExtra::kable_paper(html_font = 'helvetica')
 
 salmon.quant$aale$intra$deseq$de %>% 
   mutate(padj = ifelse(padj == 0, 
