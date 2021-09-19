@@ -1125,7 +1125,9 @@ ComplexHeatmap::Heatmap(t(toil_hm_counts),
                         name = 'z-score', 
                         show_row_names = F,
                         right_annotation = toil_sample_anno, 
-                        bottom_annotation = gene_motif_anno) 
+                        bottom_annotation = gene_motif_anno, 
+                        heatmap_height = unit(panel.figure.height/2, 'mm'), 
+                        heatmap_width = unit(panel.figure.width, 'mm')) 
 
 dev.off()
 
