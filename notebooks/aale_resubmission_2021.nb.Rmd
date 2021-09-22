@@ -896,40 +896,59 @@ options(meme_db = file.path(output.data.dir, 'reference.data',
                             'HOCOMOCOv11_core_HUMAN_mono_meme_format.meme'))
 
 salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange > 0, gene %in% c(ifn_g, ifn_a)) %>% 
-  filter(gene %in% filter(salmon.quant$hbec$lacz_v_v12$deseq$de, padj < 0.05, log2FoldChange > 0)$gene) %>% 
+  filter(padj < 0.05, log2FoldChange > 0.5) %>% #, gene %in% c(ifn_g, ifn_a)) %>% 
+  # filter(gene %in% filter(salmon.quant$hbec$lacz_v_v12$deseq$de, padj < 0.05, log2FoldChange > 0)$gene) %>% 
   select(gene_id) %>% unlist() %>% unname() -> de_list
 
-salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange > 0) %>% #, gene %in% c(ifn_g, ifn_a)) %>% 
-  filter(!gene %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 0)$gene) %>% 
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange < -0.5) %>% #, gene %in% c(ifn_g, ifn_a)) %>% 
+  # filter(gene %in% filter(salmon.quant$hbec$lacz_v_v12$deseq$de, padj < 0.05, log2FoldChange > 0)$gene) %>% 
   select(gene_id) %>% unlist() %>% unname() -> de_list_w_hbec
+
+
+# salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+#   filter(padj < 0.05, log2FoldChange > 0) %>% #, gene %in% c(ifn_g, ifn_a)) %>% 
+#   filter(!gene %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 0)$gene) %>% 
+#   select(gene_id) %>% unlist() %>% unname() -> de_list_w_hbec
 
 gr <- rowRanges(salmon.quant$gxi)
 
 ifn_de_gr <- gr[names(gr) %in% de_list]
 ifn_de_gr_hbec <- gr[names(gr) %in% de_list_w_hbec]
 
-
-
-# values(gr) <- cbind(values(gr), Biostrings::letterFrequency(x = seqs, letters = "GC", as.prob = TRUE))
-# 
-# sub_gr <- 
-#   gr[values(gr)[, 'gene_id'] %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.01, log2FoldChange > 1)$gene_id]
-
-# seqs <- getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_de_gr)
-
 promoter_seqs <- 
-  GenomicFeatures::extractUpstreamSeqs(x = BSgenome.Hsapiens.UCSC.hg38, genes = ifn_de_gr, width = 1000)
+  GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
+                                  query = ifn_de_gr, upstream = 1000, downstream = 500)
 
 promoter_seqs_hbec <- 
-  GenomicFeatures::extractUpstreamSeqs(x = BSgenome.Hsapiens.UCSC.hg38, genes = ifn_de_gr_hbec, width = 1000)
+  GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
+                                   query = ifn_de_gr_hbec, upstream = 1000, downstream = 500)
 
 
 # dreme_results <- memes::runDreme(promoter_seqs, control = "shuffle")
 # 
 tomTom_res <- memes::runAme(control = promoter_seqs_hbec,
                             input = promoter_seqs)
+
+tomTom_res %>% 
+  mutate(tmp = motif_id) %>% 
+  separate(tmp, sep = '_', into = c('TF', NA)) %>% 
+  mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF')) -> ame_tf
+# %>% 
+  # select(TF) %>% unlist() %>% unname() -> ame_tf
+
+salmon.quant$aale$intra$deseq$de %>% 
+  merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
+  # filter(gene %in% ame_tf) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
+  geom_point() + 
+  scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
+  geom_text_repel(color = 'black') + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.35, 0.99)) 
+
+panel.save(figure = 1, name = 'enriched_tf_volcano', width = 'single', height = 'single')
+
 
 isre_motif <- MotifDb::query(MotifDb::MotifDb, "ISRE") %>% 
   universalmotif::convert_motifs()
@@ -939,15 +958,13 @@ isre_motif <- isre_motif[[1]]
 irf9_motif <- MotifDb::query(MotifDb::MotifDb, "IRF9_HUMAN.H11MO.0.C") %>% 
   universalmotif::convert_motifs()
 
-irf1_motif <- MotifDb::query(MotifDb::MotifDb, "IRF1") %>% 
+irf7_motif <- MotifDb::query(MotifDb::MotifDb, "IRF7_HUMAN.H11MO.0.C") %>% 
   universalmotif::convert_motifs()
-
-irf1_motif <- irf1_motif[[3]]
 
 fos_motif <- MotifDb::query(MotifDb::MotifDb, "AP-1") %>% 
   universalmotif::convert_motifs()
 
-stat2_motif <- MotifDb::query(MotifDb::MotifDb, 'STAT2_HUMAN.H11MO.0.A') %>% 
+foxp2_motif <- MotifDb::query(MotifDb::MotifDb, 'FOXP2_HUMAN.H11MO.0.C') %>% 
   universalmotif::convert_motifs()
 
 isre_fimo_results <- memes::runFimo(promoter_seqs, isre_motif, thresh = 1e-3) %>% 
@@ -965,7 +982,7 @@ fos_fimo_results <- memes::runFimo(promoter_seqs, fos_motif, thresh = 1e-6) %>%
   merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') 
   # select(gene) %>% distinct()
 
-stat2_fimo_results <- memes::runFimo(promoter_seqs, stat2_motif, thresh = 1e-3) %>% 
+foxp2_fimo_results <- memes::runFimo(promoter_seqs, foxp2_motif, thresh = 1e-3) %>% 
   as.data.frame() %>% 
   merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') 
   # select(gene) %>% distinct()
@@ -978,7 +995,105 @@ irf9_fimo_results <- memes::runFimo(promoter_seqs, irf9_motif, thresh = 1e-3) %>
 # fimo_results %>% as.data.frame() %>% 
 #   merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id') %>% 
 #   select(gene) %>% distinct()
+```
 
+```{r}
+
+ctrl_norm_factor <- 43576060
+kras_norm_factor <- 60276212
+
+kras_bam_path <- file.path(output.data.dir, 'narrow_output.data/bwa/mergedLibrary/kras_R1.mLb.clN.sorted.bam')
+
+ctrl_bam_path <- file.path(output.data.dir, 'narrow_output.data/bwa/mergedLibrary/ctrl_R1.mLb.clN.sorted.bam')
+
+
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange > 1.5, gene %in% c(ifn_g, ifn_a)) %>% 
+  select(gene_id) %>% unlist() %>% unname() -> de_list
+
+# salmon.quant$aale$intra$deseq$de %>% 
+#   filter(padj > 0.5) %>%  #, log2FoldChange < -1.5) %>%  #, log2FoldChange > 1.5, gene %in% c(ifn_g, ifn_a)) %>% 
+#   select(gene_id) %>% unlist() %>% unname() -> ns_list
+
+gr <- rowRanges(salmon.quant$gxi)
+
+ifn_de_gr <- gr[names(gr) %in% de_list]
+
+ns_gr <- gr[names(gr) %in% ns_list]
+
+de_promoter_regions <- promoters(ifn_de_gr, upstream = 1000, downstream = 500)
+ns_promoter_regions <- promoters(ns_gr, upstream = 1000, downstream = 200)
+
+bamsignals::bamCoverage(kras_bam_path, de_promoter_regions, paired.end = 'extend') -> kras_de_prom_profile
+bamsignals::bamCoverage(ctrl_bam_path, de_promoter_regions, paired.end = 'extend') -> ctrl_de_prom_profile
+
+# bamsignals::bamCoverage(kras_bam_path, ns_promoter_regions, paired.end = 'extend') -> kras_ns_prom_profile
+# bamsignals::bamCoverage(ctrl_bam_path, ns_promoter_regions, paired.end = 'extend') -> ctrl_ns_prom_profile
+
+bamsignals::alignSignals(kras_de_prom_profile) %>% 
+  as.data.frame() %>% 
+  mutate(position = row_number()) %>% 
+  gather(prom, cov, -position) %>%
+  mutate(position = position - 1000,
+         cov = (cov/kras_norm_factor) * 1e6,
+         condition = 'kras',
+         context = 'de') -> kras_de_prom_df
+
+# bamsignals::alignSignals(kras_ns_prom_profile) %>% 
+#   as.data.frame() %>% 
+#   mutate(position = row_number()) %>% 
+#   gather(prom, cov, -position) %>%
+#   mutate(position = position - 1000,
+#          cov = (cov/kras_norm_factor) * 1e6,
+#          condition = 'kras',
+#          context = 'ns') -> kras_ns_prom_df
+
+bamsignals::alignSignals(ctrl_de_prom_profile) %>% 
+  as.data.frame() %>% 
+  mutate(position = row_number()) %>% 
+  gather(prom, cov, -position) %>%
+  mutate(position = position - 1000,
+         cov = (cov/ctrl_norm_factor) * 1e6,
+         condition = 'ctrl',
+         context = 'de') -> ctrl_de_prom_df
+
+# rbind(kras_de_prom_df, kras_ns_prom_df) %>% 
+#   group_by(position, context) %>% 
+#   summarise(ci = list(mean_cl_normal(cov))) %>% 
+#   unnest(ci) %>% 
+#   ggplot(aes(x = position, y = y, ymin = ymin, ymax = ymax, color = context)) + 
+#   geom_ribbon() + 
+#   geom_point()
+  
+
+rbind(kras_de_prom_df, ctrl_de_prom_df) %>%
+  ggplot(aes(position, cov, group = condition, color = condition)) +
+    stat_summary(geom="ribbon", fun.data=mean_cl_boot, width=0.1, conf.int=0.95, fill='grey', alpha = 0.4)+
+    # stat_summary(geom="line", fun=mean, linetype="dashed")+
+    stat_summary(geom="point", fun=mean, alpha = 0.5, size = rel(0.1)) +
+    scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+    xlab('distance to TSS') +
+    ylab('mean CPM (95% CI)') + 
+    xlim(-1000, 500) + 
+    theme(legend.position = c(0.35, 0.99))
+
+panel.save(figure = 2, name = 'isg_atac_enrichment', width = 'single', height = 'single')
+
+
+
+# avgBinnedSig <- rowMeans(bamsignals::alignSignals(kras_prom_profile))
+# 
+# avgBinnedSig %>% 
+#   as.data.frame() %>% 
+#   rownames_to_column('bin') %>% 
+#   ggplot(aes(bin, .)) + 
+#   geom_col()
+# 
+# bamsignals::alignSignals(bamsignals::bamCoverage(kras_bam_path, promoter_regions, paired.end = 'extend')) %>% dim()
+```
+
+
+```{r}
 Biostrings::letterFrequency(x = seqs, letters = "GC", as.prob = TRUE)
 
 gr[, 'GC'] <- Biostrings::letterFrequency(x = seqs, letters = "GC", as.prob = TRUE)
@@ -1679,37 +1794,72 @@ panel.save(figure = 'hbec',
 ```{r}
 kras_atac_anno_peaks <- 
   read_tsv(file.path(output.data.dir, 
-                     'atac_out/bwa/mergedLibrary/macs/broadPeak/kras_R1.mLb.clN_peaks.annotatePeaks.txt'))
+                     'narrow_output.data/bwa/mergedLibrary/macs/narrowPeak/kras_R1.mLb.clN_peaks.annotatePeaks.txt'))
+
+ctrl_atac_anno_peaks <- 
+  read_tsv(file.path(output.data.dir, 
+                     'narrow_output.data/bwa/mergedLibrary/macs/narrowPeak/ctrl_R1.mLb.clN_peaks.annotatePeaks.txt'))
 
 consensus_atac_anno_peak_counts <- 
   read_tsv(file.path(output.data.dir, 
-                     'atac_out/bwa/mergedLibrary/macs/broadPeak/consensus/consensus_peaks.mLb.clN.featureCounts.txt'),
+                     'narrow_output.data/bwa/mergedLibrary/macs/narrowPeak/consensus/consensus_peaks.mLb.clN.featureCounts.txt'),
            skip = 1)
 
 consensus_atac_boolean_anno <- 
   read_tsv(file.path(output.data.dir, 
-                     'atac_out/bwa/mergedLibrary/macs/broadPeak/consensus/consensus_peaks.mLb.clN.boolean.annotatePeaks.txt'))
-oreagnno_tfbs <- 
-  read_tsv(file.path(output.data.dir, 
-                     'oreganno_tfbs_int_consensus_anno_peaks_wb_f0.7.tsv'), 
-           col_names = c('chr', 'tfbs_start', 'tfbs_end', 'tf', 'junk_1', 'tfbs_strand', 
-                         'junk_2', 'peak_start', 'peak_end', 'interval_id'))
-
-rmsk_int_cons <- 
-  read_tsv(file.path(output.data.dir, 
-                     'rmsk_int_consensus_anno_peaks_wb_f0.7_r.tsv'), 
-           col_names = c('chr', 'tfbs_start', 'tfbs_end', 'tf', 'junk_1', 'tfbs_strand', 
-                         'junk_2', 'peak_start', 'peak_end', 'interval_id'))
-
-oreagnno_tfbs %>% 
-  dplyr::select(-junk_1, -junk_2) %>% 
-  merge(consensus_atac_boolean_anno %>% 
-  filter(`Gene Name` %in% filter(salmon.quant$aale$deseq$de, abs(log2FoldChange) > 0.25)$gene), 
-  by = 'interval_id') -> tfbs_boolean_peaks
+                     'narrow_output.data/bwa/mergedLibrary/macs/narrowPeak/consensus/consensus_peaks.mLb.clN.boolean.annotatePeaks.txt'
+                     )
+           )
 
 
+irf9_fimo_results %>% 
+  mutate(start.x = start.y + start.x,
+         end.x = start.y + end.x) %>% 
+  select(chr, start = start.x, end = end.x, strand = strand.x, gene, motif_id) %>% 
+  unite(col = 'name', sep = '_', c(gene, motif_id)) %>% 
+  makeGRangesFromDataFrame(keep.extra.columns = T) -> irf9_bed
 
-kras_atac_anno_peaks
+consensus_atac_anno_peak_counts %>% 
+  select(chr = Chr, start = Start, end = End, strand = Strand, name = Geneid) %>% 
+  makeGRangesFromDataFrame(keep.extra.columns = T) -> consensus_bed
+
+consensus_atac_boolean_anno %>% 
+  filter(ctrl_R1.mLb.clN.bool == F) %>% 
+  select(chr, start, end, name = interval_id) %>% 
+  makeGRangesFromDataFrame(keep.extra.columns = T) -> kras_atac_bed
+
+consensus_atac_boolean_anno %>% 
+  filter(ctrl_R1.mLb.clN.bool == F) %>% 
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 0.5)$gene) %>%
+  filter(`Gene Name` %in% aale_ifn$gene) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  # filter(annotation == "promoter-TSS ") %>%
+  group_by(annotation) %>%
+  tally() #%>% filter(grepl('ZNF', `Gene Name`)) %>% 
+  arrange(-n)
+
+HelloRanges::R_bedtools_intersect(kras_atac_bed, irf9_bed, wa = T, F = 0.25, s = T)
+
+{
+    genome <- Seqinfo(genome = NA_character_)
+    gr_a <- kras_atac_bed
+    gr_b <- irf9_bed
+    pairs <- findOverlapPairs(gr_a, gr_b, ignore.strand = FALSE)
+    olap <- pintersect(pairs, ignore.strand = FALSE)
+    keep <- width(olap)/width(second(pairs)) >= 0
+    pairs <- pairs[keep]
+    ans <- first(pairs)
+    ans
+}
+
+values(ans)$name
+
+consensus_atac_boolean_anno %>% 
+  filter(interval_id %in% as.data.frame(values(ans))$name) %>% 
+  View()
+
+  
+merge(consensus_atac_anno_peak_counts, by.x = c('chr', 'start.x', 'end.x'), by.y = c('Chr', 'Start', 'End'))
 
 ```
 
