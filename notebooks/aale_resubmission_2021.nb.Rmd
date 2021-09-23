@@ -1068,14 +1068,15 @@ bamsignals::alignSignals(ctrl_de_prom_profile) %>%
 
 rbind(kras_de_prom_df, ctrl_de_prom_df) %>%
   ggplot(aes(position, cov, group = condition, color = condition)) +
-    stat_summary(geom="ribbon", fun.data=mean_cl_boot, width=0.1, conf.int=0.95, fill='grey', alpha = 0.4)+
-    # stat_summary(geom="line", fun=mean, linetype="dashed")+
-    stat_summary(geom="point", fun=mean, alpha = 0.5, size = rel(0.1)) +
+    stat_summary(geom="ribbon", fun.data=mean_cl_boot, width=0.1, conf.int=0.95, 
+                 fill='grey', alpha = 0.1, size = rel(0.05), show.legend = F)+
+    # stat_summary(geom="line", fun=mean, linetype="dashed", alpha = 0.15, size = rel(0.05)) +
+    stat_summary(geom="point", fun=mean, alpha = 0.25, size = rel(1)) +
     scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
     xlab('distance to TSS') +
     ylab('mean CPM (95% CI)') + 
     xlim(-1000, 500) + 
-    theme(legend.position = c(0.35, 0.99))
+    theme(legend.position = c(0.3, 0.99))
 
 panel.save(figure = 2, name = 'isg_atac_enrichment', width = 'single', height = 'single')
 
@@ -1302,13 +1303,14 @@ norm.counts.final <- read_tsv(file.path(output.data.dir, 'tcga.data', 'luad.data
 
 norm.counts.final %>% 
   filter(sample != 'TCGA-44-3917-01') %>% 
-  filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
+  filter(KRAS %in% c('p.G12D', 'p.G12C', 'p.G12V', 'WT_normal')) -> working_toil_counts
 
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, log2FoldChange > 3.5, gene %in% c(ifn_a, ifn_g)) -> aale_ifn
 
 working_toil_counts %>% 
-  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
   # filter(gene %in% aale_ifn$gene) %>%
   group_by(gene) %>%
   mutate(count = scale(log1p(count), center = T)) %>%
@@ -1329,10 +1331,22 @@ working_toil_counts %>%
                                 annotation_name_side = 'bottom',
                                 simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
 
+working_toil_counts %>% 
+  select(sample, 'G12' = KRAS) %>%
+  distinct() %>% 
+  column_to_rownames('sample') %>% 
+  ComplexHeatmap::rowAnnotation(df = . , 
+                                   col = list(G12D = c('WT_normal' = 'white', 
+                                                       'p.G12' = viridis(3)[2])),
+                                   show_legend = F,
+                                annotation_name_side = 'bottom',
+                                simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
+
 
 
 working_toil_counts %>% 
-  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
   # filter(gene %in% aale_ifn$gene) %>%
   select(gene) %>% 
   distinct() %>% 
@@ -1350,14 +1364,14 @@ working_toil_counts %>%
 ComplexHeatmap::Heatmap(t(toil_hm_counts), 
                         name = 'z-score', 
                         show_row_names = F,
-                        left_annotation = toil_sample_anno, 
-                        bottom_annotation = gene_motif_anno, 
+                        left_annotation = toil_sample_anno,
+                        bottom_annotation = gene_motif_anno,
                         # heatmap_width = unit(panel.figure.width, 'mm'),
                         # heatmap_height = unit(panel.figure.height/2, 'mm'),
                         # column_dend_height = unit(3, 'mm'),
                         # row_dend_width = unit(4.5, 'mm'),
                         height = unit((panel.figure.height/2)/1.325, 'mm'),
-                        width = unit((panel.figure.width)/1.645, 'mm')) -> toil_hm_plt
+                        width = unit((panel.figure.width)/1.645, 'mm')) #-> toil_hm_plt
 
 size = calc_ht_size(toil_hm_plt)
 size
@@ -1830,13 +1844,54 @@ consensus_atac_boolean_anno %>%
 
 consensus_atac_boolean_anno %>% 
   filter(ctrl_R1.mLb.clN.bool == F) %>% 
-  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 0.5)$gene) %>%
-  filter(`Gene Name` %in% aale_ifn$gene) %>%
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+  filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
   separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
-  # filter(annotation == "promoter-TSS ") %>%
-  group_by(annotation) %>%
-  tally() #%>% filter(grepl('ZNF', `Gene Name`)) %>% 
-  arrange(-n)
+  filter(annotation == "promoter-TSS ") %>%
+  # group_by(annotation) %>%
+  group_by(`Gene Name`) %>%
+  tally() -> uniq_peak_genes#%>% filter(grepl('ZNF', `Gene Name`)) %>% 
+  # arrange(-n)
+
+consensus_atac_boolean_anno %>% 
+  filter(ctrl_R1.mLb.clN.bool == F) %>% 
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+  filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>% 
+  mutate(strand = '+') %>% 
+  select(chr, start, end, strand, name = `Gene Name`) %>% 
+  GenomicRanges::makeGRangesFromDataFrame() -> ifn_uniq_peak_ranges
+
+names(ifn_uniq_peak_ranges) <- uniq_peak_genes$`Gene Name`
+
+consensus_atac_boolean_anno %>% 
+  filter(ctrl_R1.mLb.clN.bool == F) %>% 
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+  filter(!`Gene Name` %in% c(ifn_g, ifn_a), ! is.na(`Gene Name`)) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>% 
+  mutate(strand = '+') %>% 
+  select(chr, start, end, strand, name = `Gene Name`) %>% 
+  GenomicRanges::makeGRangesFromDataFrame() -> other_uniq_peak_ranges
+
+names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>% 
+                                  filter(ctrl_R1.mLb.clN.bool == F) %>% 
+                                  filter(`Gene Name` %in%
+                                           filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+                                  filter(!`Gene Name` %in% c(ifn_g, ifn_a), ! is.na(`Gene Name`)) %>% 
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>% 
+  select(`Gene Name`) %>% unlist() %>% unname()
+
+getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_uniq_peak_ranges) -> ifn_uniq_seqs
+getSeq(BSgenome.Hsapiens.UCSC.hg38, other_uniq_peak_ranges) -> other_uniq_seqs
+
+memes::runAme(input = ifn_uniq_seqs, control = other_uniq_seqs) %>% 
+  memes::plot_ame_heatmap()
+  
+  
+salmon.quant$aale$intra$deseq$de %>% filter(gene %in% uniq_peak_genes$`Gene Name`) %>% View()
 
 HelloRanges::R_bedtools_intersect(kras_atac_bed, irf9_bed, wa = T, F = 0.25, s = T)
 
