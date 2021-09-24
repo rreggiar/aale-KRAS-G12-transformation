@@ -1119,7 +1119,7 @@ salmon.quant$aale$exo$deseq$de %>%
   geom_text_repel(aes(label = ifelse(abs(EXO_aale) > 1 & abs(INTRA_aale) > 1, gene, '')), show.legend = F) +
   theme(legend.position = c(0.99, 0.25)) +
   geom_line(stat = 'smooth', method = 'lm', linetype = 'dashed', alpha = 0.8, color = 'purple') +
-  annotate(geom = 'text', x = -1.8, y = 4, 
+  annotate(geom = 'text', x = 2, y = -2, 
            label = paste0('y', ' ', ' = -0.99 + 0.66x; \nadj. R2 = 0.4919'), 
            size = rel(3.75), alpha = 0.8)
 
