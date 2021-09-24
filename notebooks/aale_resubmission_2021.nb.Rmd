@@ -679,7 +679,7 @@ run.de.seq.contrast <- function(tximeta.object, base_level = 'ctrl'){
 
   dds.gxi.lfc <- lfcShrink(dds.gxi, coef = "conditionkras.platformrnaEASY") %>%
     as.data.frame() %>%
-    filter(padj <= 0.05) %>%
+    # filter(padj <= 0.05) %>%
     rownames_to_column('gene_id') %>%
     merge(salmon.quant$gxi.bed, by = 'gene_id')
 
@@ -726,12 +726,15 @@ ucsc.rmsk.salmon.quant$aale$ctrl_compare$deseq <-
   run.de.seq(ucsc.rmsk.salmon.quant$aale$ctrl_compare, base_level = 'ctrl')
 ucsc.rmsk.salmon.quant$aale$platform_compare$deseq <- 
   run.de.seq(ucsc.rmsk.salmon.quant$aale$platform_compare, base_level = 'ctrl')
-ucsc.rmsk.salmon.quant$hbec$hbec_wt$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$hbec_wt, base_level = 'wt2_kras_wt')
-ucsc.rmsk.salmon.quant$hbec$hbec_v12$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$hbec_v12, base_level = 'wt2_kras_v12')
-ucsc.rmsk.salmon.quant$hbec$lacz_v_wt$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$lacz_v_wt, base_level = 'wt2_lacz')
+# ucsc.rmsk.salmon.quant$hbec$hbec_wt$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$hbec_wt, base_level = 'wt2_kras_wt')
+# ucsc.rmsk.salmon.quant$hbec$hbec_v12$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$hbec_v12, base_level = 'wt2_kras_v12')
+# ucsc.rmsk.salmon.quant$hbec$lacz_v_wt$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$lacz_v_wt, base_level = 'wt2_lacz')
 ucsc.rmsk.salmon.quant$hbec$lacz_v_v12$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$lacz_v_v12, base_level = 'wt2_lacz')
 ucsc.rmsk.salmon.quant$hbec$a549$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$a549, base_case = 'Empty')
 ucsc.rmsk.salmon.quant$all_intra$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$all_intra)
+
+saveRDS(ucsc.rmsk.salmon.quant, file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
+
 
 
 ```
@@ -998,6 +1001,12 @@ irf9_fimo_results <- memes::runFimo(promoter_seqs, irf9_motif, thresh = 1e-3) %>
 ```
 
 ```{r}
+salmon.quant$aale$exo$
+
+
+```
+
+```{r}
 
 ctrl_norm_factor <- 43576060
 kras_norm_factor <- 60276212
@@ -1093,6 +1102,68 @@ panel.save(figure = 2, name = 'isg_atac_enrichment', width = 'single', height = 
 # bamsignals::alignSignals(bamsignals::bamCoverage(kras_bam_path, promoter_regions, paired.end = 'extend')) %>% dim()
 ```
 
+```{r}
+salmon.quant$aale$exo$deseq$de %>% 
+  dplyr::rename('EXO_aale' = log2FoldChange) %>% 
+  filter(padj < 0.05) %>% 
+  merge(salmon.quant$aale$intra$deseq$de %>% 
+          dplyr::rename('INTRA_aale' = log2FoldChange) %>% 
+          filter(padj < 0.05), by = 'gene') %>% 
+  mutate(unique = ifelse(gene %in% uniq_kras_peak_genes$`Gene Name`, 'KRAS', 
+                         ifelse(gene %in% uniq_ctrl_peak_genes$`Gene Name`, 'CTRL', NA))) %>% 
+  ggplot(aes(EXO_aale, INTRA_aale, color = unique)) + 
+  geom_point() + 
+  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2]), name = 'unique ATAC peak') +
+  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
+  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
+  geom_text_repel(aes(label = ifelse(abs(EXO_aale) > 1 & abs(INTRA_aale) > 1, gene, '')), show.legend = F) +
+  theme(legend.position = c(0.99, 0.25)) +
+  geom_line(stat = 'smooth', method = 'lm', linetype = 'dashed', alpha = 0.8, color = 'purple') +
+  annotate(geom = 'text', x = -2, y = 4, label = 'y_hat = -0.99 + 0.66x; \nadj. R2 = 0.4919', size = rel(2))
+
+salmon.quant$aale$exo$deseq$de %>% 
+  dplyr::rename('EXO_aale' = log2FoldChange) %>% 
+  filter(padj < 0.05) %>% 
+  merge(salmon.quant$aale$intra$deseq$de %>% 
+          dplyr::rename('INTRA_aale' = log2FoldChange) %>% 
+          filter(padj < 0.05), by = 'gene') %>% 
+  lm(EXO_aale ~ INTRA_aale, data = .) %>% 
+  summary()
+
+
+panel.save(figure = 3, name = 'intra_v_exo_de', width = 'single', height = 'single')
+
+
+
+
+salmon.quant$aale$exo$deseq$de %>% 
+  mutate(biotype = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', 'coding')) %>%
+  # filter(padj < 0.05) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = biotype)) + 
+  geom_point(alpha = 0.6) + 
+  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1, gene, '')), show.legend = F) +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.99,0.99))
+
+panel.save(figure = 3, name = 'exo_de', width = 'single', height = 'single')
+
+
+
+ucsc.rmsk.salmon.quant$aale$exo$deseq$de %>%
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene) %>%
+  merge(meta.data$te.families.clades, by = 'gene') %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = clade)) + 
+  geom_point(alpha = 0.6) + 
+  xlim(-2, 2) +
+  
+  scale_color_viridis_d() +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1, gene, '')), show.legend = F) +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed')
+  
+  
+  
+```
 
 ```{r}
 Biostrings::letterFrequency(x = seqs, letters = "GC", as.prob = TRUE)
@@ -1129,8 +1200,6 @@ hm_col_data <-
                                         de_list, 
                                       !grepl('intra', 
                                              colnames(salmon.quant$all_intra$deseq$counts))]
-
-
 hm_count_data <- 
   salmon.quant$all_intra$deseq$counts[salmon.quant$all_intra$deseq$counts$gene %in%
                                         de_list,
@@ -1450,359 +1519,6 @@ ucsc.rmsk.salmon.quant$a549$deseq$counts %>%
   pheatmap()
 ```
 
-## FUN: plot tx count
-```{r}
-tx.ome.cov.plt <- function(tx.counts){
-  tx.counts %>% 
-    rownames_to_column('enst') %>% 
-    merge(gencode.35.tx.to.gene, by = 'enst') %>% 
-    gather(names, count, -enst, -ensg:-biotype) %>% 
-    merge(metadata.df, by = 'names') %>% 
-    filter(biotype != 'Mt_rRNA') %>% 
-    filter(count >= 5) %>% 
-    group_by(biotype, names, condition) %>% 
-    mutate(biotype.count = n()) %>% 
-    dplyr::select(biotype, names, condition, biotype.count) %>% 
-    distinct() %>% 
-    merge(gen.35.biotype.count, by = 'biotype') %>% 
-    mutate(coverage = biotype.count/n) 
-}
-```
-## FUN: elbow.plt
-```{r}
-elbow.plt <- function(df){
-  k.max <- nrow(df) - 1
-  k.values <- 1:k.max
-  
-  cluster.compute <- function(k){
-    cluster.out <- kmeans(df, 
-                          k, 
-                          nstart = 25)
-    return(cluster.out$tot.withinss)
-  }
-  
-  elbow.df <- tibble()
-  for(i in k.values){
-    print(i)
-    temp.df <- 
-      tibble(k = i, 
-             ss = cluster.compute(i))
-    elbow.df <- rbind(temp.df, elbow.df)
-  }
-  
-  ggplot(elbow.df,
-         aes(k, ss)) + 
-    geom_point() +
-    geom_line() + 
-    geom_vline(xintercept = k.values, 
-               linetype = 'dashed', 
-               alpha = 0.3)
-}
-```
-
-### FUN: build.signature.lists
-```{r}
-extract.leading.edge <- function(fgsea, deseq){
-  
-  fgsea %>% 
-    filter(pathway == 'HALLMARK MYC TARGETS V1') %>% 
-    dplyr::select(leadingEdge) %>% 
-    unlist() %>% 
-    unname() -> myc.tmp
-  fgsea %>% 
-    filter(pathway == 'HALLMARK E2F TARGETS') %>% 
-    dplyr::select(leadingEdge) %>% 
-    unlist() %>% 
-    unname() -> e2f.tmp
-  fgsea %>% 
-    filter(pathway == 'HALLMARK G2M CHECKPOINT') %>% 
-    dplyr::select(leadingEdge) %>% 
-    unlist() %>% 
-    unname() -> g2m.tmp
-  
-  deseq %>% 
-    filter(gene %in% g12c.sc.marker.genes$`G12C induced`) %>% 
-    dplyr::select(gene) %>% unlist() %>% unname() -> g12c.tmp
-  
-  return(list('myc.signature' = myc.tmp,
-              'e2f.signature' = e2f.tmp,
-              'g2m.signature' = g2m.tmp,
-              'g12c.signature' = g12c.tmp))
-}
-
-build.signature.lists <- function(){
-  
-  for (signature in c('myc.signature', 'e2f.signature', 'g2m.signature', 'g12c.signature')){
-      consensus.tmp <- Reduce(intersect, list(salmon.quant$exoTIC_2D$deseq$signatures[[toString(signature)]],
-                                                 salmon.quant$rnaEasy_2D$deseq$signatures[[toString(signature)]],
-                                                 salmon.quant$rnaEasy_3D$deseq$signatures[[toString(signature)]],
-                                                 kras_wt.vs.g12c_de_signatures[[toString(signature)]]))
-      
-      exRNA.consensus.tmp <- Reduce(intersect, list(salmon.quant$exoTIC_2D$deseq$signatures[[toString(signature)]],
-                                                 salmon.quant$rnaEasy_2D$deseq$signatures[[toString(signature)]],
-                                                 salmon.quant$rnaEasy_3D$deseq$signatures[[toString(signature)]]))
-
-      rnaEasy.tmp <- Reduce(intersect, list(salmon.quant$rnaEasy_2D$deseq$signatures[[toString(signature)]],
-                                                   salmon.quant$rnaEasy_3D$deseq$signatures[[toString(signature)]]))
-      
-      two_D.tmp <- Reduce(intersect, list(salmon.quant$rnaEasy_2D$deseq$signatures[[toString(signature)]],
-                                                 salmon.quant$exoTIC_2D$deseq$signatures[[toString(signature)]]))
-      
-      luad.tmp <- Reduce()
-      
-      assign(paste0(toString(signature), '_list'), list('consensus' = consensus.tmp,
-                                             'exRNA.consensus' = exRNA.consensus.tmp,
-                                             'rnaEasy' = rnaEasy.tmp,
-                                             'twoD' = two_D.tmp))
-  }
-  
-  return(list('myc' = myc.signature_list, 
-              'e2f' = e2f.signature_list, 
-              'g2m' = g2m.signature_list, 
-              'g12c' = g12c.signature_list))
-}
-
-build.de.agreement.lists <- function(exoTIC_2D, rnaEasy_2D, rnaEasy_3D, 
-                                     threshold = 1, padj_cutoff = 25){
-  
-  exoTIC_2D %>% 
-    merge(rnaEasy_2D, by = 'gene') %>% 
-    merge(rnaEasy_3D, by = 'gene') %>% 
-    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold & log2FoldChange >= threshold) %>% 
-    dplyr::select(gene) %>% 
-    unlist() %>% unname() -> up.consensus.tmp
-  
-  exoTIC_2D %>% top_n(padj_cutoff, wt = -padj) %>% 
-    merge(rnaEasy_2D %>% top_n(padj_cutoff, wt = -padj), by = 'gene') %>% 
-    merge(rnaEasy_3D %>% top_n(padj_cutoff, wt = -padj), by = 'gene') %>% 
-    dplyr::select(gene) %>% 
-    unlist() %>% unname() -> sig.consensus.tmp
-  
-  exoTIC_2D %>% 
-    merge(rnaEasy_2D, by = 'gene') %>% 
-    merge(rnaEasy_3D, by = 'gene') %>% 
-    filter(log2FoldChange.x <= -threshold & log2FoldChange.y <= -threshold & log2FoldChange <= -threshold) %>% 
-    dplyr::select(gene) %>% 
-    unlist() %>% unname() -> dn.consensus.tmp
-  
-  exoTIC_2D %>% 
-    merge(rnaEasy_2D, by = 'gene') %>% 
-    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>% 
-    dplyr::select(gene) %>% 
-    unlist() %>% unname() -> up.two_D.tmp
-  
-  exoTIC_2D %>% top_n(padj_cutoff, wt = -padj) %>% 
-    merge(rnaEasy_2D %>% top_n(padj_cutoff, wt = -padj), by = 'gene') %>% 
-    dplyr::select(gene) %>% 
-    unlist() %>% unname() -> sig.two_D.tmp
-    
-  exoTIC_2D %>% 
-    merge(rnaEasy_2D, by = 'gene') %>% 
-    filter(log2FoldChange.x <= -threshold & log2FoldChange.y <= -threshold) %>% 
-    dplyr::select(gene) %>% 
-    unlist() %>% unname() -> dn.two_D.tmp
-  
-  rnaEasy_2D %>% 
-    merge(rnaEasy_3D, by = 'gene') %>% 
-    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>% 
-    dplyr::select(gene) %>% 
-    unlist() %>% unname() -> up.rnaEasy.tmp
-  
-  rnaEasy_2D %>% top_n(padj_cutoff, wt = -padj) %>% 
-    merge(rnaEasy_3D %>% top_n(padj_cutoff, wt = -padj), by = 'gene') %>% 
-    dplyr::select(gene) %>% 
-    unlist() %>% unname() -> sig.rnaEasy.tmp
-  
-  rnaEasy_2D %>% 
-    merge(rnaEasy_3D, by = 'gene') %>% 
-    filter(log2FoldChange.x <= -threshold & log2FoldChange.y <= -threshold) %>% 
-    dplyr::select(gene) %>% 
-    unlist() %>% unname() -> dn.rnaEasy.tmp
-  
-  exoTIC_2D %>%
-    merge(kras_wt.vs.g12c_de, by = 'gene') %>%
-    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>%
-    dplyr::select(gene) %>%
-    unlist() %>% unname() -> luad.2D.exoTIC.tmp
-
-  rnaEasy_2D %>%
-    merge(kras_wt.vs.g12c_de, by = 'gene') %>%
-    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>%
-    dplyr::select(gene) %>%
-    unlist() %>% unname() -> luad.2D.rnaEasy.tmp
-
-  rnaEasy_3D %>%
-    merge(kras_wt.vs.g12c_de, by = 'gene') %>%
-    filter(log2FoldChange.x >= threshold & log2FoldChange.y >= threshold) %>%
-    dplyr::select(gene) %>%
-    unlist() %>% unname() -> luad.3D.rnaEasy.tmp
-  
-  
-  
-  return(list('up.consensus' = up.consensus.tmp,
-              'sig.consensus' = sig.consensus.tmp,
-              'up.rnaEasy' = up.rnaEasy.tmp,
-              'sig.rnaEasy' = sig.rnaEasy.tmp,
-              'up.twoD' = up.two_D.tmp,
-              'sig.twoD' = sig.two_D.tmp,
-              'dn.consensus' = dn.consensus.tmp,
-              'dn.rnaEasy' = dn.rnaEasy.tmp,
-              'dn.twoD' = dn.two_D.tmp,
-              'luad.2D.rnaEasy' = luad.2D.rnaEasy.tmp,
-              'luad.3D.rnaEasy' = luad.3D.rnaEasy.tmp,
-              'luad.2D.exoTIC' = luad.2D.exoTIC.tmp))
-}
-
-
-
-
-#######
-```
-### CALL: build.signature.lists
-```{r}
-salmon.quant$exoTIC_2D$deseq$signatures <- 
-  extract.leading.edge(salmon.quant$exoTIC_2D$deseq$H.fgsea, salmon.quant$exoTIC_2D$deseq$de)
-
-salmon.quant$rnaEasy_2D$deseq$signatures <- 
-  extract.leading.edge(salmon.quant$rnaEasy_2D$deseq$H.fgsea, salmon.quant$rnaEasy_2D$deseq$de)
-
-salmon.quant$rnaEasy_3D$deseq$signatures <- 
-  extract.leading.edge(salmon.quant$rnaEasy_3D$deseq$H.fgsea, salmon.quant$rnaEasy_3D$deseq$de)
-
-kras_wt.vs.g12c_de_signatures <- 
-  extract.leading.edge(kras_wt.vs.g12c_de_h.fgsea, kras_wt.vs.g12c_de)
-
-
-signature.list <- build.signature.lists()
-  
-  
-de.agreement.list <- build.de.agreement.lists(salmon.quant$exoTIC_2D$deseq$de,
-                                          salmon.quant$rnaEasy_2D$deseq$de,
-                                          salmon.quant$rnaEasy_3D$deseq$de,
-                                          threshold = 1, padj_cutoff = 25)
-
-
-de.agreement.list %>% 
-  map(as.data.frame, .id = 'gene') %>% 
-  imap(~mutate(.x, meta_information = .y)) %>% 
-  bind_rows() %>% 
-  rename(`.x[[i]]` = 'gene') -> de.agreement.df
-
-
-signature.list$g12c %>% 
-  map(as.data.frame, .id = 'gene') %>% 
-  imap(~mutate(.x, meta_information = .y)) %>% 
-  bind_rows() %>% 
-  rename(`.x[[i]]` = 'gene') -> de.agreement.df
-
-
-
-
-list('exoTIC_2D' = filter(salmon.quant$exoTIC_2D$deseq$de, log2FoldChange >= 1)$gene,
-     'rnaEasy_2D' = filter(salmon.quant$rnaEasy_2D$deseq$de, log2FoldChange >= 1)$gene,
-     'rnaEasy_3D' = filter(salmon.quant$rnaEasy_3D$deseq$de, log2FoldChange >= 1)$gene,
-     'luad_G12C' = filter(kras_wt.vs.g12c_de, log2FoldChange >= 1)$gene) %>%
-# list('exoTIC_2D' = filter(salmon.quant$exoTIC_2D$deseq$de, gene %in% 
-#                             salmon.quant$exoTIC_2D$deseq$signatures$e2f.signature)$gene,
-#      'rnaEasy_2D' = filter(salmon.quant$rnaEasy_2D$deseq$de, gene %in%
-#                            salmon.quant$rnaEasy_2D$deseq$signatures$e2f.signature)$gene,
-#      'rnaEasy_3D' = filter(salmon.quant$rnaEasy_3D$deseq$de, gene %in%
-#                            salmon.quant$rnaEasy_3D$deseq$signatures$e2f.signature)$gene,
-#      'luad_G12C' = filter(kras_wt.vs.g12c_de, gene %in% 
-#                             kras_wt.vs.g12c_de_signatures$e2f.signature)$gene) %>% 
-  map(as.data.frame, .id = 'gene') %>% 
-  imap(~mutate(.x, meta_information = .y)) %>% 
-  bind_rows() %>% 
-  rename(`.x[[i]]` = 'gene')-> de.agreement.df
-
-de.agreement.df %>% 
-  group_by(gene) %>% 
-  summarize(pathway = list(meta_information)) %>% 
-  ggplot(aes(pathway)) +
-  geom_bar(fill = 'black', color = 'white') +
-  # geom_hline(yintercept = seq(5, 50, 5), color = 'white') +
-  ggupset::scale_x_upset(order_by = 'degree') + xlab('') + ylab('genes in set') +
-  geom_text(stat='count', aes(label=after_stat(count)), vjust=-0.5, color = 'black') #->upset.plt
-
-panel.save(figure = 4, name = 'myc_overlap_upset', width = 'double', height = 'double', plot.in = upset.plt)
-
-
-de.agreement.df %>% 
-  group_by(gene) %>% 
-  summarize(pathway = list(meta_information)) %>% mutate(name = paste(pathway)) %>% 
-  filter(name == "c(\"exoTIC_2D\", \"rnaEasy_2D\", \"rnaEasy_3D\", \"luad_G12C\")") -> tmp.df
-
-```
-### Tx coverage
-```{r}
-salmon.quant$rnaEasy_all$deseq$tx.cov <- tx.ome.cov.plt(salmon.quant$rnaEasy_all$deseq$txi.counts)
-
-
-salmon.quant$rnaEasy_all$deseq$tx.cov %>% 
-  separate(names, sep = '[.]', into = c('platform', 'context', 'rep', 'condition')) %>% 
-  mutate(condition = factor(condition, levels = c('DMSO', 'AMG'))) %>% 
-  unite(col = 'condition', c('condition', 'context')) %>% 
-  mutate(condition = factor(condition, levels = c('DMSO_2D', 'AMG_2D', 'DMSO_3D', 'AMG_3D'))) %>% 
-  group_by(condition, platform, rep) %>% 
-  summarize(tot.tx.count = sum(biotype.count)) %>% 
-  ggplot(aes(condition, tot.tx.count)) + 
-  geom_boxplot(width = .3, position = position_dodge(width = 1), outlier.color = NA, alpha = 0.3) +
-  geom_sina(width = .3, alpha = 0.5, position = position_dodge(width = 1)) +
-  # ylim(6000, 16000) +
-  # scale_color_viridis_d() +
-  ylab('transcripts detected') + xlab('') + theme(legend.position = c(1,0.95)) #+
-  # stat_compare_means(comparisons = list(c('DMSO_2D', 'AMG_2D'), c('DMSO_2D', 'DMSO_3D'),
-  #                                       c('DMSO_3D', 'AMG_3D'), c('AMG_2D', 'AMG_3D')), method = 'wilcox.test')
-
-panel.save(figure = 1, name = 'rnaEasy_txome_count', height = 'single', width = 'single')
-
-
-salmon.quant$exoTIC_2D$deseq$tx.cov <- tx.ome.cov.plt(salmon.quant$exoTIC_2D$deseq$txi.counts)
-
-
-salmon.quant$exoTIC_2D$deseq$tx.cov %>% 
-  separate(names, sep = '[.]', into = c('platform', 'context', 'rep', 'condition')) %>% 
-  mutate(condition = factor(condition, levels = c('DMSO', 'AMG'))) %>% 
-  unite(col = 'condition', c('condition', 'context')) %>% 
-  mutate(condition = factor(condition, levels = c('DMSO_2D', 'AMG_2D'))) %>% 
-  group_by(condition, platform, rep) %>% 
-  summarize(tot.tx.count = sum(biotype.count)) %>% 
-  ggplot(aes(condition, tot.tx.count)) + 
-  geom_boxplot(width = .3, position = position_dodge(width = 1), outlier.color = NA, alpha = 0.3) +
-  geom_jitter(alpha = 0.5, position = position_dodge(width = 1)) +
-  # ylim(6000, 16000) +
-  # scale_color_viridis_d() +
-  ylab('transcripts detected') + xlab('') + theme(legend.position = c(1,0.95))
-
-panel.save(figure = 1, name = 'exoTIC_2D_txome_count', height = 'single', width = 'single')
-
-```
-### mapping rate
-```{r}
-gencode.mapping <- read_csv(file.path(output.data.dir, 'gencode.mapping.rates.csv'), 
-                            col_names = c('rep', 'sample', 'rate')) %>% 
-  distinct() %>% 
-  group_by(sample) %>% mutate(rep = 1:n(), rate = as.numeric(sub('%', '', rate))/100) %>% 
-  ungroup() %>% filter(sample %in% c('intra.aale', 'intra.hbec')) %>% mutate(mapping = 'gencode')
-
-rmsk.mapping <- read_csv(file.path(output.data.dir, 'rmsk.mapping.rates.csv'), 
-                            col_names = c('rep', 'sample', 'rate')) %>% 
-  group_by(sample) %>% mutate(rep = 1:n(), rate = as.numeric(sub('%', '', rate))/100) %>% 
-  ungroup() %>% filter(sample %in% c('intra.aale', 'intra.hbec')) %>% mutate(mapping = 'gencode_+_rmsk')
-
-
-rbind(gencode.mapping, rmsk.mapping) %>% 
-  ggplot(aes(sample, rate, color = mapping)) + 
-  geom_boxplot(fill = NA, position = position_dodge(width = 1)) + 
-  geom_sina(position = position_dodge(width = 1)) + 
-  scale_color_viridis_d() + theme(legend.position = c(0.95, 0.95)) + xlab('') -> mapping.rate_comp
-
-mapping.rate_comp
-
-panel.save(figure = 'hbec', 
-           name = 'mapping.rate.compare', width = 'single', height = 'double', mapping.rate_comp)
-
-```
 
 ## ATAC
 ```{r}
@@ -1822,8 +1538,7 @@ consensus_atac_anno_peak_counts <-
 consensus_atac_boolean_anno <- 
   read_tsv(file.path(output.data.dir, 
                      'narrow_output.data/bwa/mergedLibrary/macs/narrowPeak/consensus/consensus_peaks.mLb.clN.boolean.annotatePeaks.txt'
-                     )
-           )
+                     ))
 
 
 irf9_fimo_results %>% 
@@ -1844,14 +1559,26 @@ consensus_atac_boolean_anno %>%
 
 consensus_atac_boolean_anno %>% 
   filter(ctrl_R1.mLb.clN.bool == F) %>% 
-  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
-  filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
+  # filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+  # filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
   separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
   filter(annotation == "promoter-TSS ") %>%
   # group_by(annotation) %>%
   group_by(`Gene Name`) %>%
-  tally() -> uniq_peak_genes#%>% filter(grepl('ZNF', `Gene Name`)) %>% 
+  tally() -> uniq_kras_peak_genes#%>% filter(grepl('ZNF', `Gene Name`)) %>% 
   # arrange(-n)
+
+consensus_atac_boolean_anno %>% 
+  filter(kras_R1.mLb.clN.bool == F) %>% 
+  # filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+  # filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>%
+  # group_by(annotation) %>%
+  group_by(`Gene Name`) %>%
+  tally() -> uniq_ctrl_peak_genes
+
+
 
 consensus_atac_boolean_anno %>% 
   filter(ctrl_R1.mLb.clN.bool == F) %>% 
@@ -1887,35 +1614,48 @@ names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>%
 getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_uniq_peak_ranges) -> ifn_uniq_seqs
 getSeq(BSgenome.Hsapiens.UCSC.hg38, other_uniq_peak_ranges) -> other_uniq_seqs
 
-memes::runAme(input = ifn_uniq_seqs, control = other_uniq_seqs) %>% 
-  memes::plot_ame_heatmap()
+memes::runAme(input = ifn_uniq_seqs, control = other_uniq_seqs) -> ifn_uniq_motifs
+
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, abs(log2FoldChange) > 1) %>%
+  select(gene_id) %>% unlist() %>% unname() -> de_list
+
+de_list_ranges <- gr[names(gr) %in% de_list]
+
+names(de_list_ranges) <- paste0(seqnames(de_list_ranges), '_', names(de_list_ranges))
+
+de_list_promoter_seqs <-
+  GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
+                                  query = de_list_ranges, upstream = 1000, downstream = 500)
+
+lapply(ifn_uniq_motifs$motif_id, function(motif) {
   
+  print(motif)
   
-salmon.quant$aale$intra$deseq$de %>% filter(gene %in% uniq_peak_genes$`Gene Name`) %>% View()
+  this_motif <- MotifDb::query(MotifDb::MotifDb, motif) %>% 
+                  universalmotif::convert_motifs()
+  
+  memes::runFimo(de_list_promoter_seqs, motifs = this_motif) -> de_list_promoter_regions
+  
+  bamsignals::bamCount(kras_bam_path,
+                          de_list_promoter_regions) -> kras_de_prom_profile
 
-HelloRanges::R_bedtools_intersect(kras_atac_bed, irf9_bed, wa = T, F = 0.25, s = T)
+  bamsignals::bamCount(ctrl_bam_path,
+                          de_list_promoter_regions) -> ctrl_de_prom_profile
 
-{
-    genome <- Seqinfo(genome = NA_character_)
-    gr_a <- kras_atac_bed
-    gr_b <- irf9_bed
-    pairs <- findOverlapPairs(gr_a, gr_b, ignore.strand = FALSE)
-    olap <- pintersect(pairs, ignore.strand = FALSE)
-    keep <- width(olap)/width(second(pairs)) >= 0
-    pairs <- pairs[keep]
-    ans <- first(pairs)
-    ans
-}
+  lst('kras' = kras_de_prom_profile,
+      'ctrl' = ctrl_de_prom_profile)
+  
 
-values(ans)$name
+}) -> de_list_fimo_out
 
-consensus_atac_boolean_anno %>% 
-  filter(interval_id %in% as.data.frame(values(ans))$name) %>% 
-  View()
+de_list_fimo_out[[4]]$kras
+
+
+
+
 
   
-merge(consensus_atac_anno_peak_counts, by.x = c('chr', 'start.x', 'end.x'), by.y = c('Chr', 'Start', 'End'))
-
 ```
 
 
@@ -2070,7 +1810,7 @@ FeaturePlot(aale_sc, features = c('KRAS', 'ISG15')) + theme_set_fun()
 
 ```
 
-###w
+###
 ```{r}
 set.seed(123)
 
