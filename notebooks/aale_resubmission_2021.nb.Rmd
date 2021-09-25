@@ -1193,6 +1193,41 @@ salmon.quant$aale$intra$deseq$de %>%
   
 panel.save(plot.in = exo_v_intra_upset, figure = 3, name = 'intra_v_exo_upset', width = 'single', height = 'single')
 
+
+
+
+kras.sight <- read_csv(file.path(output.data.dir, 'kras.nanosight.data.csv'), skip = 2,
+                       col_names = c('size', 'r1', 'r2', 'r3', NA, NA, NA, NA)) %>% 
+  mutate(condition = 'kras')
+ctrl.sight <- read_csv(file.path(output.data.dir, 'ctrl.nanosight.data.csv'), skip = 2,
+                       col_names = c('size', 'r1', 'r2', 'r3', NA, NA, NA, NA)) %>% 
+  mutate(condition = 'ctrl')
+
+nano_sight <- rbind(kras.sight, ctrl.sight)
+
+nano_sight %>% 
+  select(size, r1, r2, r3, condition) %>% 
+  gather(rep, value, -condition, -size) %>% 
+  filter(size <= 400) %>% 
+  mutate(value = value/1e6) %>% 
+  group_by(size, condition) %>% 
+  summarize(y = mean(value),
+            ymin = mean(value) - sd(value),
+            ymax = mean(value) + sd(value)) %>% 
+  ggplot(aes(size, y = y, ymin = ymin, ymax = ymax)) +
+  geom_ribbon(fill = 'grey', alpha = 0.4) +
+  geom_line(color = 'darkgrey') +
+  stat_peaks(geom = 'text', span = 35, vjust = -0.5, y.label.fmt = '%#f') +
+  facet_row(~condition) + 
+  ylab('1e6 particles per mL') + xlab('nm')
+      
+panel.save(figure = 3, name = 'exo_nanosight_dist', width = 'single', height = 'single')
+
+
+
+
+
+
   
 ```
 
