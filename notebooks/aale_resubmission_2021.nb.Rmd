@@ -1175,12 +1175,12 @@ salmon.quant$aale$intra$deseq$H.fgsea %>%
   
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, abs(log2FoldChange) > 0.5) %>% 
-  mutate(context = ifelse(log2FoldChange > 0, 'INTRA_upreg', 'INTRA_downreg')) %>% 
+  mutate(context = ifelse(log2FoldChange > 0, 'INTRA_up', 'INTRA_dn')) %>% 
   select(gene, context) %>% 
   rbind(
     salmon.quant$aale$exo$deseq$de %>% 
     filter(padj < 0.05, abs(log2FoldChange) > 0.5) %>% 
-    mutate(context = ifelse(log2FoldChange > 0, 'EXO_upreg', 'EXO_downreg')) %>% 
+    mutate(context = ifelse(log2FoldChange > 0, 'EXO_up', 'EXO_dn')) %>% 
     select(gene, context)
     ) %>% 
   group_by(gene) %>% 
