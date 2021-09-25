@@ -1224,8 +1224,42 @@ nano_sight %>%
 panel.save(figure = 3, name = 'exo_nanosight_dist', width = 'single', height = 'single')
 
 
+ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>% 
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
+  merge(meta.data$te.families.clades, by = 'gene') %>%
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR')) %>% 
+  gather(sample, count, -gene, -clade, -family) %>% 
+  separate(sample, sep = '[.]', into = c(NA, NA, NA, 'condition')) %>%
+  ggplot(aes(condition, log1p(count))) + 
+  geom_boxplot(outlier.colour = NA, fill = NA) +
+  geom_jitter(alpha = 0.2) + 
+  facet_wrap(~clade) +
+  stat_compare_means(method = 'wilcox', label = 'p.format')
+  
+panel.save(figure = 3, name = 'exo_nanosight_dist', width = 'single', height = 'single')
 
 
+
+ucsc.rmsk.salmon.quant$aale$platform_compare$deseq$counts %>%
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
+  merge(meta.data$te.families.clades, by = 'gene') %>%
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR')) %>% 
+  gather(sample, count, -gene, -clade, -family) %>% 
+  separate(sample, sep = '[.]', into = c('platform', NA, NA, 'condition')) %>%
+  mutate(platform = ifelse(platform == 'rnaEASY', 'EXO', 'INTRA'),
+         condition = paste0(platform, '_', condition)) %>% 
+  ggplot(aes(condition, log1p(count))) + 
+  geom_boxplot(outlier.colour = NA, fill = NA) +
+  geom_jitter(alpha = 0.1) + 
+  facet_wrap(~clade) +
+  stat_compare_means(method = 'wilcox', label = 'p.format', hide.ns = T,
+                     comparisons = list(c('INTRA_ctrl', 'INTRA_kras'),
+                                        c('EXO_ctrl', 'EXO_kras'),
+                                        c('INTRA_kras', 'EXO_kras'),
+                                        c('INTRA_ctrl', 'EXO_ctrl'))) + 
+  xlab('') + ylab('log(norm.count + 1)')
+
+panel.save(figure = 4, name = 'te_abundance_compare', width = 'double', height = 'single')
 
 
   
