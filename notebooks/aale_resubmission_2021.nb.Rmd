@@ -192,6 +192,8 @@ panel.save <- function(figure, name, width = 'single', height = 'single', plot.i
     panel.height = panel.figure.height/3
   } else if (height == 'double'){
     panel.height = (panel.figure.height/3)*1.5
+  } else if (height == 'medium'){
+    panel.height = (panel.figure.height/3)*2
   } else{
     panel.height = panel.figure.height
   }
@@ -1986,14 +1988,14 @@ a549_de$de_682 %>%
          padj.x < 0.05) %>% 
   ggplot(aes(log2FoldChange.x, log2FoldChange.y, label = gene)) + 
   geom_point(alpha = 0.6) + 
-  ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange.x < -0.1 & log2FoldChange.y > 0.1, gene, ''))) +
+  ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange.x < -0.1 & log2FoldChange.y > 0.1, gene, '')), max.overlaps = 5) +
   facet_col(~oe) +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
   geom_hline(yintercept = 0, alpha = 0.3, linetype = 'dashed') + 
   ylab('AALE log2FC') + xlab('A549 log2FC')
 
 
-panel.save(figure = 5, name = 'facet_oe_a549_volcano', width = 'single', height = 'double')
+panel.save(figure = 5, name = 'facet_oe_a549_volcano', width = 'single', height = 'medium')
 
   
 
