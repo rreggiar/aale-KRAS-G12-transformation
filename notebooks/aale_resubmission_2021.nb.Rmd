@@ -698,6 +698,80 @@ run.de.seq.contrast <- function(tximeta.object, base_level = 'Empty'){
   
 }
 
+run.de.seq.contrast <- function(tximeta.object, base_level = 'ctrl'){
+  
+  tximeta.name <- deparse(substitute(tximeta.object))
+  
+  print(tximeta.name)
+  
+  colData(tximeta.object$gxi) %>% 
+    as.data.frame() %>% 
+    remove_rownames() %>% 
+    mutate(condition = relevel(as.factor(condition), base_level)) -> colData.gxi
+  
+  print(levels(colData.gxi$condition))
+  
+  print(colData.gxi)
+
+  count.matrix.gxi <- assay(tximeta.object$gxi, 'counts') %>% 
+    as.data.frame() %>% 
+    rownames_to_column('gene') %>% 
+    mutate_if(is.numeric, round) %>% 
+    column_to_rownames('gene')
+    
+  colData(tximeta.object$txi) %>% 
+    as.data.frame() %>% 
+    remove_rownames() -> colData.txi
+
+  count.matrix.txi <- assay(tximeta.object$txi, 'counts') %>% 
+    as.data.frame() %>% 
+    rownames_to_column('tmp') %>% 
+    mutate_if(is.numeric, round) %>% 
+    column_to_rownames('tmp')
+  
+  # colData.gxi$platform <- relevel(as.factor(colData.gxi$platform), 'intra')
+  
+  # dds.gxi <- DESeqDataSetFromMatrix(countData = count.matrix.gxi, 
+  #                                 colData = colData.gxi, 
+  #                                 design = as.formula(~condition + 
+  #                                                       platform + 
+  #                                                       platform:condition))
+
+  dds.txi <- DESeqDataSetFromMatrix(countData = count.matrix.txi,
+                                    colData = colData.txi,
+                                    design = as.formula(~platform))
+  
+  dds.gxi <- estimateSizeFactors(dds.gxi)
+  
+  filter <- rowSums(counts(dds.gxi, normalized=T) >= 10) >= 2
+  
+  dds.gxi <- DESeq(dds.gxi[filter,])
+  
+  print(resultsNames(dds.gxi))
+  
+  # results(dds.gxi, contrast =list("conditionkras.platformrnaEASY"))
+  # 
+ results(dds.gxi, contrast =list("conditionkras.platformrnaEASY"))
+
+ ctrl.dds.gxi.lfc <- lfcShrink(dds.gxi, coef = "conditionkras.platformrnaEASY") %>%
+   as.data.frame() %>%
+   # filter(padj <= 0.05) %>%
+   rownames_to_column('gene_id') %>%
+   merge(salmon.quant$gxi.bed, by = 'gene_id')
+ 
+ ctrl.dds.gxi.lfc <- lfcShrink(dds.gxi, coef = "conditionctrl.platformrnaEASY") %>%
+   as.data.frame() %>%
+   # filter(padj <= 0.05) %>%
+   rownames_to_column('gene_id') %>%
+   merge(salmon.quant$gxi.bed, by = 'gene_id')
+
+  return(list('ctrl' = ctrl.dds.gxi.lfc, 
+              'kras' = ctrl.dds.gxi.lfc,
+              'col.data' = colData.txi))
+  
+  
+}
+
 ```
 ## CALL: run.de.seq
 ```{r}
@@ -714,6 +788,8 @@ salmon.quant$a549$deseq <- run.de.seq(salmon.quant$a549, base_case = 'Empty')
 salmon.quant$all_intra$deseq <- run.de.seq(salmon.quant$all_intra)
 
 a549_de <- run.de.seq.contrast(salmon.quant$a549)
+
+tmp <- run.de.seq.contrast(salmon.quant$aale$kras_compare$)
 
 View(tmp %>% filter(padj < 0.01))
 
@@ -1168,6 +1244,61 @@ salmon.quant$aale$exo$deseq$de %>%
   lm(EXO_aale ~ INTRA_aale, data = .) %>% 
   summary()
 
+salmon.quant$aale$kras_compare$deseq$de %>% 
+  filter(!gene %in% meta.data$gencode.35.lnc.gene.names$gene,
+         padj < 0.01) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
+  geom_point(alpha = 0.6) + 
+  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1, gene, '')), show.legend = F) +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.99,0.99))
+
+salmon.quant$aale$ctrl_compare$deseq$de %>% 
+  filter(gene %in% meta.data$gencode.35.lnc.gene.names$gene,
+         padj < 0.01) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
+  geom_point(alpha = 0.6) + 
+  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1, gene, '')), show.legend = F) +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.99,0.99))
+
+
+salmon.quant$aale$ctrl_compare$deseq$de %>% 
+  filter(!gene %in% meta.data$gencode.35.lnc.gene.names$gene,
+         padj < 0.01) %>%
+  mutate(ctrl = log2FoldChange) %>% 
+  merge(salmon.quant$aale$kras_compare$deseq$de %>% 
+    filter(!gene %in% meta.data$gencode.35.lnc.gene.names$gene,
+           padj < 0.01) %>%
+    mutate(kras = log2FoldChange), by = 'gene') %>% 
+  ggplot(aes(kras, ctrl, label = gene)) + 
+  geom_point(alpha = 0.6) + 
+  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(kras) > 3 & abs(ctrl) > 3, gene, '')), show.legend = F) +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.99,0.99))
+
+
+
+salmon.quant$aale$exo$deseq$de %>% 
+  dplyr::rename('EXO_aale' = log2FoldChange) %>% 
+  filter(padj < 0.05) %>% 
+  merge(salmon.quant$aale$intra$deseq$de %>% 
+          dplyr::rename('INTRA_aale' = baseMean) %>% 
+          filter(padj < 0.05), by = 'gene') %>% 
+  mutate(unique = ifelse(gene %in% uniq_kras_peak_genes$`Gene Name`, 'KRAS', 
+                         ifelse(gene %in% uniq_ctrl_peak_genes$`Gene Name`, 'CTRL', NA))) %>% 
+  ggplot(aes(EXO_aale, INTRA_aale, color = unique)) + 
+  geom_point() + 
+  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2]), name = 'unique ATAC peak') +
+  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
+  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
+  geom_text_repel(aes(label = ifelse(abs(EXO_aale) > 1 & abs(INTRA_aale) > 1, gene, '')), show.legend = F) +
+  theme(legend.position = c(0.99, 0.99)) +
+  geom_line(stat = 'smooth', method = 'lm', linetype = 'dashed', alpha = 0.8, color = 'purple')
+
 
 panel.save(figure = 3, name = 'intra_v_exo_de', width = 'single', height = 'single')
 
@@ -1198,6 +1329,49 @@ ucsc.rmsk.salmon.quant$aale$exo$deseq$de %>%
   theme(legend.position = c(0.99,0.95))
 
 panel.save(figure = 3, name = 'exo_te_de', width = 'single', height = 'single')
+
+ucsc.rmsk.salmon.quant$aale$kras_compare$deseq$de %>%
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
+         padj < 0.05) %>%
+  merge(meta.data$te.families.clades, by = 'gene') %>% 
+  filter(clade %in% c('SINE', 'LINE', 'LTR', 'DNA')) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = clade)) + 
+  geom_point(alpha = 0.6) + 
+  # xlim(-2, 2) +
+  scale_color_viridis_d(direction = -1) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) >= 1.15, gene, '')), show.legend = F) + 
+  theme(legend.position = c(0.99,0.95)) + 
+  facet_col(~clade)
+
+ucsc.rmsk.salmon.quant$aale$ctrl_compare$deseq$de %>%
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
+         padj < 0.05) %>%
+  merge(meta.data$te.families.clades, by = 'gene') %>% 
+  filter(clade %in% c('SINE', 'LINE', 'LTR', 'DNA')) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = clade)) + 
+  geom_point(alpha = 0.6) + 
+  # xlim(-2, 2) +
+  scale_color_viridis_d(direction = -1) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) >= 1.15, gene, '')), show.legend = F) + 
+  theme(legend.position = c(0.99,0.95)) + 
+  facet_col(~clade)
+
+ucsc.rmsk.salmon.quant$aale$ctrl_compare$deseq$de %>% 
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
+         padj < 0.01) %>%
+  mutate(ctrl = log2FoldChange) %>% 
+  merge(ucsc.rmsk.salmon.quant$aale$kras_compare$deseq$de %>% 
+    mutate(kras = log2FoldChange), by = 'gene') %>% 
+  merge(meta.data$te.families.clades, by = 'gene') %>% 
+  filter(clade %in% c('SINE', 'LINE', 'LTR', 'DNA')) %>% 
+  ggplot(aes(kras, ctrl, label = gene, color = clade)) + 
+  geom_point(alpha = 0.6) + 
+  # scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(kras) > 3 & abs(ctrl) > 3, gene, '')), show.legend = F) +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.99,0.99)) + 
+  facet_col(~clade)
+
 
 
 salmon.quant$aale$intra$deseq$H.fgsea %>% 
@@ -1297,6 +1471,70 @@ ucsc.rmsk.salmon.quant$aale$platform_compare$deseq$counts %>%
 
 panel.save(figure = 4, name = 'te_abundance_compare', width = 'double', height = 'single')
 
+
+
+ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>% 
+  # filter(gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
+  merge(meta.data$te.families.clades, by = 'gene', all.x = T) %>% 
+  mutate(clade = ifelse(is.na(clade), 'gencode', clade),
+         clade = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', clade)) %>% 
+  gather(sample, count, -family, -clade, -gene) %>% 
+  mutate(condition = ifelse(grepl('ctrl', sample), 'ctrl', 'kras')) %>% 
+  group_by(sample, condition, clade) %>% 
+  summarize(clade_counts = sum(count)) %>% 
+  group_by(sample) %>% 
+  mutate(frac = clade_counts/sum(clade_counts)) %>% 
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'gencode', 'lncRNA')) %>%
+  ggplot(aes(sample, frac, fill = clade)) + 
+  geom_col()
+  # ggplot(aes(condition, frac)) + 
+  # geom_boxplot(fill = NA, outlier.colour = NA) + 
+  # geom_point() +
+  # facet_wrap(~clade, scales = 'free_y')
+
+ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>% 
+  # filter(gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
+  merge(meta.data$te.families.clades, by = 'gene', all.x = T) %>% 
+  mutate(clade = ifelse(is.na(clade), 'coding', clade),
+         clade = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', clade)) %>% 
+  gather(sample, count, -family, -clade, -gene) %>% 
+  filter(!grepl('^MT|^RP', gene)) %>% 
+  mutate(condition = ifelse(grepl('ctrl', sample), 'ctrl', 'kras'),
+         sample = str_replace(sample, 'rnaEASY.aale.', '')) %>% 
+  group_by(sample, condition, clade) %>% 
+  summarize(clade_counts = sum(count)) %>% 
+  group_by(sample) %>% 
+  mutate(frac = clade_counts/sum(clade_counts)) %>% 
+  mutate(clade = factor(clade, levels = c('SINE', "LINE",'DNA', 'LTR', 'Satellite', 'lncRNA', 'coding'))) %>% 
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'coding', 'lncRNA')) %>%
+  ggplot(aes(sample, frac, fill = clade)) + 
+  geom_col() + 
+  geom_hline(yintercept = seq(0,1,0.25), color = 'white', alpha = 0.6) +
+  scale_fill_viridis_d(direction = -1) + 
+  facet_col(~condition, scales = 'free_x') + 
+  xlab('') + 
+  ylab('fraction of norm. counts') + 
+  theme(legend.position = 'top', legend.justification = 'center')
+
+panel.save(figure = 3, name = 'biotype_dist', width = 'single', height = 'single')
+
+
+
+ucsc.rmsk.salmon.quant$aale$ctrl_compare$deseq$counts %>% 
+  # filter(gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
+  merge(meta.data$te.families.clades, by = 'gene', all.x = T) %>% 
+  mutate(clade = ifelse(is.na(clade), 'gencode', clade),
+         clade = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', clade)) %>% 
+  gather(sample, count, -family, -clade, -gene) %>% nrow()
+  filter(!grepl('^MT|^RP', gene)) %>% 
+  mutate(condition = ifelse(grepl('ctrl', sample), 'ctrl', 'kras')) %>% 
+  group_by(sample, condition, clade) %>% 
+  summarize(clade_counts = sum(count)) %>% 
+  group_by(sample) %>% 
+  mutate(frac = clade_counts/sum(clade_counts)) %>% 
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'gencode', 'lncRNA')) %>%
+  ggplot(aes(sample, frac, fill = clade)) + 
+  geom_col()
 
   
 ```
