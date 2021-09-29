@@ -1473,6 +1473,66 @@ ucsc.rmsk.salmon.quant$aale$platform_compare$deseq$counts %>%
 panel.save(figure = 4, name = 'te_exo_abundance_compare', width = 'single', height = 'single')
 
 
+ucsc.rmsk.salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
+         padj < 0.05) %>%
+  merge(meta.data$te.families.clades, by = 'gene') %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = clade)) + 
+  geom_point(alpha = 0.6) + 
+  # xlim(-2, 2) +
+  scale_color_viridis_d(direction = -1) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) >= 1.15, gene, '')), show.legend = F) + 
+  theme(legend.position = c(0.99,0.95))
+
+
+ucsc.rmsk.salmon.quant$aale$intra$deseq$de %>% 
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
+         padj < 0.05) %>%
+  merge(meta.data$te.families.clades, by = 'gene') %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = clade)) + 
+  geom_point(alpha = 0.6) + 
+  xlim(-6, 6) +
+  scale_color_viridis_d(direction = -1) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) >= 1.15, gene, '')), show.legend = F) + 
+  theme(legend.position = c(0.99,0.95))
+
+ucsc.rmsk.salmon.quant$aale$intra$deseq$de %>%
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
+         padj < 0.05) %>%
+  mutate(EXO_aale = log2FoldChange) %>% 
+  merge(ucsc.rmsk.salmon.quant$hbec$lacz_v_v12$deseq$de %>%
+    filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
+           padj < 0.05) %>%
+    mutate(INTRA_hbec = log2FoldChange), by = 'gene') %>% 
+  ggplot(aes(EXO_aale, INTRA_hbec, label = gene)) + 
+  geom_point() + 
+  ggrepel::geom_text_repel() + 
+  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
+  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4)
+
+
+ucsc.rmsk.salmon.quant$aale$intra$deseq$de %>%
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
+         padj < 0.05) %>%
+  mutate(context = 'aale') %>% 
+  rbind(ucsc.rmsk.salmon.quant$hbec$lacz_v_v12$deseq$de %>%
+    filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
+           padj < 0.05) %>% 
+      mutate(context = 'hbec')) %>% 
+  merge(meta.data$te.families.clades, by = 'gene') %>% 
+  mutate(clade = factor(clade, levels = c('DNA', 'LINE', "LTR", 'Satellite', 'SINE'))) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = clade)) + 
+  geom_point(alpha = 0.6) + 
+  ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange > 0, gene, '')), show.legend = F, max.overlaps = 40) +
+  scale_color_viridis_d(direction = -1) +
+  facet_col(~context, scales = 'free_y') +
+  xlim(-6,4) +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(.39,.39))
+
+panel.save(figure = 4, name = 'intra_te_de', width = 'single', height = 'single')
+
+
 
 ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>% 
   # filter(gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
