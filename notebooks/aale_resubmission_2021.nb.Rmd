@@ -2379,9 +2379,12 @@ a549_te_de$de_682 %>%
   merge(meta.data$te.families.clades, by.x = 'gene_id', by.y = 'gene') %>% 
   ggplot(aes(log2FoldChange, -log10(padj), label = gene_id, color = clade)) + 
   geom_point(alpha = 0.6) + 
+  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.5) +
   scale_color_viridis_d(direction = -1) +
-  ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange < -0.5, gene_id, '')), show.legend = F) +
-  facet_col(~oe)
+  ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange < -0.5, gene_id, '')), 
+                           show.legend = F) +
+  facet_col(~oe) + 
+  theme(legend.position = c(0.3, 0.99))
 
 panel.save(figure = 5, name = 'facet_te_a549_volcano', width = 'single', height = 'single')
 
@@ -2683,9 +2686,10 @@ dn_te_ranges_list[[9]][width(dn_te_ranges_list[[9]]) > 10, ] -> te_ranges_tmp
 
 resize(te_ranges_tmp, width = median(max(dn_te_ranges_list[[9]]))) -> te_ranges_tmp
 
-bamsignals::bamCoverage(kras_bam_path, te_ranges_tmp, paired.end = 'extend') -> kras_de_te_profile
-bamsignals::bamCoverage(ctrl_bam_path, te_ranges_tmp, paired.end = 'extend') -> ctrl_de_te_profile
-
+bamsignals::bamCoverage(kras_bam_path, 
+                        te_ranges_tmp, paired.end = 'extend') -> kras_de_te_profile
+bamsignals::bamCoverage(ctrl_bam_path, 
+                        te_ranges_tmp, paired.end = 'extend') -> ctrl_de_te_profile
 
 bamsignals::alignSignals(kras_de_te_profile) %>% 
   as.data.frame() %>% 
@@ -2886,9 +2890,25 @@ znf_score %>%
   mutate(rank = dense_rank(-score)) %>% 
   filter(!grepl('Mamrep', TE)) %>% 
   separate(TE, sep = '\\/', into = c('clade', 'family', 'TE')) %>% 
-  filter(TE %in% filter(upreg_te, context %in% c('aale_intra', 'aale_exo', 'h358_intra'))$gene,
-         gene %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, 
+  filter(gene %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, 
                           log2FoldChange < -0.75)$gene) -> znf_score
+
+
+znf_score %>% 
+  merge(ucsc.rmsk.salmon.quant$aale$intra$deseq$de %>% 
+          filter(padj < 0.05, log2FoldChange > 0.5), by.x = 'TE', by.y = 'gene') %>% 
+  merge(salmon.quant$aale$intra$deseq$de, by = 'gene') %>% 
+  filter(rank < 50) %>% 
+  ggplot(aes(TE, rank, color = log2FoldChange.y)) + 
+  geom_point() + 
+  scale_color_viridis_c(name = 'znf log2FC') +
+  ggrepel::geom_text_repel(aes(label = ifelse(rank < 20, gene, ''))) +
+  xlab('') + 
+  theme(legend.position = c(0.99,0.99),
+        axis.text.x = element_text(angle = 40, hjust = 1))
+
+panel.save(figure = 4, name = 'trono_znf_target_ranks', width = 'single', height = 'single')
+
 
 
 znf_score %>%
