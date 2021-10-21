@@ -905,13 +905,14 @@ salmon.quant$hbec$hbec_v12$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$h
 salmon.quant$hbec$lacz_v_wt$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$lacz_v_wt$deseq$de)
 salmon.quant$hbec$lacz_v_v12$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$lacz_v_v12$deseq$de)
 
-saveRDS(salmon.quant, file = file.path(output.data.dir, 'usalmon.quant_analysis_set.rds'))
+saveRDS(salmon.quant, file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
 
 ```
 
 ```{r}
 
 salmon.quant <- readRDS(file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
+ucsc.rmsk.salmon.quant <- readRDS(file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
 
 lapply(c(1,2), function(i) { 
   
@@ -2535,6 +2536,15 @@ consensus_atac_boolean_anno %>%
   # arrange(-n)
 
 consensus_atac_boolean_anno %>% 
+  # filter(ctrl_R1.mLb.clN.bool == T & kras_R1.mLb.clN.bool == T) %>% 
+  # filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+  # filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  # filter(annotation == "promoter-TSS ") %>%
+  select(chr, start, end, gene = `Gene Name`) %>% 
+  mutate(strand = '+') -> bg_peak_input_bed
+
+consensus_atac_boolean_anno %>% 
   filter(ctrl_R1.mLb.clN.bool == F) %>% 
   filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
   # filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
@@ -2543,24 +2553,51 @@ consensus_atac_boolean_anno %>%
   select(chr, start, end, gene = `Gene Name`) %>% 
   mutate(strand = '+') -> uniq_kras_peak_input_bed
 
-job <- rGREAT::submitGreatJob(uniq_kras_peak_input_bed, species = 'hg38')
+job <- rGREAT::submitGreatJob(gr = uniq_kras_peak_input_bed, species = 'hg38', bg = bg_peak_input_bed)
 
 tb <- rGREAT::getEnrichmentTables(job, download_by = 'tsv')
 
 base::do.call(rbind, tb) %>% 
   group_by(Ontology) %>% 
+  top_n(30, -HyperFdrQ) %>%
+  filter(HyperFdrQ < 0.05,
+         NumFgGenesHit > 1) %>% 
+  ggplot(aes(NumFgGenesHit, -log10(HyperFdrQ), label = Desc)) + 
+  geom_point() + 
+  # scale_color_viridis_d() +
+  ggrepel::geom_text_repel(show.legend = F, color = 'black') +
+  theme(legend.position = c(0.99, 0.99)) + 
+  xlab('observed genes') +
+  facet_row(~Ontology, scales = 'free')
+
+panel.save(figure = 2, 
+           name = 'atac_GREAT_enrichment_facet', width = 'double', height = 'single')
+
+
+consensus_atac_boolean_anno %>% 
+  filter(kras_R1.mLb.clN.bool == F) %>% 
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange < -0.5)$gene) %>%
+  # filter(`Gene Name` %in% meta.data$trono.krab.znfs$gene) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  # filter(annotation == "promoter-TSS ") %>%
+  select(chr, start, end, gene = `Gene Name`) %>% 
+  mutate(strand = '+') -> uniq_ctrl_peak_input_bed
+
+job <- rGREAT::submitGreatJob(uniq_ctrl_peak_input_bed, species = 'hg38', bg = bg_peak_input_bed)
+
+tb <- rGREAT::getEnrichmentTables(job, download_by = 'tsv')
+  
+base::do.call(rbind, tb) %>% 
+  group_by(Ontology) %>% View()
   top_n(10, -BinomFdrQ) %>% 
-  filter(HyperFdrQ < 0.05) %>% 
+  filter(HyperFdrQ < 0.05) %>% View()
   ggplot(aes(ObsGenes, -log10(BinomFdrQ), color = Ontology, label = Desc)) + 
   geom_point() + 
   scale_color_viridis_d() +
   ggrepel::geom_text_repel(show.legend = F) + 
-  theme(legend.position = c(0.99, 0.99))
-
-panel.save(figure = 2, 
-           name = 'atac_GREAT_enrichment', width = 'double', height = 'single')
+  theme(legend.position = c(0.99, 0.99)) + 
+  xlab('observed genes')
   
-
 consensus_atac_boolean_anno %>% 
   filter(kras_R1.mLb.clN.bool == F) %>% 
   # filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
