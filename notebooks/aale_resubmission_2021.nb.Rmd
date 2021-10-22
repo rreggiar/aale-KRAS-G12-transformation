@@ -2344,8 +2344,8 @@ salmon.quant$aale$intra$deseq$de %>%
 working_toil_counts %>% 
   # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
   # filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
-  # filter(gene %in% aale_znf$gene) %>%
-  filter(gene %in% c('ETV1', 'ALX1', 'ZNF90', 'ZNF736', 'ZNF682', 'MEF2B'), KRAS == 'p.G12D') %>% 
+  filter(gene %in% aale_znf$gene) %>%
+  # filter(gene %in% c('ETV1', 'ALX1', 'ZNF90', 'ZNF736', 'ZNF682', 'MEF2B'), KRAS == 'p.G12D') %>% 
   group_by(gene) %>%
   mutate(count = scale(log1p(count), center = T)) %>%
   select(sample, gene, count) %>%
@@ -2416,6 +2416,23 @@ pdf(file = file.path(figure.dir, 'fig.5', 'toil_znf_hm.pdf'),
 toil_hm_plt
 
 dev.off()
+
+working_toil_counts %>% 
+  filter(gene %in% aale_znf$gene,
+         KRAS %in% c('p.G12D', 'WT_normal')) -> toil_dist_counts
+
+toil_dist_counts %>% 
+  group_by(sample, KRAS) %>% 
+  summarize(znf_mean = mean(count)) %>% 
+  ggplot(aes(KRAS, znf_mean)) + 
+  geom_jitter(width = 0.15) +
+  geom_boxplot(outlier.colour = NA, fill = NA) + 
+  stat_compare_means(method = 'wilcox.test', comparisons = list(c('p.G12D', 'WT_normal'))) +
+  ylab('mean(dn ZNF counts)') + xlab('')
+
+panel.save(figure = 7, name = 'avg_znf_wilcox', width = 'single', height = 'single')
+
+
 
 
 myc.avg.counts.tidy.stratified <-
