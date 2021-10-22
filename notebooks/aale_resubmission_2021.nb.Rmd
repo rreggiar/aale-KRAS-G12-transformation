@@ -1158,7 +1158,7 @@ gr <- rowRanges(salmon.quant$gxi)
 
 ifn_de_gr <- gr[names(gr) %in% de_list]
 
-ns_gr <- gr[names(gr) %in% ns_list]
+# ns_gr <- gr[names(gr) %in% ns_list]
 
 de_promoter_regions <- promoters(ifn_de_gr, upstream = 1000, downstream = 500)
 # ns_promoter_regions <- promoters(ns_gr, upstream = 1000, downstream = 200)
@@ -1221,6 +1221,38 @@ rbind(kras_de_prom_df, ctrl_de_prom_df) %>%
 
 panel.save(figure = 2, name = 'isg_atac_enrichment', width = 'single', height = 'single')
 
+
+de_promoter_regions_for_meme <- promoters(ifn_de_gr, upstream = 300, downstream = 500) %>% 
+  memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38)
+
+salmon.quant$aale$intra$deseq$de %>%
+  filter(padj > 0.5, gene %in% c(ifn_g, ifn_a)) %>%
+  select(gene_id) %>% unlist() %>% unname() -> ns_list
+ns_gr <- gr[names(gr) %in% ns_list]
+ns_promoter_regions <- promoters(ns_gr, upstream = 300, downstream = 500) %>% 
+  memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38)
+
+
+ifn_ame_out <- memes::runAme(de_promoter_regions_for_meme, control = ns_promoter_regions)
+
+ifn_ame_out %>% 
+  mutate(tmp = motif_id) %>% 
+  separate(tmp, sep = '_', into = c('TF', NA)) %>% 
+  mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) -> ifn_ame_out
+# %>% 
+  # select(TF) %>% unlist() %>% unname() -> ame_tf
+
+salmon.quant$aale$intra$deseq$de %>% 
+  merge(ifn_ame_out, by.x = 'gene', by.y = 'TF') %>% 
+  # filter(gene %in% ame_tf) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
+  geom_point() + 
+  scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
+  geom_text_repel(color = 'black') + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.35, 0.79)) 
 
 
 # avgBinnedSig <- rowMeans(bamsignals::alignSignals(kras_prom_profile))
@@ -2034,7 +2066,7 @@ salmon.quant$aale$intra$deseq$de %>%
 panel.save(figure = 5, name = 'de_scatter_znf', width = 'single', height = 'single')
 
 salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange < -4.5, gene %in% meta.data$trono.krab.znfs$gene) %>%  #, gene %in% uniq_ctrl_peak_genes$`Gene Name`) %>% 
+  filter(padj < 0.05, log2FoldChange < -0.5, gene %in% meta.data$trono.krab.znfs$gene) %>%  #, gene %in% uniq_ctrl_peak_genes$`Gene Name`) %>% 
   # filter(gene %in% filter(salmon.quant$hbec$lacz_v_v12$deseq$de, padj < 0.05, log2FoldChange > 0)$gene) %>% 
   select(gene_id) %>% unlist() %>% unname() -> de_list
 
@@ -2062,13 +2094,34 @@ gr <- rowRanges(salmon.quant$gxi)
 znf_de_gr <- gr[names(gr) %in% de_list]
 znf_de_gr_hbec <- gr[names(gr) %in% de_list_w_hbec]
 
-promoter_seqs <- 
+znf_promoter_seqs <- 
   GenomicRanges::promoters(znf_de_gr, upstream = 200, downstream = 200) %>% 
   memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38)
 
-promoter_seqs_hbec <- 
-  GenomicRanges::promoters(znf_de_gr_hbec, upstream = 300, downstream = 300) %>% 
+znf_promoter_seqs_hbec <- 
+  GenomicRanges::promoters(znf_de_gr_hbec, upstream = 200, downstream = 200) %>% 
   memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38)
+
+znf_ame_out <- memes::runAme(znf_promoter_seqs, control = znf_promoter_seqs_hbec)
+
+znf_ame_out %>% 
+  mutate(tmp = motif_id) %>% 
+  separate(tmp, sep = '_', into = c('TF', NA)) %>% 
+  mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) -> znf_ame_out
+# %>% 
+  # select(TF) %>% unlist() %>% unname() -> ame_tf
+
+salmon.quant$aale$intra$deseq$de %>% 
+  merge(znf_ame_out, by.x = 'gene', by.y = 'TF') %>% 
+  # filter(gene %in% ame_tf) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
+  geom_point() + 
+  scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
+  geom_text_repel(color = 'black') + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.35, 0.79)) 
  
 tomTom_res <- memes::runAme(control = 'shuffle',
                             input = promoter_seqs)
@@ -2576,38 +2629,32 @@ panel.save(figure = 2,
 
 consensus_atac_boolean_anno %>% 
   filter(kras_R1.mLb.clN.bool == F) %>% 
-  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange < -0.5)$gene) %>%
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange < -1.5)$gene) %>%
   # filter(`Gene Name` %in% meta.data$trono.krab.znfs$gene) %>%
   separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
   # filter(annotation == "promoter-TSS ") %>%
   select(chr, start, end, gene = `Gene Name`) %>% 
   mutate(strand = '+') -> uniq_ctrl_peak_input_bed
 
-job <- rGREAT::submitGreatJob(uniq_ctrl_peak_input_bed, species = 'hg38', bg = bg_peak_input_bed)
+ctrl_job <- rGREAT::submitGreatJob(uniq_ctrl_peak_input_bed, species = 'hg38', bg = bg_peak_input_bed)
 
-tb <- rGREAT::getEnrichmentTables(job, download_by = 'tsv')
+ctrl_tb <- rGREAT::getEnrichmentTables(ctrl_job, download_by = 'tsv')
   
-base::do.call(rbind, tb) %>% 
-  group_by(Ontology) %>% View()
-  top_n(10, -BinomFdrQ) %>% 
-  filter(HyperFdrQ < 0.05) %>% View()
-  ggplot(aes(ObsGenes, -log10(BinomFdrQ), color = Ontology, label = Desc)) + 
+base::do.call(rbind, ctrl_tb) %>% 
+  group_by(Ontology) %>% 
+  top_n(30, -HyperFdrQ) %>% 
+  filter(HyperFdrQ < 0.05,
+         NumFgGenesHit > 1) %>% 
+  ggplot(aes(NumFgGenesHit, -log10(HyperFdrQ), label = Desc)) + 
   geom_point() + 
-  scale_color_viridis_d() +
-  ggrepel::geom_text_repel(show.legend = F) + 
+  # scale_color_viridis_d() +
+  ggrepel::geom_text_repel(show.legend = F, color = 'black', max.overlaps = 2) +
   theme(legend.position = c(0.99, 0.99)) + 
-  xlab('observed genes')
+  xlab('observed genes') +
+  facet_row(~Ontology, scales = 'free')
   
-consensus_atac_boolean_anno %>% 
-  filter(kras_R1.mLb.clN.bool == F) %>% 
-  # filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
-  # filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
-  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
-  filter(annotation == "promoter-TSS ") %>%
-  # group_by(annotation) %>%
-  group_by(`Gene Name`) %>%
-  tally() -> uniq_ctrl_peak_genes
-
+panel.save(figure = 6, 
+           name = 'atac_GREAT_enrichment_facet', width = 'single', height = 'single')
 
 
 consensus_atac_boolean_anno %>% 
