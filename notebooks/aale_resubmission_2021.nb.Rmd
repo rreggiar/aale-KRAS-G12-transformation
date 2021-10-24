@@ -907,6 +907,13 @@ salmon.quant$hbec$lacz_v_v12$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec
 
 saveRDS(salmon.quant, file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
 
+
+salmon.quant$aale$exo$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange > 0.5) %>% nrow()
+
+salmon.quant$aale$exo$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange < -0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% nrow()
+
 ```
 
 ```{r}
@@ -1030,7 +1037,7 @@ promoter_seqs_hbec <-
 
 # dreme_results <- memes::runMeme(input = promoter_seqs, control = NA)
 # 
-tomTom_res <- memes::runAme(control = 'shuffle',
+tomTom_res <- memes::runAme(control = promoter_seqs_hbec,
                             input = promoter_seqs)
 
 tomTom_res %>% 
@@ -1668,6 +1675,33 @@ ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>%
 panel.save(figure = 3, name = 'biotype_dist', width = 'single', height = 'single')
 
 
+ucsc.rmsk.salmon.quant$aale$intra$deseq$counts %>% 
+  # filter(gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
+  merge(meta.data$te.families.clades, by = 'gene', all.x = T) %>% 
+  mutate(clade = ifelse(is.na(clade), 'coding', clade),
+         clade = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', clade)) %>% 
+  gather(sample, count, -family, -clade, -gene) %>% 
+  filter(!grepl('^MT|^RP', gene)) %>% 
+  mutate(condition = ifelse(grepl('ctrl', sample), 'ctrl', 'kras'),
+         sample = str_replace(sample, 'rnaEASY.aale.', '')) %>% 
+  group_by(sample, condition, clade) %>% 
+  summarize(clade_counts = sum(count)) %>% 
+  group_by(sample) %>% 
+  mutate(frac = clade_counts/sum(clade_counts)) %>% 
+  mutate(clade = factor(clade, levels = c('SINE', "LINE",'DNA', 'LTR', 'Satellite', 'lncRNA', 'coding'))) %>% 
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'lncRNA')) %>%
+  ggplot(aes(sample, frac, fill = clade)) + 
+  geom_col() + 
+  # geom_hline(yintercept = seq(0,1,0.25), color = 'white', alpha = 0.6) +
+  scale_fill_manual(values = c(viridis(7, direction = -1)[[1]],viridis(7, direction = -1)[[2]],viridis(7, direction = -1)[[3]],
+                               viridis(7, direction = -1)[[4]],viridis(7, direction = -1)[[5]],viridis(7, direction = -1)[[6]])) +
+  facet_col(~condition, scales = 'free_x') + 
+  xlab('') + 
+  ylab('fraction of norm. counts') + 
+  theme(legend.position = 'top', legend.justification = 'center')
+
+panel.save(figure = 'fig.supplement', name = 'intra_biotype_dist', width = 'single', height = 'single')
+
 
 ucsc.rmsk.salmon.quant$aale$ctrl_compare$deseq$counts %>% 
   # filter(gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
@@ -1806,6 +1840,39 @@ salmon.quant$aale$intra$deseq$de %>%
 panel.save(figure = 1, name = 'facet_set_volcano', width = 'single', height = 'double')
 
 salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+  mutate(padj = ifelse(padj == 0, 
+                       min(filter(salmon.quant$hbec$lacz_v_v12$deseq$de, padj != 0)$padj), padj)) %>% 
+  mutate(gene_set = ifelse(gene %in% ifn_gene_list,'IFN', 'other'),
+         gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP, 'KRAS', gene_set),
+         gene_set = ifelse(gene %in% meta.data$trono.krab.znfs$gene, 'ZNF', gene_set)) %>% 
+  mutate(gene_set = factor(gene_set, levels = c('KRAS','IFN','ZNF', 'other'))) %>% 
+  filter(padj < 0.05) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
+  geom_point(alpha = 0.6) + 
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
+                                                padj < 0.0001 & gene_set != 'other', gene, ''))) +
+  facet_col(~gene_set, scales = 'free_y') +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + xlim(-10,10)
+
+panel.save(figure = 'fig.supplement', name = 'hbec_facet_set_volcano', width = 'single', height = 'double')
+
+
+salmon.quant$aale$intra$deseq$de %>% 
+  mutate(padj = ifelse(padj == 0, 
+                       min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
+  mutate(biotype = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', 'protein-coding')) %>% 
+  # filter(padj < 0.05) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
+  geom_point(alpha = 0.6) + 
+  # scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 |
+                                                -log10(padj) > 250, gene, ''))) +
+  facet_row(~biotype, scales = 'free')
+
+panel.save(figure = 'fig.supplement', name = 'facet_biotype_volcano', width = 'double', height = 'single')
+
+
+salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
    filter(padj < 0.05, log2FoldChange > 1) %>% 
    select(gene) %>% unlist() %>% unname() -> hbec_up
 
@@ -1890,6 +1957,79 @@ salmon.quant$aale$intra$deseq$de %>%
 
 
 
+```
+### rerwip PCA
+```{r}
+set.seed(234)
+### Gencode PCA
+
+salmon.quant$all_intra$deseq$col.data
+
+salmon.quant$aale$exo$deseq$gxi.vst.counts %>% apply(., 1, sd) -> pca_sd
+salmon.quant$aale$exo$deseq$gxi.vst.counts[!pca_sd == 0, ] -> pca_filt
+salmon.quant$aale$exo$deseq$col.data -> pca_col_data
+
+pca_filt %>%
+  t() %>% 
+  as.data.frame() %>% 
+  prcomp(scale=T) -> pca_out_raw
+
+summary(pca_out_raw)
+pcs.of.interest <- apply(pca_out_raw$x, 2, var)
+pcs.props <-  pcs.of.interest/sum(pcs.of.interest)
+cumsum(pcs.props)[1]
+ 
+# convert output to dataframe
+pca.out <- as.data.frame(pca_out_raw$x) %>% 
+  rownames_to_column('names') %>% 
+  merge(pca_col_data, by ='names')
+# summarize PC contributions
+pca.out.summary <- 
+  as.data.frame(summary(pca_out_raw)$importance) %>% 
+  rownames_to_column('metric') %>% 
+  gather(pc, value, -metric) %>% 
+  spread(metric, value)
+# summarize PC contributions
+pca.out.contributions <- 
+  as.data.frame(pca_out_raw$rotation) %>% 
+  rownames_to_column('tx') %>% 
+  gather(pc, contrib, -tx) %>% 
+  #merge(gencode.reference,
+  #      by.x = 'tx',
+  #      by.y = 'gene.name') %>% 
+  group_by(pc) %>% 
+  mutate(contrib = abs(contrib)) %>% 
+  filter(contrib > quantile(contrib, 0.95))
+# plot PC1 and PC2
+pca.out %>% 
+  rownames_to_column('sample') %>% 
+  #separate(sample, sep = '[.]', into = c(NA, 'condition', NA)) %>% 
+  ggplot(aes(PC1, PC2,
+             fill = condition,
+             color = condition)) + 
+    geom_point(size = rel(2)) + 
+    scale_size_continuous(range = c(0.1, 2.5), breaks = c(0,5,10,15,20)) + 
+    xlab(paste('PC1', round(cumsum(pcs.props)[1], digits = 3), sep = ' ')) +
+    ylab(paste('PC2', round(cumsum(pcs.props)[2] - cumsum(pcs.props)[1], 
+                            digits = 3), sep = ' ')) +
+    scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+    geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
+    geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) + 
+    theme(legend.position = c(0.30, 0.25),
+            legend.key.width = unit(0.125,'cm'),
+            legend.key.height = unit(0.4, 'cm'))
+
+panel.save(figure = 'fig.supplement', name = 'aale_exo_pca', width = 'single', height = 'single')
+
+
+# print top contibutors per PC
+pca.out.contributions %>%
+  group_by(pc) %>%
+  filter(pc %in% c("PC1", "PC2")) %>% 
+  select(pc, contrib, tx) %>% 
+  mutate(contrib = abs(contrib)) %>% 
+  top_n(5, wt = contrib) %>% 
+  arrange(pc, -contrib)
 ```
 
 ```{r}
@@ -2418,12 +2558,20 @@ toil_hm_plt
 dev.off()
 
 working_toil_counts %>% 
-  filter(gene %in% aale_znf$gene,
-         KRAS %in% c('p.G12D', 'WT_normal')) -> toil_dist_counts
+  filter(KRAS %in% c('p.G12D', 'WT_normal')) %>% 
+  mutate(gene_set = ifelse(gene %in% aale_znf$gene, 'dn_ZNF', 
+                           ifelse(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 
+                                              'IFITM1', 'OAS1', 'MOV10', 'OAS3'), 'up_IFN', 'other'))) %>% 
+  filter(gene_set != 'other') -> toil_dist_counts
+
+
 
 toil_dist_counts %>% 
-  group_by(sample, KRAS) %>% 
-  summarize(znf_mean = mean(count)) %>% 
+  group_by(sample, KRAS, gene_set) %>% 
+  summarize(exp_mean = mean(count)) %>% 
+  pivot_wider(names_from = gene_set, values_from = exp_mean) %>% 
+  ggplot(aes(dn_ZNF, up_IFN, color = KRAS)) + 
+  geom_point()
   ggplot(aes(KRAS, znf_mean)) + 
   geom_jitter(width = 0.15) +
   geom_boxplot(outlier.colour = NA, fill = NA) + 
@@ -2431,6 +2579,17 @@ toil_dist_counts %>%
   ylab('mean(dn ZNF counts)') + xlab('')
 
 panel.save(figure = 7, name = 'avg_znf_wilcox', width = 'single', height = 'single')
+
+
+toil_dist_counts %>% 
+  ggplot(aes(KRAS, count)) + 
+  geom_jitter(alpha =0.4) +
+  geom_boxplot(outlier.colour = NA, fill = NA) + 
+  facet_row(~gene) + 
+  theme(axis.text.x = element_text(angle = 40, hjust = 1),
+        legend.position = c(0.99,0.99)) + 
+  stat_compare_means(method = 'wilcox.test', comparisons = list(c('p.G12D', 'WT_normal')), hide.ns = F, label = 'p.signif') + 
+  xlab('')
 
 
 
