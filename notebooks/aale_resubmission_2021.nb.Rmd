@@ -1273,6 +1273,81 @@ salmon.quant$aale$intra$deseq$de %>%
 # bamsignals::alignSignals(bamsignals::bamCoverage(kras_bam_path, promoter_regions, paired.end = 'extend')) %>% dim()
 ```
 
+```{r}
+
+
+smRNA_de <- read_csv(file = file.path(output.data.dir, 'AALE_DESeq2.csv')) %>% 
+  dplyr::rename(gene = 1,
+                log2fc = 2)
+
+smRNA_de %>% 
+  # filter(gene %in% salmon.quant$aale$exo$deseq$de$gene)
+  filter(padj < 0.05) %>% 
+  # mutate()
+  ggplot(aes(log2fc, -log10(padj))) + 
+  geom_point() + 
+  xlim(-4,4) + 
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2fc) > 1.5, gene, '')))
+
+panel.save(figure = 'fig.supplement', name = 'smRNA_exo_de', width = 'single', height = 'single')
+
+
+salmon.quant$aale$exo$deseq$de %>% 
+  # filter(gene %in% salmon.quant$aale$exo$deseq$de$gene)
+  filter(padj < 0.05) %>% 
+  # mutate()
+  ggplot(aes(log2FoldChange, -log10(padj))) + 
+  geom_point() + 
+  # xlim(-4,4) + 
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1.5, gene, '')))
+
+
+smRNA_de %>% 
+  select(gene, log2fc, padj) %>% 
+  filter(padj < 0.05) %>% 
+  merge(salmon.quant$aale$intra$deseq$de %>% filter(padj < 0.05), by = 'gene') %>% 
+  ggplot(aes(log2FoldChange, log2fc)) + 
+  xlab('intra -- RNA') + ylab('exo -- OTTRseq') +
+  geom_point() + 
+  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
+  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
+  geom_text_repel(aes(label = gene), show.legend = F)
+
+panel.save(figure = 'fig.supplement', name = 'smRNA_exo_v_intra_de', width = 'single', height = 'single')
+
+
+iso_de <- read_csv(file = file.path(output.data.dir, 'unique_to_exo_DE_isoforms_P05.csv'))[, 2:15]
+
+iso_exo <- read_csv(file = file.path(output.data.dir, 'annotated_unique_exo_isoforms.csv'))
+iso_intra <- read_csv(file = file.path(output.data.dir, 'annotated_unique_intra_isoforms.csv'))
+
+
+iso_exo %>% 
+  filter(gene_biotype %in% c('lncRNA', 'protein_coding')) %>% 
+  group_by(gene_biotype) %>% 
+  summarize(count = length(gene_biotype)) %>% 
+  ggplot(aes(gene_biotype, count, label = count)) + 
+  geom_col() + 
+  geom_hline(yintercept = seq(0,300,50), color = 'white') +
+  coord_flip() +
+  xlab('')
+
+panel.save(figure = 'fig.supplement', name = 'iso_exo_count', width = 'single', height = 'single')
+
+
+iso_de %>% 
+  filter(padj < 0.05) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj))) + 
+  geom_point() +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 7.5, gene, '')))
+panel.save(figure = 'fig.supplement', name = 'iso_exo_de', width = 'single', height = 'single')
+
+
+annotated_unique_exo_isoforms.csv
+
+
+
+```
 
 ## Ex RNA
 ```{r}

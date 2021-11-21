@@ -1,0 +1,2 @@
+error: usage wrapperStarRun.sh sampleDir starGenome 2pass={T/F} edit={T/F}
+example wrapperStarRun.sh /scratch/kimlab/projects/exoRNA-biomarkers-panc/data/a549_0.2MOI_24hr     intra /public/groups/kimlab/indexes/sel.aln.gen.34.ucsc.rmsk.index.salmon.1.2.1

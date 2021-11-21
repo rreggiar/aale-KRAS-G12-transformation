@@ -1,0 +1,93 @@
+nohup: ignoring input
+./wrapperStarRun.sh: line 16: 2pass=T: command not found
+cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale/ /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/ T T
++ ./starRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.1.ctrl /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/pass T /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/ 2021-05-15-09.41.51-PDT
+script: starRun.sh
+STAR version: 2.7.6a
+time: 2021-05-15-09.41.51-PDT
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.1.ctrl
+firstPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.1.ctrl/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out
+secondPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.1.ctrl/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out/second_pass_out
+May 15 09:41:51 ..... started STAR run
+May 15 09:41:51 ..... loading genome
+May 15 09:42:32 ..... started mapping
+May 15 10:06:21 ..... finished mapping
+May 15 10:06:32 ..... finished successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./starRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.1.kras /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/pass T /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/ 2021-05-15-09.41.51-PDT
+script: starRun.sh
+STAR version: 2.7.6a
+time: 2021-05-15-09.41.51-PDT
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.1.kras
+firstPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.1.kras/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out
+secondPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.1.kras/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out/second_pass_out
+May 15 10:06:35 ..... started STAR run
+May 15 10:06:35 ..... loading genome
+May 15 10:07:15 ..... started mapping
+May 15 10:15:56 ..... finished mapping
+May 15 10:16:05 ..... finished successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./starRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.2.ctrl /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/pass T /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/ 2021-05-15-09.41.51-PDT
+script: starRun.sh
+STAR version: 2.7.6a
+time: 2021-05-15-09.41.51-PDT
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.2.ctrl
+firstPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.2.ctrl/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out
+secondPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.2.ctrl/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out/second_pass_out
+May 15 10:16:07 ..... started STAR run
+May 15 10:16:07 ..... loading genome
+May 15 10:16:47 ..... started mapping
+May 15 10:32:39 ..... finished mapping
+May 15 10:32:49 ..... finished successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./starRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.2.kras /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/pass T /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/ 2021-05-15-09.41.51-PDT
+script: starRun.sh
+STAR version: 2.7.6a
+time: 2021-05-15-09.41.51-PDT
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.2.kras
+firstPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.2.kras/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out
+secondPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.2.kras/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out/second_pass_out
+May 15 10:32:51 ..... started STAR run
+May 15 10:32:51 ..... loading genome
+May 15 10:33:32 ..... started mapping
+May 15 10:40:35 ..... finished mapping
+May 15 10:40:44 ..... finished successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./starRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.3.ctrl /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/pass T /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/ 2021-05-15-09.41.51-PDT
+script: starRun.sh
+STAR version: 2.7.6a
+time: 2021-05-15-09.41.51-PDT
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.3.ctrl
+firstPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.3.ctrl/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out
+secondPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.3.ctrl/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out/second_pass_out
+May 15 10:40:45 ..... started STAR run
+May 15 10:40:45 ..... loading genome
+May 15 10:41:27 ..... started mapping
+May 15 10:51:58 ..... finished mapping
+May 15 10:52:07 ..... finished successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
++ ./starRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.3.kras /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/pass T /public/groups/kimlab/genomes.annotations/star.1.7.6.a.genome/ 2021-05-15-09.41.51-PDT
+script: starRun.sh
+STAR version: 2.7.6a
+time: 2021-05-15-09.41.51-PDT
+input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.3.kras
+firstPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.3.kras/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out
+secondPassDir: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.aale//intra.aale.3.kras/star.1.7.6.a.genome_2021-05-15-09.41.51-PDT_star_out/second_pass_out
+May 15 10:52:08 ..... started STAR run
+May 15 10:52:08 ..... loading genome
+May 15 10:52:50 ..... started mapping
+May 15 11:03:05 ..... finished mapping
+May 15 11:03:14 ..... finished successfully
++ exitStatus=0
++ '[' 0 -ne 0 ']'
++ set +x
