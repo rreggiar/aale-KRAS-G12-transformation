@@ -2041,7 +2041,7 @@ salmon.quant$aale$intra$deseq$de %>%
     lm(AALE ~ HBEC, data = .) %>% summary()
 
 
-panel.save(figure = 1, name = 'de_scatter_ifn', width = 'single', height = 'single')
+panel.save(figure = 1, name = 'de_scatter_ifn', width = 'single', height = 'double')
 
 
 
