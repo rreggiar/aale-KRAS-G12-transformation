@@ -1886,30 +1886,43 @@ msig.df[grepl('OXIDATIVE|XENOBIOTIC', names(msig.df))] %>%
 salmon.quant$aale$intra$deseq$H.fgsea %>% 
   group_by(pathway) %>% 
   mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
+         pathway = str_replace_all(pathway, ' ', '\n'),
          coverage = round(length(unlist(leadingEdge))/size, 3),
          NES = round(NES, 3)) %>% 
   arrange(-NES, padj) %>% 
-  filter(!grepl('ZNF', pathway)) -> exp_tbl
+  filter(!grepl('ZNF', pathway)) %>% 
+  ggplot(aes(NES, reorder(pathway, NES), fill = padj)) + 
+  geom_col(color = 'white') + 
+  geom_text(aes(label = coverage, x = NES - 0.6 * sign(NES)), color = 'white') + 
+  scale_fill_gsea(reverse = T) + 
+  ylab('') + 
+  theme(legend.position = c(0.95, 0.16), axis.text.y = element_text(size = base_size/1.25))
+
+panel.save(figure = 1, name = 'gsea_labelled_bar', width = 'single', height = 'double')
+
 
 exp_tbl %>% 
   select(pathway, padj, NES, coverage) %>% 
   mutate(padj = format(padj, scientific= T, digits = 2)) %>% 
-  gridExtra::grid.table() 
+  gridExtra::grid.table()
+  
 
 
 salmon.quant$aale$intra$deseq$de %>% 
   mutate(padj = ifelse(padj == 0, 
                        min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
   mutate(gene_set = ifelse(gene %in% ifn_gene_list,'IFN', 'other'),
-         gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP, 'KRAS', gene_set),
+         gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP | gene == 'KRAS', 'KRAS', gene_set),
          gene_set = ifelse(gene %in% meta.data$trono.krab.znfs$gene, 'ZNF', gene_set)) %>% 
   mutate(gene_set = factor(gene_set, levels = c('KRAS','IFN','ZNF', 'other'))) %>% 
-  filter(padj < 0.05) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
+  filter(padj < 0.05, gene_set != 'other') %>% 
+  mutate(kras = ifelse(gene == 'KRAS', T, F)) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = kras)) + 
   geom_point(alpha = 0.6) + 
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
-                                                padj < 0.0001 & gene_set != 'other', gene, ''))) +
+                                                padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, ''))) +
   facet_col(~gene_set, scales = 'free_y') +
+  scale_color_manual(values = c('black', 'red'), guide = 'none') +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed')
 
 panel.save(figure = 1, name = 'facet_set_volcano', width = 'single', height = 'double')
@@ -1988,10 +2001,11 @@ salmon.quant$aale$intra$deseq$de %>%
           dplyr::rename('HBEC' = log2FoldChange) %>% 
           filter(padj < 0.05) %>% 
           mutate(HBEC = HBEC), by = 'gene') %>% 
-  mutate(ISRE = ifelse(gene %in% irf1_fimo_results$gene, T, F)) %>% 
-  ggplot(aes(AALE, HBEC, color = ISRE)) + 
+  # mutate(ISRE = ifelse(gene %in% irf1_fimo_results$gene, T, F)) %>% 
+  ggplot(aes(AALE, HBEC)) +
   geom_point() + 
-  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2]), name = 'ISRE motif') +
+  xlab('AALE log2FC') + ylab('HBEC log2FC') +
+  # scale_color_manual(values = c(viridis(3)[1], viridis(3)[2]), name = 'ISRE motif') +
   geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
   geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')), show.legend = F) + 
