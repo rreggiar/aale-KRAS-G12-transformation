@@ -1894,12 +1894,30 @@ salmon.quant$aale$intra$deseq$H.fgsea %>%
   ggplot(aes(NES, reorder(pathway, NES), fill = padj)) + 
   geom_col(color = 'white') + 
   geom_text(aes(label = coverage, x = NES - 0.75 * sign(NES)), color = 'white') + 
+  # scale_fill_viridis_c() + 
+  scale_fill_gsea(reverse = T) +
+  ylab('') + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
+  theme(legend.position = c(0.95, 0.16), axis.text.y = element_text(size = base_size))
+
+
+salmon.quant$aale$intra$deseq$H.fgsea %>% 
+  group_by(pathway) %>% 
+  mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
+         pathway = str_replace_all(pathway, ' ', '\n'),
+         coverage = round(length(unlist(leadingEdge))/size, 3),
+         NES = round(NES, 3)) %>% 
+  arrange(-NES, padj) %>% 
+  filter(!grepl('ZNF', pathway)) %>% 
+  ggplot(aes(NES, reorder(pathway, NES), fill = padj)) + 
+  geom_col(color = 'white') + 
+  geom_text(aes(label = coverage, x = NES - 0.75 * sign(NES)), color = 'white') + 
   scale_fill_viridis_c() + 
   ylab('') + 
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
   theme(legend.position = c(0.95, 0.16), axis.text.y = element_text(size = base_size))
 
-panel.save(figure = 1, name = 'gsea_labelled_bar', width = 'single', height = 'double')
+panel.save(figure = 1, name = 'gsea_labelled_bar', width = 'medium', height = 'double')
 
 
 exp_tbl %>% 
