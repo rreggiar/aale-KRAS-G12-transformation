@@ -1896,7 +1896,7 @@ salmon.quant$aale$intra$deseq$H.fgsea %>%
   geom_text(aes(label = coverage, x = NES - 0.6 * sign(NES)), color = 'white') + 
   scale_fill_gsea(reverse = T) + 
   ylab('') + 
-  theme(legend.position = c(0.95, 0.16), axis.text.y = element_text(size = base_size/1.25))
+  theme(legend.position = c(0.95, 0.16), axis.text.y = element_text(size = base_size))
 
 panel.save(figure = 1, name = 'gsea_labelled_bar', width = 'single', height = 'double')
 
