@@ -2926,6 +2926,20 @@ consensus_atac_boolean_anno %>%
   select(chr, start, end, gene = `Gene Name`) %>% 
   mutate(strand = '+') -> uniq_kras_peak_input_bed
 
+salmon.quant$aale$intra$deseq$de %>% 
+  merge(uniq_kras_peak_genes, by.x = 'gene', by.y = 'Gene Name') %>% 
+  mutate(ISG = ifelse(gene %in% c(ifn_a, ifn_g), 'ISG', 'other')) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = ISG)) + 
+  geom_point() +
+  scale_color_manual(values = c('gold', 'black')) +
+  geom_text_repel(color = 'black', aes(label = ifelse(ISG == 'ISG', gene, ''))) + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.99, 0.99)) 
+
+panel.save(figure = 2, 
+           name = 'unqiq_kras_peaks_volcano_isg', width = 'single', height = 'single')
+
+
 job <- rGREAT::submitGreatJob(gr = uniq_kras_peak_input_bed, species = 'hg38', bg = bg_peak_input_bed)
 
 tb <- rGREAT::getEnrichmentTables(job, download_by = 'tsv')
