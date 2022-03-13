@@ -994,20 +994,6 @@ tomTom_res %>%
   mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
          TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
          TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) -> ame_tf
-# %>% 
-  # select(TF) %>% unlist() %>% unname() -> ame_tf
-
-salmon.quant$aale$intra$deseq$de %>% 
-  merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
-  # filter(gene %in% ame_tf) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
-  geom_point() + 
-  scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
-  geom_text_repel(color = 'black') + 
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
-  theme(legend.position = c(0.35, 0.79)) 
-
-panel.save(figure = 1, name = 'enriched_tf_volcano', width = 'single', height = 'single')
 
 
 isre_motif <- MotifDb::query(MotifDb::MotifDb, "ISRE") %>% 
@@ -1900,7 +1886,10 @@ wrap_plots(plt_1A.plt,
            plt_1B.plt,
            plt_1C.plt,
            plt_1D.plt,
-           patchwork::plot_spacer(), 
+           patchwork::wrap_elements(full = 
+                                      grid::grid.grabExpr(ComplexHeatmap::draw(plt_1E.plt,
+                                                                               heatmap_legend_side = 'right'), 
+                                                                               width = patch_fig_width)), 
            design = fig_1_patch) + 
   plot_annotation(tag_levels = 'A') &
   theme(plot.tag = element_text(size = rel(0.75)),
@@ -1911,6 +1900,145 @@ ggsave(plot = figure_1_patchwork.fig,
        filename = file.path(figure.dir, 'fig.1', 'figure_1_pathwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
+```
+## complex heatmap
+```{r}
+toil.survival <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.survival.tsv.gz')) 
+luad.phenotypes <- 
+  read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.GDC_phenotype.tsv.gz')) %>% 
+  select(sample = submitter_id.samples, 
+       sample_type = sample_type.samples,
+       stage = tumor_stage.diagnoses,
+       age = age_at_index.demographic,
+       sex = gender.demographic,
+       race = race.demographic)
+luad.mutect <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.mutect2_snv.tsv.gz')) %>% 
+  filter(gene %in% c('KRAS')) %>% 
+  select(sample = Sample_ID, gene, aa_change = Amino_Acid_Change) %>% 
+  pivot_wider(names_from = gene, values_from = aa_change) %>% 
+  mutate(across(.cols = where(is.list), paste)) 
+
+luad.phenotypes.merge <- luad.phenotypes %>% 
+  merge(luad.mutect, by = 'sample', all.x = T) %>% 
+  filter(sample_type %in% c('Primary Tumor', 'Solid Tissue Normal')) %>% 
+  merge(toil.survival, by = 'sample') %>% 
+  mutate(sample = str_sub(sample, end = str_length(sample) - 1)) %>% 
+  replace_na(list(KRAS = 'WT')) %>% 
+  mutate(KRAS = ifelse(sample_type == 'Solid Tissue Normal', 'WT_normal', KRAS))
+
+norm.counts.final <- read_tsv(file.path(output.data.dir, 'tcga.data', 'luad.data.frame.tsv'))
+```
+
+```{r}
+
+norm.counts.final %>% 
+  filter(sample != 'TCGA-44-3917-01') %>% 
+  filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
+
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange > 1.5, gene %in% c(ifn_a, ifn_g)) -> aale_ifn
+
+working_toil_counts %>% 
+  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  # filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
+  # filter(gene %in% aale_hbec_de$gene) %>%
+  group_by(gene) %>%
+  mutate(count = scale(log1p(count), center = T)) %>%
+  select(sample, gene, count) %>%
+  pivot_wider(names_from = gene, values_from = count) %>%
+  distinct() %>% 
+  column_to_rownames('sample') %>% 
+  t() -> toil_hm_counts
+
+working_toil_counts %>% 
+  select(sample, 'G12D' = KRAS) %>%
+  distinct() %>% 
+  column_to_rownames('sample') %>% 
+  ComplexHeatmap::columnAnnotation(df = . , 
+                                   col = list(G12D = c('WT_normal' = 'white', 
+                                                       'p.G12D' = viridis(3)[2])),
+                                    show_legend = F,
+                                    annotation_name_side = 'left',
+                                    annotation_name_gp = grid::gpar(fontsize = 7),
+                                    simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
+
+working_toil_counts %>% 
+  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  select(gene) %>% 
+  distinct() %>% 
+  merge(salmon.quant$aale$intra$deseq$de %>% select(gene, log2FoldChange), by = 'gene') %>% 
+  column_to_rownames('gene') -> toil_de
+
+toil_de[order(match(rownames(toil_de), rownames(toil_hm_counts))), , drop =F] -> toil_de
+
+toil_de_list <- setNames(toil_de$log2FoldChange, rownames(toil_de))
+ComplexHeatmap::rowAnnotation(
+  `AALE log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
+      bar_width = 1, 
+      which = 'row',
+      gp = grid::gpar(col = "black", fill = "white"), 
+      border = FALSE,
+      annotation_name_gp = grid::gpar(fontsize = 7),
+      height = unit(3.5, "cm")
+  ), show_annotation_name = TRUE,
+  annotation_name_gp = grid::gpar(fontsize = 7)) -> log2fc_ha
+
+working_toil_counts %>% 
+  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  # filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
+  # filter(gene %in% aale_hbec_de$gene) %>%
+  select(gene) %>% 
+  distinct() %>% 
+  mutate(IRF9 = ifelse(gene %in% irf9_fimo_results$gene, T, F),
+         IRF1 = ifelse(gene %in% irf1_fimo_results$gene, T, F),
+         IRF7 = ifelse(gene %in% irf7_fimo_results$gene, T, F)) %>% 
+  column_to_rownames('gene') %>% 
+  ComplexHeatmap::rowAnnotation(df =.,
+                                col = list(IRF9 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white'),
+                                           IRF1 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white'),
+                                           IRF7 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
+                                show_legend = F,
+                                annotation_name_gp = grid::gpar(fontsize = 7),
+                                simple_anno_size = unit(1.75, "mm")) -> gene_motif_anno
+  
+ComplexHeatmap::Heatmap(toil_hm_counts, 
+                        name = 'z-score', 
+                        show_row_names = T,
+                        show_column_names = F,
+                        row_names_side = 'right',
+                        row_dend_width = unit(2, 'mm'),
+                        left_annotation = gene_motif_anno,
+                        right_annotation = log2fc_ha,
+                        top_annotation = toil_sample_anno,
+                        heatmap_legend_param = 
+                          list(labels_gp = grid::gpar(fontsize = 7),
+                               legend_gp = grid::gpar(fontsize = 7),
+                               legend_direction = 'vertical',
+                               legend_height = unit(3.5, "cm"),
+                               title_gp = grid::gpar(fontsize = 7, face = 'bold')),
+                        row_names_gp = grid::gpar(fontsize = 7),
+                        heatmap_width = patch_fig_width*0.875) -> plt_1E.plt
+
+size = calc_ht_size(toil_hm_plt)
+size
+
+pdf(file = file.path(figure.dir, 'fig.1', 'toil_hm.pdf'),
+    width=unit(size[1], 'mm'), height=unit(size[2], 'mm'), family = 'Helvetica')
+
+toil_hm_plt
+
+dev.off()
+
+# save_pheatmap_pdf(x = toil_hm, filename = 'test_hm.pdf', height = panel.figure.height/2, width = panel.figure.width)
+
+
+working_toil_counts %>% 
+  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  ggplot(aes(KRAS, count)) + 
+  geom_boxplot(outlier.colour = NA, fill = NA) +
+  geom_point() + 
+  facet_wrap(~gene) + 
+  stat_compare_means(comparisons = list(c('p.G12D', 'WT_normal')), method = 'wilcox')
 ```
 
 ```{r}
@@ -2156,121 +2284,7 @@ pca.out.contributions %>%
   arrange(pc, -contrib)
 ```
 
-```{r}
-toil.survival <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.survival.tsv.gz')) 
-luad.phenotypes <- 
-  read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.GDC_phenotype.tsv.gz')) %>% 
-  select(sample = submitter_id.samples, 
-       sample_type = sample_type.samples,
-       stage = tumor_stage.diagnoses,
-       age = age_at_index.demographic,
-       sex = gender.demographic,
-       race = race.demographic)
-luad.mutect <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.mutect2_snv.tsv.gz')) %>% 
-  filter(gene %in% c('KRAS')) %>% 
-  select(sample = Sample_ID, gene, aa_change = Amino_Acid_Change) %>% 
-  pivot_wider(names_from = gene, values_from = aa_change) %>% 
-  mutate(across(.cols = where(is.list), paste)) 
 
-luad.phenotypes.merge <- luad.phenotypes %>% 
-  merge(luad.mutect, by = 'sample', all.x = T) %>% 
-  filter(sample_type %in% c('Primary Tumor', 'Solid Tissue Normal')) %>% 
-  merge(toil.survival, by = 'sample') %>% 
-  mutate(sample = str_sub(sample, end = str_length(sample) - 1)) %>% 
-  replace_na(list(KRAS = 'WT')) %>% 
-  mutate(KRAS = ifelse(sample_type == 'Solid Tissue Normal', 'WT_normal', KRAS))
-
-norm.counts.final <- read_tsv(file.path(output.data.dir, 'tcga.data', 'luad.data.frame.tsv'))
-```
-
-```{r}
-
-norm.counts.final %>% 
-  filter(sample != 'TCGA-44-3917-01') %>% 
-  filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
-
-salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange > 1.5, gene %in% c(ifn_a, ifn_g, jak_stat)) -> aale_ifn
-
-working_toil_counts %>% 
-  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
-  # filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
-  # filter(gene %in% aale_ifn$gene) %>%
-  group_by(gene) %>%
-  mutate(count = scale(log1p(count), center = T)) %>%
-  select(sample, gene, count) %>%
-  pivot_wider(names_from = gene, values_from = count) %>%
-  distinct() %>% 
-  column_to_rownames('sample') %>% 
-  t() -> toil_hm_counts
-
-working_toil_counts %>% 
-  select(sample, 'G12D' = KRAS) %>%
-  distinct() %>% 
-  column_to_rownames('sample') %>% 
-  ComplexHeatmap::rowAnnotation(df = . , 
-                                   col = list(G12D = c('WT_normal' = 'white', 
-                                                       'p.G12D' = viridis(3)[2])),
-                                   show_legend = F,
-                                annotation_name_side = 'bottom',
-                                simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
-
-
-
-working_toil_counts %>% 
-  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
-  # filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
-  # filter(gene %in% aale_ifn$gene) %>%
-  select(gene) %>% 
-  distinct() %>% 
-  mutate(IRF9 = ifelse(gene %in% irf9_fimo_results$gene, T, F),
-         IRF1 = ifelse(gene %in% irf1_fimo_results$gene, T, F),
-         IRF7 = ifelse(gene %in% irf7_fimo_results$gene, T, F)) %>% 
-  column_to_rownames('gene') %>% 
-  ComplexHeatmap::columnAnnotation(df =.,
-                                col = list(IRF9 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white'),
-                                           IRF1 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white'),
-                                           IRF7 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
-                                show_legend = F,
-                                annotation_name_side = 'right',
-                                simple_anno_size = unit(2.5, "mm")) -> gene_motif_anno
-
-
-
-
-ComplexHeatmap::Heatmap(t(toil_hm_counts), 
-                        name = 'z-score', 
-                        show_row_names = F,
-                        left_annotation = toil_sample_anno,
-                        bottom_annotation = gene_motif_anno,
-                        # heatmap_width = unit(panel.figure.width, 'mm'),
-                        # heatmap_height = unit(panel.figure.height/2, 'mm'),
-                        # column_dend_height = unit(3, 'mm'),
-                        # row_dend_width = unit(4.5, 'mm'),
-                        height = unit((panel.figure.height/2)/1.325, 'mm'),
-                        width = unit((panel.figure.width*4)/1.645, 'mm')) #-> toil_hm_plt
-
-size = calc_ht_size(toil_hm_plt)
-size
-
-pdf(file = file.path(figure.dir, 'fig.1', 'toil_hm.pdf'),
-    width=unit(size[1], 'mm'), height=unit(size[2], 'mm'), family = 'Helvetica')
-
-toil_hm_plt
-
-dev.off()
-
-# save_pheatmap_pdf(x = toil_hm, filename = 'test_hm.pdf', height = panel.figure.height/2, width = panel.figure.width)
-
-
-working_toil_counts %>% 
-  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
-  ggplot(aes(KRAS, count)) + 
-  geom_boxplot(outlier.colour = NA, fill = NA) +
-  geom_point() + 
-  facet_wrap(~gene) + 
-  stat_compare_means(comparisons = list(c('p.G12D', 'WT_normal')), method = 'wilcox')
-```
 
 ```{r}
 myc.avg.counts.tidy.stratified <-
