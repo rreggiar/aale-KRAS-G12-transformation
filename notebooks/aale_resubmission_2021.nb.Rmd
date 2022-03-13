@@ -1890,9 +1890,10 @@ wrap_plots(plt_1A.plt,
                                       grid::grid.grabExpr(ComplexHeatmap::draw(plt_1E.plt,
                                                                                heatmap_legend_side = 'right'), 
                                                                                width = patch_fig_width)), 
+           heights = c(1,1,0.75,1),
            design = fig_1_patch) + 
   plot_annotation(tag_levels = 'A') &
-  theme(plot.tag = element_text(size = rel(0.75)),
+  theme(plot.tag = element_text(size = rel(0.95), face = 'bold'),
         plot.tag.position = c(0.01, 0.99)) -> figure_1_patchwork.fig
 
 
