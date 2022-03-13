@@ -2947,7 +2947,8 @@ output.data.dir
 bigWigs <- c(file.path(output.data.dir, 'atac_out/bwa/mergedLibrary/bigwig/kras_R1.mLb.clN.bigWig'),
              file.path(output.data.dir, 'atac_out/bwa/mergedLibrary/bigwig/ctrl_R1.mLb.clN.bigWig'))
 
-plot_big_wig_coverage <- function(chr, start, stop, label_diff = 25, gene_name, break_denom) { 
+plot_big_wig_coverage <- function(chr, start, stop, 
+                                  finish_plot = F, gene_name) { 
   
   loci <- paste0(chr, ':', start, '-', stop)
   
@@ -2976,24 +2977,32 @@ plot_big_wig_coverage <- function(chr, start, stop, label_diff = 25, gene_name, 
   
   exon_end_vector <- tx_tbl[[2]]
   
-  first_exon_label_pos <- first_exon_start - label_diff
-  
   first_gene_name <- attr(tx_tbl, 'gene')
   
-  start_stop_df <- data.frame(x = first_exon_start,
-                              start = exon_start_vector, 
-                              end = exon_end_vector,
-                              y = 0.5)
-  
+  start_stop_df <- data.frame(x = first_exon_stop,
+                          start = exon_start_vector, 
+                          end = exon_end_vector,
+                          y = 0.5)
+
   gene_line_end <- ifelse(max(start_stop_df$end) >= region_stop, region_stop, max(start_stop_df$end))
   
-  break_step = (stop-start)/break_denom
+  if (attr(tx_tbl, 'strand') == '+') {
+    arrow_end = 'last'
+    gene_line_start <- ifelse(min(start_stop_df$start) >= region_start, min(start_stop_df$start), region_start)
+
+  } else {
+    arrow_end = 'first'
+    gene_line_start <- ifelse(min(start_stop_df$start) >= region_start, min(start_stop_df$start), region_start)
+
+  }
+  
+
+  # break_step = (stop-start)/break_denom
 
   track_data$KRAS %>% 
     as.data.frame() %>% 
     ggplot(aes(start, max)) + 
-    scale_x_continuous(breaks = seq(min(as.data.frame(track_data$KRAS$start)), 
-                              max(as.data.frame(track_data$KRAS$end)), break_step), labels = comma) +
+    scale_x_continuous(labels = comma) +
     scale_y_continuous(limits = c(0, max(max_vector)), expand = c(0,0)) +
     ylab('coverage') + 
     theme(axis.line.x = element_blank(), 
@@ -3012,9 +3021,8 @@ plot_big_wig_coverage <- function(chr, start, stop, label_diff = 25, gene_name, 
              yend = y)) + 
     scale_x_continuous(limits = c(region_start, region_stop)) +
     scale_y_continuous(limits = c(0,1)) +
-    # geom_vline(xintercept = seq(region_start, region_stop, break_step/2), alpha = 1, color = 'grey') +
-    geom_segment(aes(xend = gene_line_end), 
-                 color = 'darkblue', size = 0.75, alpha = 0.1, arrow = arrow()) +
+    geom_segment(aes(x = gene_line_start, xend = gene_line_end), 
+                 color = 'darkblue', size = 0.75, alpha = 0.1, arrow = arrow(ends = arrow_end)) +
     geom_segment(aes(x = start, xmin = start, xend = end, y = y, yend = y), 
                  color = 'darkblue', size = 8) +
     ylab('') + xlab('') +
@@ -3029,8 +3037,7 @@ plot_big_wig_coverage <- function(chr, start, stop, label_diff = 25, gene_name, 
     as.data.frame() %>% 
     ggplot(aes(start, max)) + 
     scale_y_continuous(limits = c(0, max(max_vector)), expand = c(0,0)) +
-    scale_x_continuous(breaks = seq(min(as.data.frame(track_data$KRAS$start)), 
-                                  max(as.data.frame(track_data$KRAS$end)), break_step), labels = comma) +
+    scale_x_continuous(labels = comma) +
     ylab('coverage') + xlab(chr) +
     geom_area(fill = alpha(viridis(3)[1], 1), color = alpha(viridis(3)[1], 1)) +
     theme(axis.line.x = element_blank()) -> C.plt
@@ -3040,19 +3047,39 @@ plot_big_wig_coverage <- function(chr, start, stop, label_diff = 25, gene_name, 
         theme_void() +
         coord_cartesian(clip = "off")
   
-  atac_layout <- "
-  DA
-  DB
-  DC
-  "
+  if (finish_plot == T) {
+    
+      atac_layout <- "
+      DA
+      DB
+      DC
+      "
   
-  wrap_plots(A.plt + ylab(''),
-             B.plt,
-             C.plt + ylab(''),
-             p4,
-             design = atac_layout, 
-             heights = c(1,0.09, 1),
-             widths = c(0.01, 1))
+      wrap_plots(A.plt + ylab(''),
+                 B.plt,
+                 C.plt + ylab(''),
+                 p4,
+                 design = atac_layout, 
+                 heights = c(1,0.09, 1),
+                 widths = c(0.01, 1))
+  } else {
+    
+      atac_layout <- "
+      A
+      B
+      C
+      "
+  
+      wrap_plots(A.plt + ylab(''),
+                 B.plt,
+                 C.plt + ylab(''),
+                 design = atac_layout, 
+                 heights = c(1,0.09, 1),
+                 widths = c(1))
+    
+  }
+  
+
   
 }
 
@@ -3065,6 +3092,59 @@ plot_big_wig_coverage(chr = 'chr14', start = 94107978, stop = 94113941,
 plot_big_wig_coverage(chr = 'chr12', start = 112971378, stop = 112985846, 
                       label_diff = 170, gene_name = 'OAS2', break_denom = 4)
 
+plot_big_wig_coverage(chr = 'chr12', start = 112971378, stop = 112985846, 
+                      label_diff = 170, gene_name = 'OAS2', break_denom = 4)
+
+znf90_atac.plt <- plot_big_wig_coverage(chr = 'chr19', start = 20070264, stop = 20088302,
+                                        gene_name = 'ZNF90')
+
+znf736_atac.plt <- plot_big_wig_coverage(chr = 'chr7', start = 64297134, stop = 64316493,
+                                         gene_name = 'ZNF736')
+
+znf682_atac.plt <- plot_big_wig_coverage(chr = 'chr19', start = 20037000, stop = 20054000,
+                                         gene_name = 'ZNF682')
+
+znf826P_atac.plt <- plot_big_wig_coverage(chr = 'chr19', start = 20418153, stop = 20430548,
+                                         gene_name = 'ZNF826P')
+
+MGMT_atac.plt <- plot_big_wig_coverage(chr = 'chr10', start = 129459369, stop = 129473612,
+                                         gene_name = 'MGMT')
+
+
+znf_atac_layout <- "
+EAB
+ECD
+"
+
+collected_y.plt <- 
+  ggplot(data.frame(l = 'coverage', x = 1, y = 1)) +
+      geom_text(aes(x, y, label = l), angle = 90) + 
+      theme_void() +
+      coord_cartesian(clip = "off")
+  
+wrap_plots(znf736_atac.plt,
+           znf682_atac.plt,
+           znf826P_atac.plt,
+           znf90_atac.plt,
+           collected_y.plt,
+           design = znf_atac_layout,
+           widths = c(0.01, 1, 1))
+
+panel.save(figure = 2, 
+           name = 'test_patch_znf_atac', width = 'double', height = 'single')
+panel.save(figure = 2, 
+           name = 'test_patch_znf_ataac', width = 'double', height = 'double')
+
+znf_atac_layout <- "
+ABC
+"
+
+wrap_plots(znf736_atac.plt,
+           znf682_atac.plt,
+           znf826P_atac.plt,
+           design = znf_atac_layout)
+panel.save(figure = 2, 
+           name = 'test_patch_znf_ataac', width = 'double', height = 'single')
 
 
 job <- rGREAT::submitGreatJob(gr = uniq_kras_peak_input_bed, species = 'hg38', bg = bg_peak_input_bed)
