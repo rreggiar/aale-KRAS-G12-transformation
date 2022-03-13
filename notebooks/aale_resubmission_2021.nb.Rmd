@@ -1836,23 +1836,30 @@ salmon.quant$aale$intra$deseq$de %>%
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_1A.plt
 
 salmon.quant$aale$intra$deseq$H.fgsea %>% 
+  arrange(NES) %>% 
+  mutate(rank = row_number()) %>% 
   group_by(pathway) %>% 
   mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
          pathway = str_replace_all(pathway, ' ', '\n'),
          observed = length(unlist(leadingEdge)),
          NES = round(NES, 3)) %>% 
-  arrange(-NES, padj) %>% 
+  # arrange(-NES, padj) %>% 
   filter(!grepl('ZNF', pathway)) %>% 
-  ggplot(aes(NES, reorder(pathway, NES), color = padj)) + 
+  ggplot(aes(NES, rank, color = padj)) + 
   geom_point(size = 4) +
-  geom_segment( aes(x=0, xend=NES, y=pathway, yend=pathway)) +
+  geom_segment(aes(x=0, xend=NES, y=rank, yend=rank)) +
   geom_text(aes(label = paste0(observed, '/', size), 
                 x = NES - 0.75 * sign(NES)), 
             nudge_y = 0.25, 
             color = 'black', 
             size = txt.mm_to_pts(0.8)) + 
+  geom_text(aes(label = pathway, 
+              x = - .9 * sign(NES)), 
+              nudge_y = 0, 
+              color = 'black', 
+              size = txt.mm_to_pts(0.8)) + 
   scale_color_gsea(reverse = T) +
-  ylab('') + 
+  ylab('gsea rank') + 
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
   theme(legend.position = c(0.95, 0.16)) -> plt_1B.plt
 
@@ -1873,24 +1880,35 @@ salmon.quant$aale$intra$deseq$de %>%
                   size = txt.mm_to_pts(0.8),show.legend = F) + 
   theme(legend.position = c(0.99, 0.22)) -> plt_1C.plt
 
+salmon.quant$aale$intra$deseq$de %>% 
+  merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
+  # filter(gene %in% ame_tf) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
+  geom_point() + 
+  geom_text_repel(color = 'black', size = txt.mm_to_pts(0.8)) + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.35, 0.79)) -> plt_1D.plt
+
 fig_1_patch <- "
 AB
 AB
-CC
-DD
+CD
+EE
 "
 
 wrap_plots(plt_1A.plt,
            plt_1B.plt,
            plt_1C.plt,
+           plt_1D.plt,
            patchwork::plot_spacer(), 
            design = fig_1_patch) + 
   plot_annotation(tag_levels = 'A') &
   theme(plot.tag = element_text(size = rel(0.75)),
-        plot.tag.position = c(0.01, 0.99))
+        plot.tag.position = c(0.01, 0.99)) -> figure_1_patchwork.fig
 
 
-ggsave(filename = file.path(figure.dir, 'fig.1', 'figure_1_pathwork.pdf'),
+ggsave(plot = figure_1_patchwork.fig,
+       filename = file.path(figure.dir, 'fig.1', 'figure_1_pathwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
 ```
@@ -2200,7 +2218,7 @@ working_toil_counts %>%
 
 
 working_toil_counts %>% 
-  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
   # filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
   # filter(gene %in% aale_ifn$gene) %>%
   select(gene) %>% 
