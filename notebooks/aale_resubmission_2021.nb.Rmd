@@ -62,7 +62,7 @@ base_size = 10
 
 theme_set(theme_foundation(base_size = base_size,
                            base_family = 'Helvetica') + 
-            theme(plot.title = element_blank(),
+            theme(plot.title = element_text(size = rel(0.95), face = 'bold'),
                 panel.background = element_rect(colour = NA),
                 plot.background = element_rect(colour = NA),
                 panel.border = element_rect(colour = NA), 
@@ -2942,14 +2942,129 @@ panel.save(figure = 2,
 
 library(trackplot)
 
-bigWigs <- c('/public/groups/kimlab/aale-KRAS-G12-transformation/output.data/atac_out/bwa/mergedLibrary/bigwig/kras_R1.mLb.clN.bigWig',
-             '/public/groups/kimlab/aale-KRAS-G12-transformation/output.data/atac_out/bwa/mergedLibrary/bigwig/ctrl_R1.mLb.clN.bigWig')
+output.data.dir
 
-#Step-1. Extract the siganl for your loci of interst
-track_data = track_extract(bigWigs = bigWigs, loci = "chr14:24,160,912-24,161,493")
+bigWigs <- c(file.path(output.data.dir, 'atac_out/bwa/mergedLibrary/bigwig/kras_R1.mLb.clN.bigWig'),
+             file.path(output.data.dir, 'atac_out/bwa/mergedLibrary/bigwig/ctrl_R1.mLb.clN.bigWig'))
 
-#Step-1a (optional). Summarize trcks by condition
-track_data = track_summarize(summary_list = track_data, condition = c("A", "B", "B", "C", "D"), stat = "mean")
+plot_big_wig_coverage <- function(chr, start, stop, label_diff = 25, gene_name, break_denom) { 
+  
+  loci <- paste0(chr, ':', start, '-', stop)
+  
+  track_data = track_extract(bigWigs = bigWigs, loci = loci, binsize = 1)
+
+  track_data = track_summarize(summary_list = track_data, condition = c("KRAS", "CTRL"), stat = "mean")
+  
+  gene_model <- trackplot::.extract_geneModel_ucsc(chr = chr,
+                                                    start = start,
+                                                    end = stop,
+                                                    refBuild = 'hg38')
+    
+  max_vector <- c(as.data.frame(track_data$KRAS)$max, as.data.frame(track_data$CTRL)$max)
+
+  tx_tbl <- trackplot::.collapse_tx(gene_model)[[gene_name]]
+  
+  region_start <- min(as.data.frame(track_data$KRAS)$start)
+  
+  region_stop <- max(as.data.frame(track_data$KRAS)$end)
+  
+  first_exon_start <- tx_tbl[[1]][1]
+  
+  first_exon_stop <- tx_tbl[[2]][1]
+  
+  exon_start_vector <- tx_tbl[[1]]
+  
+  exon_end_vector <- tx_tbl[[2]]
+  
+  first_exon_label_pos <- first_exon_start - label_diff
+  
+  first_gene_name <- attr(tx_tbl, 'gene')
+  
+  start_stop_df <- data.frame(x = first_exon_start,
+                              start = exon_start_vector, 
+                              end = exon_end_vector,
+                              y = 0.5)
+  
+  gene_line_end <- ifelse(max(start_stop_df$end) >= region_stop, region_stop, max(start_stop_df$end))
+  
+  break_step = (stop-start)/break_denom
+
+  track_data$KRAS %>% 
+    as.data.frame() %>% 
+    ggplot(aes(start, max)) + 
+    scale_x_continuous(breaks = seq(min(as.data.frame(track_data$KRAS$start)), 
+                              max(as.data.frame(track_data$KRAS$end)), break_step), labels = comma) +
+    scale_y_continuous(limits = c(0, max(max_vector)), expand = c(0,0)) +
+    ylab('coverage') + 
+    theme(axis.line.x = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), 
+        title = element_text(face = 'bold', hjust = -0.5)) +
+    xlab('') +
+    ggtitle(first_gene_name) +
+    geom_area(fill = alpha(viridis(3)[2], 1), color = alpha(viridis(3)[2], 1)) -> A.plt
+  
+  ggplot(data = start_stop_df, 
+         aes(x = x, 
+             xmin = start, 
+             xend = end, 
+             y = y, 
+             yend = y)) + 
+    scale_x_continuous(limits = c(region_start, region_stop)) +
+    scale_y_continuous(limits = c(0,1)) +
+    # geom_vline(xintercept = seq(region_start, region_stop, break_step/2), alpha = 1, color = 'grey') +
+    geom_segment(aes(xend = gene_line_end), 
+                 color = 'darkblue', size = 0.75, alpha = 0.1, arrow = arrow()) +
+    geom_segment(aes(x = start, xmin = start, xend = end, y = y, yend = y), 
+                 color = 'darkblue', size = 8) +
+    ylab('') + xlab('') +
+    theme(axis.line.y = element_blank(), 
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.line.x = element_blank(), 
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank()) -> B.plt
+  
+  track_data$CTRL %>% 
+    as.data.frame() %>% 
+    ggplot(aes(start, max)) + 
+    scale_y_continuous(limits = c(0, max(max_vector)), expand = c(0,0)) +
+    scale_x_continuous(breaks = seq(min(as.data.frame(track_data$KRAS$start)), 
+                                  max(as.data.frame(track_data$KRAS$end)), break_step), labels = comma) +
+    ylab('coverage') + xlab(chr) +
+    geom_area(fill = alpha(viridis(3)[1], 1), color = alpha(viridis(3)[1], 1)) +
+    theme(axis.line.x = element_blank()) -> C.plt
+
+  p4 <- ggplot(data.frame(l = A.plt$labels$y, x = 1, y = 1)) +
+        geom_text(aes(x, y, label = l), angle = 90) + 
+        theme_void() +
+        coord_cartesian(clip = "off")
+  
+  atac_layout <- "
+  DA
+  DB
+  DC
+  "
+  
+  wrap_plots(A.plt + ylab(''),
+             B.plt,
+             C.plt + ylab(''),
+             p4,
+             design = atac_layout, 
+             heights = c(1,0.09, 1),
+             widths = c(0.01, 1))
+  
+}
+
+plot_big_wig_coverage(chr = 'chr14', start = 24159500, stop = 24164100, 
+                      label_diff = 120, gene_name = 'IRF9', break_denom = 4)
+
+plot_big_wig_coverage(chr = 'chr14', start = 94107978, stop = 94113941, 
+                      label_diff = 170, gene_name = 'IFI27', break_denom = 4)
+
+plot_big_wig_coverage(chr = 'chr12', start = 112971378, stop = 112985846, 
+                      label_diff = 170, gene_name = 'OAS2', break_denom = 4)
+
 
 
 job <- rGREAT::submitGreatJob(gr = uniq_kras_peak_input_bed, species = 'hg38', bg = bg_peak_input_bed)
