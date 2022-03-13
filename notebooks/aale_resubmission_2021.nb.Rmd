@@ -27,7 +27,6 @@ suppressPackageStartupMessages({
   library(ggrepel)
   library(ggforce)
   library(ggpmisc)
-  # library(ggprism)
   library(patchwork)
   library(extrafont)
   library(ggrepel)
@@ -35,21 +34,13 @@ suppressPackageStartupMessages({
   library(viridis)
   library(patchwork)
   library(fgsea)
-  # library(caret)
   library(msigdbr)
   library(matrixStats)
-  # library(NMF)
-  # library(rsample)
-  # library(vip)
-  # library(ROCR)
-  # library(glmnet)
-  # library(mlbench)
   library(tximeta)
   library(SummarizedExperiment)
   library(rjson)
   library(HDF5Array)
-  library(DESeq2)
-  # library(ggpmisc)
+  # library(DESeq2)
   library(survival)
   library(survminer)
 })
@@ -62,7 +53,7 @@ base_size = 10
 
 theme_set(theme_foundation(base_size = base_size,
                            base_family = 'Arial') + 
-            theme(plot.title = element_text(size = rel(0.95), face = 'bold'),
+            theme(plot.title = element_text(size = rel(0.9), face = 'bold'),
                 panel.background = element_rect(colour = NA),
                 plot.background = element_rect(colour = NA),
                 panel.border = element_rect(colour = NA), 
@@ -70,9 +61,10 @@ theme_set(theme_foundation(base_size = base_size,
                 axis.line.x = NULL, 
                 axis.line.y = NULL, 
                 axis.text = element_text(size = rel(0.8)), 
-                axis.text.x = element_text(margin = margin(t = 0.8 * base_size/4)), 
+                axis.title = element_text(size = rel(0.8)),
+                axis.text.x = element_text(margin = margin(t = 0.8 * base_size/4), size = rel(0.8)), 
                 axis.text.x.top = element_text(margin = margin(b = 0.8 * base_size/4), vjust = 0), 
-                axis.text.y = element_text(margin = margin(r = 0.5 * base_size/4), hjust = 1), 
+                axis.text.y = element_text(margin = margin(r = 0.5 * base_size/4), hjust = 1, size = rel(0.8)), 
                 axis.text.y.right = element_text(margin = margin(l = 0.5 * base_size/4), hjust = 0), 
                 axis.ticks = element_line(), 
                 axis.ticks.length = unit(base_size/2.5, "pt"), axis.ticks.length.x = NULL, 
@@ -84,8 +76,8 @@ theme_set(theme_foundation(base_size = base_size,
                 legend.key.size= unit(0.08, "in"),
                 legend.spacing = unit(0, "in"),
                 legend.key = element_rect(colour = NA),
-                legend.title = element_text(face="italic"),
-                legend.text = element_text(face = 'bold'),
+                legend.title = element_text(face="bold", size = rel(0.8)),
+                legend.text = element_text(size = rel(0.75)),
                 legend.justification = c("right", "top"),
                 legend.box.just = "right",
                 legend.margin = margin(6, 6, 6, 6),
@@ -102,54 +94,9 @@ theme_set(theme_foundation(base_size = base_size,
                 legend.box.spacing = unit(-0.02, 'in'),
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank()
-          ))
+))
 
-theme_set_fun <- function(){
-  theme_set(theme_foundation(base_size = base_size,
-                             base_family = 'Helvetica') + 
-              theme(plot.title = element_blank(),
-                  panel.background = element_rect(colour = NA),
-                  plot.background = element_rect(colour = NA),
-                  panel.border = element_rect(colour = NA), 
-                  axis.line = element_line(), 
-                  axis.line.x = NULL, 
-                  axis.line.y = NULL, 
-                  axis.text = element_text(size = rel(0.95)), 
-                  axis.text.x = element_text(margin = margin(t = 0.8 * base_size/4)), 
-                  axis.text.x.top = element_text(margin = margin(b = 0.8 * base_size/4), vjust = 0), 
-                  axis.text.y = element_text(margin = margin(r = 0.5 * base_size/4), hjust = 1), 
-                  axis.text.y.right = element_text(margin = margin(l = 0.5 * base_size/4), hjust = 0), 
-                  axis.ticks = element_line(), 
-                  axis.ticks.length = unit(base_size/2.5, "pt"), axis.ticks.length.x = NULL, 
-                  axis.ticks.length.x.top = NULL, axis.ticks.length.x.bottom = NULL, 
-                  axis.ticks.length.y = NULL, axis.ticks.length.y.left = NULL, 
-                  axis.ticks.length.y.right = NULL,
-                  strip.text = element_text(size = 8),
-                  strip.background = element_blank(),
-                  legend.key.size= unit(0.08, "in"),
-                  legend.spacing = unit(0, "in"),
-                  legend.key = element_rect(colour = NA),
-                  legend.title = element_text(face="italic"),
-                  legend.text = element_text(face = 'bold'),
-                  legend.justification = c("right", "top"),
-                  legend.box.just = "right",
-                  legend.margin = margin(6, 6, 6, 6),
-                  plot.margin=margin(0.04,
-                                     0.04,
-                                     0.04,
-                                     0.04,
-                                     unit = "in"),
-                  # legend.margin = margin(-0.04,
-                  #                    -0.02,
-                  #                    0.08,
-                  #                    0.02,
-                  #                    unit = "in"),
-                  legend.box.spacing = unit(-0.02, 'in'),
-                  panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank()
-            ))
-}
-
+txt.mm_to_pts <- function(ratio){ base_size * ratio * (25.4 / 72.27) } # for reverse can use .pt
 ```
 ## figure dirs, and other globally relevant constants
 ```{r system I/O constants}
@@ -172,11 +119,11 @@ chr.order <- c('chr1', 'chr2', 'chr3',
 ```{r saving panel}
 panel.figure.width = 85
 panel.figure.width.medium = 114
-panel.figure.width.double = 174
+panel.figure.width.double = 17
 panel.figure.height = 279.4 
-# panel.figure.width.in = 3.4252
-# panel.figure.height = 22.5
-# panel.figure.height.in = 8.858268
+
+patch_fig_width = unit(172, 'mm')
+patch_fig_height = unit(279.4 , 'mm')
 
 panel.save <- function(figure, name, width = 'single', height = 'single', plot.in = last_plot()){
   
@@ -217,7 +164,7 @@ panel.save <- function(figure, name, width = 'single', height = 'single', plot.i
                 '.pdf'),
        width = panel.width, 
        height = panel.height, 
-       units = 'mm', plot = plot.in)
+       units = 'mm', plot = plot.in, device = cairo_pdf)
 }
 
 save_pheatmap_pdf <- function(x, filename, width=panel.figure.width, height=3) {
@@ -916,6 +863,7 @@ salmon.quant$aale$exo$deseq$de %>%
 
 ```
 
+# START HERE FOR ANALYSIS
 ```{r}
 
 salmon.quant <- readRDS(file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
@@ -938,7 +886,7 @@ lapply(c(1,2), function(i) {
   ggplot(aes(context)) + 
   geom_bar() + 
   ggupset::scale_x_upset() +
-  geom_text(stat='count', aes(label=after_stat(count)))
+  geom_text(stat='count', aes(label=after_stat(count)), size = base_size*0.6*txt.mm_to_pts)
 
 msig.df[grepl('INTERFERON|INFLAMMATORY', names(msig.df))] %>% 
   lapply(function(x) as.data.frame(x)) %>% 
@@ -1175,9 +1123,6 @@ de_promoter_regions <- promoters(ifn_de_gr, upstream = 1000, downstream = 500)
 bamsignals::bamCoverage(kras_bam_path, de_promoter_regions, paired.end = 'extend') -> kras_de_prom_profile
 bamsignals::bamCoverage(ctrl_bam_path, de_promoter_regions, paired.end = 'extend') -> ctrl_de_prom_profile
 
-# bamsignals::bamCoverage(kras_bam_path, ns_promoter_regions, paired.end = 'extend') -> kras_ns_prom_profile
-# bamsignals::bamCoverage(ctrl_bam_path, ns_promoter_regions, paired.end = 'extend') -> ctrl_ns_prom_profile
-
 bamsignals::alignSignals(kras_de_prom_profile) %>% 
   as.data.frame() %>% 
   mutate(position = row_number()) %>% 
@@ -1187,14 +1132,6 @@ bamsignals::alignSignals(kras_de_prom_profile) %>%
          condition = 'kras',
          context = 'de') -> kras_de_prom_df
 
-# bamsignals::alignSignals(kras_ns_prom_profile) %>% 
-#   as.data.frame() %>% 
-#   mutate(position = row_number()) %>% 
-#   gather(prom, cov, -position) %>%
-#   mutate(position = position - 1000,
-#          cov = (cov/kras_norm_factor) * 1e6,
-#          condition = 'kras',
-#          context = 'ns') -> kras_ns_prom_df
 
 bamsignals::alignSignals(ctrl_de_prom_profile) %>% 
   as.data.frame() %>% 
@@ -1875,60 +1812,10 @@ ComplexHeatmap::Heatmap(hm_count_data, col = viridis(16, option = 'plasma'),
   
 ```
 
+# Figure 1
 ```{r}
 msig.df[grepl('INTERFERON', names(msig.df))] %>% 
                              unlist() %>% unname() -> ifn_gene_list
-
-msig.df[grepl('OXIDATIVE|XENOBIOTIC', names(msig.df))] %>% 
-                             unlist() %>% unname() -> metab_gene_list
-
-
-salmon.quant$aale$intra$deseq$H.fgsea %>% 
-  group_by(pathway) %>% 
-  mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
-         pathway = str_replace_all(pathway, ' ', '\n'),
-         coverage = round(length(unlist(leadingEdge))/size, 3),
-         NES = round(NES, 3)) %>% 
-  arrange(-NES, padj) %>% 
-  filter(!grepl('ZNF', pathway)) 
-  ggplot(aes(NES, reorder(pathway, NES), fill = padj)) + 
-  geom_col(color = 'white') + 
-  geom_text(aes(label = coverage, x = NES - 0.75 * sign(NES)), color = 'white') + 
-  # scale_fill_viridis_c() + 
-  scale_fill_gsea(reverse = T) +
-  ylab('') + 
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
-  theme(legend.position = c(0.95, 0.16), axis.text.y = element_text(size = base_size))
-
-
-salmon.quant$aale$intra$deseq$H.fgsea %>% 
-  group_by(pathway) %>% 
-  mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
-         pathway = str_replace_all(pathway, ' ', '\n'),
-         # coverage = round(length(unlist(leadingEdge))/size, 3),
-         observed = length(unlist(leadingEdge)),
-         NES = round(NES, 3)) %>% 
-  arrange(-NES, padj) %>% 
-  filter(!grepl('ZNF', pathway)) %>% 
-  ggplot(aes(NES, reorder(pathway, NES), color = padj)) + 
-  # geom_col(color = 'white') + 
-  geom_point(size = 4) +
-  geom_segment( aes(x=0, xend=NES, y=pathway, yend=pathway)) +
-  geom_text(aes(label = paste0(observed, '/', size), x = NES - 0.75 * sign(NES)), nudge_y = 0.25, color = 'black') + 
-  scale_color_gsea(reverse = T) +
-  ylab('') + 
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
-  theme(legend.position = c(0.95, 0.16), axis.text.y = element_text(size = base_size))
-
-panel.save(figure = 1, name = 'gsea_labelled_bar', width = 'single', height = 'double')
-
-
-exp_tbl %>% 
-  select(pathway, padj, NES, coverage) %>% 
-  mutate(padj = format(padj, scientific= T, digits = 2)) %>% 
-  gridExtra::grid.table()
-  
-
 
 salmon.quant$aale$intra$deseq$de %>% 
   mutate(padj = ifelse(padj == 0, 
@@ -1936,18 +1823,127 @@ salmon.quant$aale$intra$deseq$de %>%
   mutate(gene_set = ifelse(gene %in% ifn_gene_list,'IFN', 'other'),
          gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP | gene == 'KRAS', 'KRAS', gene_set),
          gene_set = ifelse(gene %in% meta.data$trono.krab.znfs$gene, 'ZNF', gene_set)) %>% 
-  mutate(gene_set = factor(gene_set, levels = c('KRAS','IFN','ZNF', 'other'))) %>% 
+  mutate(gene_set = factor(gene_set, levels = c('IFN','KRAS','ZNF', 'other'))) %>% 
   filter(padj < 0.05, gene_set != 'other') %>% 
   mutate(kras = ifelse(gene == 'KRAS', T, F)) %>% 
   ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = kras)) + 
   geom_point(alpha = 0.6) + 
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
-                                                padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, ''))) +
+                                                padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, '')),
+                           size = txt.mm_to_pts(0.8)) +
   facet_col(~gene_set, scales = 'free_y') +
   scale_color_manual(values = c('black', 'red'), guide = 'none') +
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed')
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_1A.plt
 
-panel.save(figure = 1, name = 'facet_set_volcano', width = 'single', height = 'double')
+salmon.quant$aale$intra$deseq$H.fgsea %>% 
+  group_by(pathway) %>% 
+  mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
+         pathway = str_replace_all(pathway, ' ', '\n'),
+         observed = length(unlist(leadingEdge)),
+         NES = round(NES, 3)) %>% 
+  arrange(-NES, padj) %>% 
+  filter(!grepl('ZNF', pathway)) %>% 
+  ggplot(aes(NES, reorder(pathway, NES), color = padj)) + 
+  geom_point(size = 4) +
+  geom_segment( aes(x=0, xend=NES, y=pathway, yend=pathway)) +
+  geom_text(aes(label = paste0(observed, '/', size), 
+                x = NES - 0.75 * sign(NES)), 
+            nudge_y = 0.25, 
+            color = 'black', 
+            size = txt.mm_to_pts(0.8)) + 
+  scale_color_gsea(reverse = T) +
+  ylab('') + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
+  theme(legend.position = c(0.95, 0.16)) -> plt_1B.plt
+
+salmon.quant$aale$intra$deseq$de %>% 
+  dplyr::rename('AALE' = log2FoldChange) %>% 
+  filter(padj < 0.05,
+         gene %in% c(ifn_a, ifn_g)) %>% 
+  merge(salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+          dplyr::rename('HBEC' = log2FoldChange) %>% 
+          filter(padj < 0.05) %>% 
+          mutate(HBEC = HBEC), by = 'gene') %>% 
+  ggplot(aes(AALE, HBEC)) +
+  geom_point() + 
+  xlab('AALE log2FC') + ylab('HBEC log2FC') +
+  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
+  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
+  geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')), 
+                  size = txt.mm_to_pts(0.8),show.legend = F) + 
+  theme(legend.position = c(0.99, 0.22)) -> plt_1C.plt
+
+fig_1_patch <- "
+AB
+AB
+CC
+DD
+"
+
+wrap_plots(plt_1A.plt,
+           plt_1B.plt,
+           plt_1C.plt,
+           patchwork::plot_spacer(), 
+           design = fig_1_patch) + 
+  plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = rel(0.75)),
+        plot.tag.position = c(0.01, 0.99))
+
+
+ggsave(filename = file.path(figure.dir, 'fig.1', 'figure_1_pathwork.pdf'),
+       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+```
+
+```{r}
+msig.df[grepl('INTERFERON', names(msig.df))] %>% 
+                             unlist() %>% unname() -> ifn_gene_list
+
+msig.df[grepl('OXIDATIVE|XENOBIOTIC', names(msig.df))] %>% 
+                             unlist() %>% unname() -> metab_gene_list
+
+salmon.quant$aale$intra$deseq$H.fgsea %>% 
+  group_by(pathway) %>% 
+  mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
+         pathway = str_replace_all(pathway, ' ', '\n'),
+         observed = length(unlist(leadingEdge)),
+         NES = round(NES, 3)) %>% 
+  arrange(-NES, padj) %>% 
+  filter(!grepl('ZNF', pathway)) %>% 
+  ggplot(aes(NES, reorder(pathway, NES), color = padj)) + 
+  geom_point(size = 4) +
+  geom_segment( aes(x=0, xend=NES, y=pathway, yend=pathway)) +
+  geom_text(aes(label = paste0(observed, '/', size), 
+                x = NES - 0.75 * sign(NES)), 
+            nudge_y = 0.25, 
+            color = 'black', 
+            size = txt.mm_to_pts(0.8)) + 
+  scale_color_gsea(reverse = T) +
+  ylab('') + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
+  theme(legend.position = c(0.95, 0.16)) -> plt_1A.plt
+
+# panel.save(figure = 1, name = 'gsea_labelled_bar', width = 'single', height = 'double')
+  
+salmon.quant$aale$intra$deseq$de %>% 
+  mutate(padj = ifelse(padj == 0, 
+                       min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
+  mutate(gene_set = ifelse(gene %in% ifn_gene_list,'IFN', 'other'),
+         gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP | gene == 'KRAS', 'KRAS', gene_set),
+         gene_set = ifelse(gene %in% meta.data$trono.krab.znfs$gene, 'ZNF', gene_set)) %>% 
+  mutate(gene_set = factor(gene_set, levels = c('IFN','ZNF','KRAS', 'other'))) %>% 
+  filter(padj < 0.05, gene_set != 'other') %>% 
+  mutate(kras = ifelse(gene == 'KRAS', T, F)) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = kras)) + 
+  geom_point(alpha = 0.6) + 
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
+                                                padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, '')),
+                           size = txt.mm_to_pts(0.8)) +
+  facet_col(~gene_set, scales = 'free_y') +
+  scale_color_manual(values = c('black', 'red'), guide = 'none') +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_1B.plt
+
+# panel.save(figure = 1, name = 'facet_set_volcano', width = 'single', height = 'double')
 
 salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
   mutate(padj = ifelse(padj == 0, 
@@ -2023,15 +2019,14 @@ salmon.quant$aale$intra$deseq$de %>%
           dplyr::rename('HBEC' = log2FoldChange) %>% 
           filter(padj < 0.05) %>% 
           mutate(HBEC = HBEC), by = 'gene') %>% 
-  # mutate(ISRE = ifelse(gene %in% irf1_fimo_results$gene, T, F)) %>% 
   ggplot(aes(AALE, HBEC)) +
   geom_point() + 
   xlab('AALE log2FC') + ylab('HBEC log2FC') +
-  # scale_color_manual(values = c(viridis(3)[1], viridis(3)[2]), name = 'ISRE motif') +
   geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
-  geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')), show.legend = F) + 
-  theme(legend.position = c(0.99, 0.22))
+  geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')), 
+                  size = txt.mm_to_pts(0.8),show.legend = F) + 
+  theme(legend.position = c(0.99, 0.22)) -> plt_1C.plt
   
   salmon.quant$aale$intra$deseq$de %>% 
   dplyr::rename('AALE' = log2FoldChange) %>% 
@@ -2044,7 +2039,7 @@ salmon.quant$aale$intra$deseq$de %>%
     lm(AALE ~ HBEC, data = .) %>% summary()
 
 
-panel.save(figure = 1, name = 'de_scatter_ifn', width = 'single', height = 'double')
+# panel.save(figure = 1, name = 'de_scatter_ifn', width = 'single', height = 'double')
 
 
 
