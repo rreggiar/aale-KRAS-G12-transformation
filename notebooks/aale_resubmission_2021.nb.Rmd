@@ -2101,15 +2101,15 @@ salmon.quant$aale$intra$deseq$de %>%
   mutate(padj = ifelse(padj == 0, 
                        min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
   mutate(biotype = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', 'protein-coding')) %>% 
-  # filter(padj < 0.05) %>% 
+  mutate(biotype = factor(biotype, levels = c('protein-coding','lncRNA'))) %>% 
+  filter(padj < 0.05) %>%
   ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
   geom_point(alpha = 0.6) + 
-  # scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 |
-                                                -log10(padj) > 250, gene, ''))) +
-  facet_col(~biotype, scales = 'free')
+                                                -log10(padj) > 250, gene, '')),
+                           size = txt.mm_to_pts(0.8)) +
+  facet_col(~biotype, scales = 'free') -> plt_S1A.plt
 
-# plot PC1 and PC2
 salmon.quant$aale$intra$deseq$pca$pca.out %>% 
   rownames_to_column('sample') %>% 
   ggplot(aes(PC1, PC2,
@@ -2123,9 +2123,9 @@ salmon.quant$aale$intra$deseq$pca$pca.out %>%
     scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
     geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
     geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) + 
-    theme(legend.position = c(0.30, 0.25),
+    theme(legend.position = c(0.30, 0.30),
             legend.key.width = unit(0.125,'cm'),
-            legend.key.height = unit(0.4, 'cm'))
+            legend.key.height = unit(0.4, 'cm')) -> plt_S1B.plt
 
 salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
   mutate(padj = ifelse(padj == 0, 
@@ -2143,7 +2143,29 @@ salmon.quant$hbec$lacz_v_v12$deseq$de %>%
                            size = txt.mm_to_pts(0.8)) +
   facet_col(~gene_set, scales = 'free_y') +
   scale_color_manual(values = c('black', 'red'), guide = 'none') +
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') #-> plt_1A.plt
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_S1C.plt
+
+
+fig_S1_patch <- "
+AC
+AC
+BC
+EE
+"
+
+wrap_plots(plt_S1A.plt,
+           plt_S1B.plt,
+           plt_S1C.plt,
+           patchwork::plot_spacer(), 
+           design = fig_S1_patch) + 
+  plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = rel(0.95), face = 'bold'),
+        plot.tag.position = c(0.01, 0.99)) -> figure_S1_patchwork.fig
+
+
+ggsave(plot = figure_S1_patchwork.fig,
+       filename = file.path(figure.dir, 'fig.1', 'figure_S1_patchwork.pdf'),
+       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
 
 ```
