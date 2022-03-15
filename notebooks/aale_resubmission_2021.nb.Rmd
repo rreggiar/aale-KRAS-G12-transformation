@@ -1179,13 +1179,24 @@ consensus_atac_boolean_anno %>%
 
 consensus_atac_boolean_anno %>% 
   filter(ctrl_R1.mLb.clN.bool == F) %>% 
-  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+  # filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
   # filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
   separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
   filter(annotation == "promoter-TSS ") %>%
   # group_by(annotation) %>%
   group_by(`Gene Name`) %>%
   tally() -> uniq_kras_peak_genes#%>% filter(grepl('ZNF', `Gene Name`)) %>% 
+  # arrange(-n)
+
+consensus_atac_boolean_anno %>% 
+  filter(kras_R1.mLb.clN.bool == F) %>% 
+  # filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange <= -1)$gene) %>%
+  # filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>%
+  # group_by(annotation) %>%
+  group_by(`Gene Name`) %>%
+  tally() -> uniq_ctrl_peak_genes#%>% filter(grepl('ZNF', `Gene Name`)) %>% 
   # arrange(-n)
 
 consensus_atac_boolean_anno %>% 
@@ -2118,27 +2129,548 @@ annotated_unique_exo_isoforms.csv
 
 ```
 
-## Ex RNA
+
+
+# Figure 1
+## toil data load and transform
 ```{r}
-salmon.quant$aale$exo$deseq$de %>% 
-  dplyr::rename('EXO_aale' = log2FoldChange) %>% 
-  filter(padj < 0.05) %>% 
-  merge(salmon.quant$aale$intra$deseq$de %>% 
-          dplyr::rename('INTRA_aale' = log2FoldChange) %>% 
-          filter(padj < 0.05), by = 'gene') %>% 
-  mutate(unique = ifelse(gene %in% uniq_kras_peak_genes$`Gene Name`, 'KRAS', 
-                         ifelse(gene %in% uniq_ctrl_peak_genes$`Gene Name`, 'CTRL', NA))) %>% 
-  ggplot(aes(EXO_aale, INTRA_aale, color = unique)) + 
+toil.survival <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.survival.tsv.gz')) 
+
+luad.phenotypes <- 
+  read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.GDC_phenotype.tsv.gz')) %>% 
+  select(sample = submitter_id.samples, 
+       sample_type = sample_type.samples,
+       stage = tumor_stage.diagnoses,
+       age = age_at_index.demographic,
+       sex = gender.demographic,
+       race = race.demographic)
+
+luad.mutect <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.mutect2_snv.tsv.gz')) %>% 
+  filter(gene %in% c('KRAS')) %>% 
+  select(sample = Sample_ID, gene, aa_change = Amino_Acid_Change) %>% 
+  pivot_wider(names_from = gene, values_from = aa_change) %>% 
+  mutate(across(.cols = where(is.list), paste)) 
+
+luad.phenotypes.merge <- luad.phenotypes %>% 
+  merge(luad.mutect, by = 'sample', all.x = T) %>% 
+  filter(sample_type %in% c('Primary Tumor', 'Solid Tissue Normal')) %>% 
+  merge(toil.survival, by = 'sample') %>% 
+  mutate(sample = str_sub(sample, end = str_length(sample) - 1)) %>% 
+  replace_na(list(KRAS = 'WT')) %>% 
+  mutate(KRAS = ifelse(sample_type == 'Solid Tissue Normal', 'WT_normal', KRAS))
+
+norm.counts.final <- read_tsv(file.path(output.data.dir, 'tcga.data', 'luad.data.frame.tsv'))
+
+norm.counts.final %>% 
+  filter(sample != 'TCGA-44-3917-01') %>% 
+  filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
+```
+### complex plotting
+```{r}
+
+plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = NULL, split_title = NULL) {
+  
+   set.seed(123)
+  
+  ## heatmap count matrix
+  working_toil_counts %>% 
+    filter(gene %in% filter_values) %>%
+    group_by(gene) %>%
+    mutate(count = scale(log1p(count), center = T)) %>%
+    select(sample, gene, count) %>%
+    pivot_wider(names_from = gene, values_from = count) %>%
+    distinct() %>% 
+    column_to_rownames('sample') %>% 
+    t() -> toil_hm_counts
+  
+  ## heatmap mutation annotation 
+  working_toil_counts %>% 
+    select(sample, 'G12D' = KRAS) %>%
+    distinct() %>% 
+    column_to_rownames('sample') %>% 
+    ComplexHeatmap::columnAnnotation(df = . , 
+                                     col = list(G12D = c('WT_normal' = 'white', 
+                                                         'p.G12D' = viridis(3)[2])),
+                                      show_legend = F,
+                                      annotation_name_side = 'left',
+                                      annotation_name_gp = grid::gpar(fontsize = 8),
+                                      simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
+  ## heatmap DE barpot annotation
+  working_toil_counts %>% 
+    filter(gene %in% filter_values) %>%
+    select(gene) %>% 
+    distinct() %>% 
+    merge(salmon.quant$aale$intra$deseq$de %>% select(gene, log2FoldChange), by = 'gene') %>% 
+    column_to_rownames('gene') -> toil_de
+  
+  toil_de[order(match(rownames(toil_de), rownames(toil_hm_counts))), , drop =F] -> toil_de
+  
+  toil_de_list <- setNames(toil_de$log2FoldChange, rownames(toil_de))
+  
+  ComplexHeatmap::rowAnnotation(
+    `AALE log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
+        bar_width = 1, 
+        which = 'row',
+        gp = grid::gpar(col = "black", fill = "white"), 
+        border = FALSE,
+        annotation_name_gp = grid::gpar(fontsize = 8),
+        width = unit(1.25, "cm"),
+        height = unit(0.75, "cm")), 
+    show_annotation_name = TRUE,
+    annotation_name_gp = grid::gpar(fontsize = 8)) -> log2fc_ha
+  
+  working_toil_counts %>% 
+  filter(gene %in% filter_values) %>%
+  select(gene) %>% 
+  distinct() %>% 
+  mutate(IRF9 = ifelse(gene %in% irf9_fimo_results$gene, T, F),
+         IRF1 = ifelse(gene %in% irf1_fimo_results$gene, T, F),
+         IRF7 = ifelse(gene %in% irf7_fimo_results$gene, T, F)) %>% 
+  column_to_rownames('gene') %>% 
+  ComplexHeatmap::rowAnnotation(df =.,
+                                col = list(IRF9 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white'),
+                                           IRF1 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white'),
+                                           IRF7 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
+                                show_legend = F,
+                                annotation_name_gp = grid::gpar(fontsize = 8),
+                                simple_anno_size = unit(2, "mm")) -> gene_motif_anno
+  
+  ComplexHeatmap::Heatmap(toil_hm_counts, 
+                        name = 'z-score', 
+                        show_row_names = show_genes,
+                        show_column_names = F,
+                        row_split = split_vector,
+                        row_title = split_title,
+                        row_title_gp = grid::gpar(fontsize = 7, face = 'bold'),
+                        row_names_side = 'right',
+                        row_dend_width = unit(3, 'mm'),
+                        left_annotation = gene_motif_anno,
+                        right_annotation = log2fc_ha,
+                        top_annotation = toil_sample_anno,
+                        heatmap_legend_param = 
+                          list(labels_gp = grid::gpar(fontsize = 7),
+                               legend_gp = grid::gpar(fontsize = 7),
+                               legend_direction = 'vertical',
+                               legend_height = unit(3.5, "cm"),
+                               title_gp = grid::gpar(fontsize = 7, face = 'bold')),
+                        row_names_gp = grid::gpar(fontsize = 7),
+                        heatmap_width = patch_fig_width*0.875)
+    
+  
+}
+
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange > 1.5, gene %in% c(ifn_a, ifn_g)) -> aale_ifn
+
+unique_peak_aale_ifn_list <- unique(c(uniq_kras_peak_genes$`Gene Name`, aale_ifn$gene))
+
+aale_ifn_chm <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = T)
+
+aale_ifn_chm_rowOrder <- ComplexHeatmap::row_order(ComplexHeatmap::draw(aale_ifn_chm))
+
+ifn_high_hm_zoom <- aale_ifn_chm[aale_ifn_chm_rowOrder[1:18], ]
+
+aale_ifn_chm_no_rownames <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = F, split_vector = 2, split_title = "cluster_%s")
+aale_ifn_chm_no_rownames
+```
+## patchwork
+```{r}
+msig.df[grepl('INTERFERON', names(msig.df))] %>% 
+                             unlist() %>% unname() -> ifn_gene_list
+
+salmon.quant$aale$intra$deseq$de %>% 
+  mutate(padj = ifelse(padj == 0, 
+                       min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
+  mutate(gene_set = ifelse(gene %in% ifn_gene_list,'IFN', 'other'),
+         gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP | gene == 'KRAS', 'KRAS', gene_set),
+         gene_set = ifelse(gene %in% meta.data$trono.krab.znfs$gene, 'ZNF', gene_set)) %>% 
+  mutate(gene_set = factor(gene_set, levels = c('IFN','KRAS','ZNF', 'other'))) %>% 
+  filter(padj < 0.05, gene_set != 'other') %>% 
+  mutate(kras = ifelse(gene == 'KRAS', T, F)) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = kras)) + 
+  geom_point(alpha = 0.6) + 
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
+                                                padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, '')),
+                           size = txt.mm_to_pts(0.8)) +
+  facet_col(~gene_set, scales = 'free_y') +
+  scale_color_manual(values = c('black', 'red'), guide = 'none') +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_1A.plt
+
+salmon.quant$aale$intra$deseq$H.fgsea %>% 
+  arrange(NES) %>% 
+  mutate(rank = row_number()) %>% 
+  group_by(pathway) %>% 
+  mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
+         pathway = str_replace_all(pathway, ' ', '\n'),
+         observed = length(unlist(leadingEdge)),
+         NES = round(NES, 3)) %>% 
+  # arrange(-NES, padj) %>% 
+  filter(!grepl('ZNF', pathway)) %>% 
+  ggplot(aes(NES, rank, color = padj)) + 
+  geom_point(size = 4) +
+  geom_segment(aes(x=0, xend=NES, y=rank, yend=rank)) +
+  geom_text(aes(label = paste0(observed, '/', size), 
+                x = NES - 0.75 * sign(NES)), 
+            nudge_y = 0.15, 
+            color = 'black', 
+            size = txt.mm_to_pts(0.8)) + 
+  geom_text(aes(label = pathway, 
+              x = - .9 * sign(NES)), 
+              nudge_y = 0.05, 
+              color = 'black', 
+              size = txt.mm_to_pts(0.8)) + 
+  scale_color_gsea(reverse = T) +
+  ylab('gene set') + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
+  theme(legend.position = c(0.95, 0.17),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank()) -> plt_1B.plt
+
+salmon.quant$aale$intra$deseq$de %>% 
+  dplyr::rename('AALE' = log2FoldChange) %>% 
+  filter(padj < 0.05,
+         gene %in% c(ifn_a, ifn_g)) %>% 
+  merge(salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+          dplyr::rename('HBEC' = log2FoldChange) %>% 
+          filter(padj < 0.05) %>% 
+          mutate(HBEC = HBEC), by = 'gene') %>% 
+  ggplot(aes(AALE, HBEC)) +
   geom_point() + 
-  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2]), name = 'unique ATAC peak') +
+  xlab('AALE log2FC') + ylab('HBEC log2FC') +
   geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
-  geom_text_repel(aes(label = ifelse(abs(EXO_aale) > 1 & abs(INTRA_aale) > 1, gene, '')), show.legend = F) +
-  theme(legend.position = c(0.99, 0.25)) +
-  geom_line(stat = 'smooth', method = 'lm', linetype = 'dashed', alpha = 0.8, color = 'purple') +
-  annotate(geom = 'text', x = 2.35, y = -2, fontface = 'italic',
-           label = paste0('y', ' ', ' = -0.99 + 0.66x; \nadj. R2 = 0.49'), 
-           size = rel(3.75), alpha = 0.8)
+  geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')), 
+                  size = txt.mm_to_pts(0.8),show.legend = F) + 
+  theme(legend.position = c(0.99, 0.22)) -> plt_1C.plt
+
+salmon.quant$aale$intra$deseq$de %>% 
+  merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
+  geom_point() + 
+  geom_text_repel(color = 'black', size = txt.mm_to_pts(0.8)) + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.35, 0.79)) -> plt_1D.plt
+
+fig_1_patch <- "
+AB
+AB
+CD
+EE
+"
+
+wrap_plots(plt_1A.plt,
+           plt_1B.plt,
+           plt_1C.plt,
+           plt_1D.plt,
+           patchwork::wrap_elements(full = 
+                                      grid::grid.grabExpr(ComplexHeatmap::draw(ifn_high_hm_zoom,
+                                                                               heatmap_legend_side = 'right'), 
+                                                                               width = patch_fig_width)), 
+           heights = c(1,1,0.75,1.25),
+           design = fig_1_patch) + 
+  plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = rel(0.95), face = 'bold'),
+        plot.tag.position = c(0.01, 0.99)) -> figure_1_patchwork.fig
+
+
+ggsave(plot = figure_1_patchwork.fig,
+       filename = file.path(figure.dir, 'fig.1', 'figure_1_patchwork.pdf'),
+       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+```
+## Figure S1
+```{r}
+salmon.quant$aale$intra$deseq$de %>% 
+  mutate(padj = ifelse(padj == 0, 
+                       min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
+  mutate(biotype = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', 'protein-coding')) %>% 
+  mutate(biotype = factor(biotype, levels = c('protein-coding','lncRNA'))) %>% 
+  filter(padj < 0.05) %>%
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
+  geom_point(alpha = 0.6) + 
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 |
+                                                -log10(padj) > 250, gene, '')),
+                           size = txt.mm_to_pts(0.8)) +
+  facet_col(~biotype, scales = 'free') -> plt_S1A.plt
+
+salmon.quant$aale$intra$deseq$pca$pca.out %>% 
+  rownames_to_column('sample') %>% 
+  ggplot(aes(PC1, PC2,
+             fill = condition,
+             color = condition)) + 
+    geom_point(size = rel(2)) + 
+    scale_size_continuous(range = c(0.1, 2.5), breaks = c(0,5,10,15,20)) + 
+    xlab(paste('PC1', round(cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[1], digits = 3), sep = ' ')) +
+    ylab(paste('PC2', round(cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[2] - cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[1],
+                            digits = 3), sep = ' ')) +
+    scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+    geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
+    geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) + 
+    theme(legend.position = c(0.30, 0.45),
+            legend.key.width = unit(0.125,'cm'),
+            legend.key.height = unit(0.4, 'cm')) -> plt_S1B.plt
+
+salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
+  mutate(padj = ifelse(padj == 0, 
+                       min(filter(salmon.quant$hbec$lacz_v_v12$deseq$de, padj != 0)$padj), padj)) %>% 
+  mutate(gene_set = ifelse(gene %in% ifn_gene_list,'HBEC-IFN', 'other'),
+         gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP | gene == 'KRAS', 'HBEC-KRAS', gene_set),
+         gene_set = ifelse(gene %in% meta.data$trono.krab.znfs$gene, 'HBEC-ZNF', gene_set)) %>% 
+  mutate(gene_set = factor(gene_set, levels = c('HBEC-IFN','HBEC-KRAS','HBEC-ZNF', 'other'))) %>% 
+  filter(padj < 0.05, gene_set != 'other') %>% 
+  mutate(kras = ifelse(gene == 'KRAS', T, F)) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = kras)) + 
+  geom_point(alpha = 0.6, shape = 24) + 
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
+                                                padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, '')),
+                           size = txt.mm_to_pts(0.8)) +
+  facet_col(~gene_set, scales = 'free_y') +
+  scale_color_manual(values = c('black', 'red'), guide = 'none') +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_S1C.plt
+
+
+fig_S1_patch <- "
+AC
+AC
+BC
+EE
+"
+
+wrap_plots(plt_S1A.plt,
+           plt_S1B.plt,
+           plt_S1C.plt,
+           patchwork::wrap_elements(full = 
+                          grid::grid.grabExpr(ComplexHeatmap::draw(aale_ifn_chm_no_rownames,
+                                                                   heatmap_legend_side = 'right'), 
+                                                                   width = patch_fig_width)), 
+           design = fig_S1_patch,
+           heights = c(0.75,0.75,0.75, 1.75)) + 
+  plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = rel(0.95), face = 'bold'),
+        plot.tag.position = c(0.01, 0.99)) -> figure_S1_patchwork.fig
+
+
+ggsave(plot = figure_S1_patchwork.fig,
+       filename = file.path(figure.dir, 'fig.1', 'figure_S1_patchwork.pdf'),
+       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+
+```
+
+# Figure 2
+```{r}
+rbind(kras_de_prom_df, ctrl_de_prom_df) %>%
+  ggplot(aes(position, cov, group = condition, color = condition)) +
+    stat_summary(geom="ribbon", fun.data=mean_cl_boot, width=0.1, conf.int=0.95, 
+                 fill='grey', alpha = 0.1, size = rel(0.05), show.legend = F)+
+    stat_summary(geom="point", fun=mean, alpha = 1, size = rel(1), show.legend = T) +
+    scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+    xlab('distance to TSS') +
+    ylab('mean CPM (95% CI)') + 
+    xlim(-1000, 500) + 
+    theme(legend.position = c(0.3, 0.99)) -> plt_2A.plt
+
+salmon.quant$aale$intra$deseq$de %>% 
+  merge(uniq_kras_peak_genes, by.x = 'gene', by.y = 'Gene Name') %>% 
+  mutate(`unique peaks` = ifelse(gene %in% c(ifn_a, ifn_g), 'ISG', 'other')) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = `unique peaks`)) + 
+  geom_point() +
+  scale_color_manual(values = c('black', 'grey')) +
+  geom_text_repel(aes(label = ifelse(`unique peaks` == 'ISG' | log2FoldChange > 6, gene, '')), 
+                  size = txt.mm_to_pts(0.8), show.legend = F) + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.3, 0.99)) -> plt_2B.plt
+
+
+base::do.call(rbind, tb) %>% 
+  group_by(Ontology) %>% 
+  top_n(30, -HyperFdrQ) %>%
+  filter(HyperFdrQ < 0.05,
+         NumFgGenesHit > 1, 
+         grepl('interferon|virus|RNA|oligo|^ex', Desc),
+         !grepl('part', Desc)) %>% 
+  ggplot(aes(-log10(HyperFdrQ), FgRegionsHit, label = Desc)) + 
+  geom_point() +
+  geom_text_repel(size = txt.mm_to_pts(0.8), show.legend = F) +
+  ggforce::facet_row(~Ontology) +
+  ylab('observed regions') -> plt_2D.plt
+
+
+# base::do.call(rbind, tb) %>% 
+#   group_by(Ontology) %>% 
+#   top_n(30, -HyperFdrQ) %>%
+#   filter(HyperFdrQ < 0.05,
+#          NumFgGenesHit > 1, 
+#          Ontology == 'GO Cellular Component',
+#          grepl('interferon|virus|dsRNA|oligo|^ex', Desc),
+#          !grepl('part', Desc)) %>% 
+#   # mutate(Desc = str_replace_all(Desc, ' ', '\n')) %>% 
+#   ggplot(aes(-log10(HyperFdrQ), reorder(Desc, -HyperFdrQ), label = Desc)) + 
+#   geom_point(size = 4) +
+#   geom_segment(aes(x=0, xend = -log10(HyperFdrQ), y=Desc, yend=Desc)) +
+#   geom_text(aes(label = Desc, 
+#             x = 3), 
+#             nudge_y = 0.5, 
+#             color = 'black', 
+#             size = txt.mm_to_pts(0.8)) + 
+#   theme(axis.text.y = element_blank(),
+#         axis.ticks.y = element_blank(),
+#         plot.title = element_text(size = rel(0.7), face = 'plain')) +
+#   # ylab('') +
+#   ylab('GO Cellular Component') -> plt_2D.plt
+# 
+# base::do.call(rbind, tb) %>% 
+#   group_by(Ontology) %>% 
+#   top_n(30, -HyperFdrQ) %>%
+#   filter(HyperFdrQ < 0.05,
+#          NumFgGenesHit > 1, 
+#          Ontology == 'GO Molecular Function',
+#          grepl('oligo|RNA', Desc),
+#          !grepl('part', Desc)) %>% 
+#   mutate(Desc = str_replace_all(Desc, ' ', '\n')) %>%
+#   ggplot(aes(-log10(HyperFdrQ), reorder(Desc, -HyperFdrQ), label = Desc)) + 
+#   geom_point(size = 4) +
+#   geom_segment(aes(x=0, xend = -log10(HyperFdrQ), y=Desc, yend=Desc)) +
+#   geom_text(aes(label = Desc, 
+#             x = -log10(HyperFdrQ) - 2), 
+#             nudge_y = 0.25, 
+#             color = 'black', 
+#             size = txt.mm_to_pts(0.8)) + 
+#   theme(axis.text.y = element_blank(),
+#         axis.ticks.y = element_blank(),
+#         plot.title = element_text(size = rel(0.7), face = 'plain')) +
+#   # ylab('') +
+#   ylab('GO Molecular Function') -> plt_2E.plt
+# 
+# base::do.call(rbind, tb) %>% 
+#   group_by(Ontology) %>% 
+#   top_n(30, -HyperFdrQ) %>%
+#   filter(HyperFdrQ < 0.05,
+#          NumFgGenesHit > 1, 
+#          Ontology == 'GO Biological Process',
+#          grepl('interferon|virus', Desc)) %>% 
+#   mutate(Desc = str_replace_all(Desc, 'pathway', '')) %>%
+#   ggplot(aes(-log10(HyperFdrQ), reorder(Desc, -HyperFdrQ), label = Desc)) + 
+#   geom_point(size = 4) +
+#   geom_segment(aes(x=0, xend = -log10(HyperFdrQ), y=Desc, yend=Desc)) +
+#   geom_text(aes(label = Desc, 
+#             x = -log10(HyperFdrQ) - 7), 
+#             nudge_y = 0.25, 
+#             color = 'black', 
+#             size = txt.mm_to_pts(0.8)) + 
+#   theme(axis.text.y = element_blank(),
+#         axis.ticks.y = element_blank(),
+#         plot.title = element_text(size = rel(0.7), face = 'plain')) +
+#   # ylab('') +
+#   ylab('GO Biological Process') -> plt_S2F.plt
+
+
+
+fig_2_patch <- "
+AB
+CC
+DD
+"
+
+wrap_plots(plt_2A.plt + labs(tag = 'A'),
+           plt_2B.plt + labs(tag = 'B'),
+           ifn_atac_6.plt,
+           plt_2D.plt + labs(tag = 'D'),
+           # plt_2E.plt + labs(tag = 'E'),
+           # plt_S2F.plt + labs(tag = 'F'),
+           heights = c(1,1.5,0.50),
+           design = fig_2_patch) -> figure_2_patchwork.fig
+
+
+ggsave(plot = figure_2_patchwork.fig,
+       filename = file.path(figure.dir, 'fig.2', 'figure_2_patchwork.pdf'),
+       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+
+```
+## Figure S2
+```{r}
+base::do.call(rbind, tb) %>% 
+  group_by(Ontology) %>% 
+  top_n(30, -HyperFdrQ) %>%
+  filter(HyperFdrQ < 0.05,
+         NumFgGenesHit > 1, 
+         Ontology == 'GO Biological Process',
+         grepl('interferon|virus', Desc)) %>% 
+  mutate(Desc = str_replace_all(Desc, ' ', '\n')) %>% 
+  ggplot(aes(-log10(HyperFdrQ), reorder(Desc, -HyperFdrQ), label = Desc)) + 
+  geom_point(size = 4) +
+  geom_segment(aes(x=0, xend = -log10(HyperFdrQ), y=Desc, yend=Desc)) +
+  geom_text(aes(label = NumFgGenesHit, 
+              x = -log10(HyperFdrQ) - 0.75), 
+          nudge_y = 0.15, 
+          color = 'black', 
+          size = txt.mm_to_pts(0.8)) +
+  ylab('') +
+  ggtitle('GO Biological Process') -> plt_S2A.plt
+
+salmon.quant$aale$intra$deseq$counts %>% 
+  filter(grepl('^IFN', gene)) %>% 
+  select(gene, contains('.')) %>% 
+  gather(names, counts, -gene) %>% 
+  merge(salmon.quant$aale$intra$deseq$col.data, by = 'names') %>% 
+  ggplot(aes(reorder(gene, counts), counts, color = condition)) + 
+  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+  geom_boxplot(fill = NA) + 
+  coord_flip() + 
+  theme(legend.position = c(0.99, 0.15)) + 
+  xlab('') -> plt_S2B.plt
+
+plot_big_wig_coverage(loci = 'chr19:39,294,877-39,297,773', 
+                      gene_name = 'IFNL1', y_lab = 'norm.\nread depth', lab_tag = 'C') -> ifnl1_atac.plt
+
+fig_S2_patch <- "
+AB
+CB
+DB
+"
+
+wrap_plots(plt_S2A.plt,
+           plt_S2B.plt,
+           ifnl1_atac.plt,
+           patchwork::plot_spacer(),
+           design = fig_S2_patch) -> figure_S2_patchwork.fig
+
+
+ggsave(plot = figure_S2_patchwork.fig,
+       filename = file.path(figure.dir, 'fig.2', 'figure_S2_patchwork.pdf'),
+       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+```
+
+# Figure 3
+```{r}
+
+kras.sight <- read_csv(file.path(output.data.dir, 'kras.nanosight.data.csv'), skip = 2,
+                       col_names = c('size', 'r1', 'r2', 'r3', NA, NA, NA, NA)) %>% 
+  mutate(condition = 'kras')
+ctrl.sight <- read_csv(file.path(output.data.dir, 'ctrl.nanosight.data.csv'), skip = 2,
+                       col_names = c('size', 'r1', 'r2', 'r3', NA, NA, NA, NA)) %>% 
+  mutate(condition = 'ctrl')
+
+nano_sight <- rbind(kras.sight, ctrl.sight)
+
+nano_sight %>% 
+  select(size, r1, r2, r3, condition) %>% 
+  gather(rep, value, -condition, -size) %>% 
+  filter(size <= 400) %>% 
+  mutate(value = value/1e6) %>% 
+  group_by(size, condition) %>% 
+  summarize(y = mean(value),
+            ymin = mean(value) - sd(value),
+            ymax = mean(value) + sd(value)) %>% 
+  ggplot(aes(size, y = y, ymin = ymin, ymax = ymax, fill = condition)) +
+  geom_ribbon(alpha = 0.25) +
+  geom_line(color = 'darkgrey') +
+  scale_fill_manual(values = c(viridis(3)[1], viridis(3)[2]), guide = F) +
+  stat_peaks(geom = 'text', span = 35, vjust = -0.5, y.label.fmt = '%#f') +
+  facet_row(~condition) + 
+  ylab('1e6 particles per mL') + xlab('nm') -> plt_3A.plt
 
 salmon.quant$aale$exo$deseq$de %>% 
   dplyr::rename('EXO_aale' = log2FoldChange) %>% 
@@ -2147,7 +2679,89 @@ salmon.quant$aale$exo$deseq$de %>%
           dplyr::rename('INTRA_aale' = log2FoldChange) %>% 
           filter(padj < 0.05), by = 'gene') %>% 
   lm(EXO_aale ~ INTRA_aale, data = .) %>% 
-  summary()
+  summary() -> exo_lm_out
+
+b <- round(exo_lm_out$coefficients[1,1], 2)
+m <- round(exo_lm_out$coefficients[2,1], 2)
+r2 <- round(exo_lm_out$adj.r.squared, 2)
+
+salmon.quant$aale$exo$deseq$de %>% 
+  dplyr::rename('EXO_aale' = log2FoldChange) %>% 
+  filter(padj < 0.05) %>% 
+  merge(salmon.quant$aale$intra$deseq$de %>% 
+          dplyr::rename('INTRA_aale' = log2FoldChange) %>% 
+          filter(padj < 0.05), by = 'gene') %>% 
+  mutate(unique = ifelse(gene %in% uniq_kras_peak_genes$`Gene Name`, 'KRAS', 
+                         ifelse(gene %in% uniq_ctrl_peak_genes$`Gene Name`, 'CTRL', 'none'))) %>% 
+  ggplot(aes(EXO_aale, INTRA_aale, color = unique)) + 
+  geom_point() + 
+  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2], 'grey'), name = 'unique ATAC peak') +
+  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
+  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
+  geom_text_repel(aes(label = ifelse(abs(EXO_aale) > 1 & abs(INTRA_aale) > 1 | unique != 'none', gene, '')), 
+                  size = txt.mm_to_pts(0.8), show.legend = F) +
+  theme(legend.position = c(0.99, 0.25)) +
+  geom_line(stat = 'smooth', method = 'lm', linetype = 'dashed', alpha = 0.8, color = 'purple') +
+  annotate(geom = 'text', x = 2.35, y = -2, fontface = 'italic',
+           label = paste0('y', ' ', ' = ',b,' + ',m,'x; \nadj. R2 = ', r2), 
+           size = rel(3.75), alpha = 0.8) + 
+  ylab('intracellular log2FC') + xlab('extracellular log2FC') -> plt_3B.plt
+
+salmon.quant$aale$exo$deseq$de %>% 
+  mutate(biotype = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', 'coding')) %>%
+  # filter(padj < 0.05) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = biotype)) + 
+  geom_point(alpha = 0.6) + 
+  scale_color_manual(values = c('black', 'grey')) +
+  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1, gene, '')), size = txt.mm_to_pts(0.8),
+                           show.legend = F) +
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.2,0.99)) -> plt_3C.plt
+
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, abs(log2FoldChange) > 0.5) %>% 
+  mutate(context = ifelse(log2FoldChange > 0, 'INTRA_up', 'INTRA_dn')) %>% 
+  select(gene, context) %>% 
+  rbind(
+    salmon.quant$aale$exo$deseq$de %>% 
+    filter(padj < 0.05, abs(log2FoldChange) > 0.5) %>% 
+    mutate(context = ifelse(log2FoldChange > 0, 'EXO_up', 'EXO_dn')) %>% 
+    select(gene, context)
+    ) %>% 
+  group_by(gene) %>% 
+  summarize(contexts = list(context)) %>% 
+  ggplot(aes(contexts)) + 
+  geom_bar() + 
+  ggupset::scale_x_upset() +
+  geom_text(stat='count', aes(label=after_stat(count)), vjust = -0.5, size = txt.mm_to_pts(0.8)) +
+  xlab('') + ylab('overlapping genes') -> plt_3D.plt
+
+fig_3_patch <- "
+AB
+CD
+EF
+"
+
+wrap_plots(plt_3A.plt,
+           plt_3B.plt,
+           plt_3C.plt,
+           plt_3D.plt,
+           design = fig_3_patch) + 
+  plot_annotation(tag_levels = 'A')  -> figure_3_patchwork.fig
+
+
+ggsave(plot = figure_3_patchwork.fig,
+       filename = file.path(figure.dir, 'fig.3', 'figure_3_patchwork.pdf'),
+       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+```
+
+## Ex RNA
+```{r}
+
+
+
+
 
 salmon.quant$aale$kras_compare$deseq$de %>% 
   filter(!gene %in% meta.data$gencode.35.lnc.gene.names$gene,
@@ -2213,7 +2827,7 @@ salmon.quant$aale$exo$deseq$de %>%
   # filter(padj < 0.05) %>% 
   ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = biotype)) + 
   geom_point(alpha = 0.6) + 
-  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+  scale_color_manual(values = c('black', 'grey')) +
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1, gene, '')), show.legend = F) +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
   theme(legend.position = c(0.99,0.99))
@@ -2643,390 +3257,6 @@ ComplexHeatmap::Heatmap(hm_count_data, col = viridis(16, option = 'plasma'),
                         bottom_annotation = bottom_ha)
   
 ```
-
-# Figure 1
-## toil data load and transform
-```{r}
-toil.survival <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.survival.tsv.gz')) 
-
-luad.phenotypes <- 
-  read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.GDC_phenotype.tsv.gz')) %>% 
-  select(sample = submitter_id.samples, 
-       sample_type = sample_type.samples,
-       stage = tumor_stage.diagnoses,
-       age = age_at_index.demographic,
-       sex = gender.demographic,
-       race = race.demographic)
-
-luad.mutect <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.mutect2_snv.tsv.gz')) %>% 
-  filter(gene %in% c('KRAS')) %>% 
-  select(sample = Sample_ID, gene, aa_change = Amino_Acid_Change) %>% 
-  pivot_wider(names_from = gene, values_from = aa_change) %>% 
-  mutate(across(.cols = where(is.list), paste)) 
-
-luad.phenotypes.merge <- luad.phenotypes %>% 
-  merge(luad.mutect, by = 'sample', all.x = T) %>% 
-  filter(sample_type %in% c('Primary Tumor', 'Solid Tissue Normal')) %>% 
-  merge(toil.survival, by = 'sample') %>% 
-  mutate(sample = str_sub(sample, end = str_length(sample) - 1)) %>% 
-  replace_na(list(KRAS = 'WT')) %>% 
-  mutate(KRAS = ifelse(sample_type == 'Solid Tissue Normal', 'WT_normal', KRAS))
-
-norm.counts.final <- read_tsv(file.path(output.data.dir, 'tcga.data', 'luad.data.frame.tsv'))
-
-norm.counts.final %>% 
-  filter(sample != 'TCGA-44-3917-01') %>% 
-  filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
-```
-### complex plotting
-```{r}
-
-plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = NULL, split_title = NULL) {
-  
-   set.seed(123)
-  
-  ## heatmap count matrix
-  working_toil_counts %>% 
-    filter(gene %in% filter_values) %>%
-    group_by(gene) %>%
-    mutate(count = scale(log1p(count), center = T)) %>%
-    select(sample, gene, count) %>%
-    pivot_wider(names_from = gene, values_from = count) %>%
-    distinct() %>% 
-    column_to_rownames('sample') %>% 
-    t() -> toil_hm_counts
-  
-  ## heatmap mutation annotation 
-  working_toil_counts %>% 
-    select(sample, 'G12D' = KRAS) %>%
-    distinct() %>% 
-    column_to_rownames('sample') %>% 
-    ComplexHeatmap::columnAnnotation(df = . , 
-                                     col = list(G12D = c('WT_normal' = 'white', 
-                                                         'p.G12D' = viridis(3)[2])),
-                                      show_legend = F,
-                                      annotation_name_side = 'left',
-                                      annotation_name_gp = grid::gpar(fontsize = 8),
-                                      simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
-  ## heatmap DE barpot annotation
-  working_toil_counts %>% 
-    filter(gene %in% filter_values) %>%
-    select(gene) %>% 
-    distinct() %>% 
-    merge(salmon.quant$aale$intra$deseq$de %>% select(gene, log2FoldChange), by = 'gene') %>% 
-    column_to_rownames('gene') -> toil_de
-  
-  toil_de[order(match(rownames(toil_de), rownames(toil_hm_counts))), , drop =F] -> toil_de
-  
-  toil_de_list <- setNames(toil_de$log2FoldChange, rownames(toil_de))
-  
-  ComplexHeatmap::rowAnnotation(
-    `AALE log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
-        bar_width = 1, 
-        which = 'row',
-        gp = grid::gpar(col = "black", fill = "white"), 
-        border = FALSE,
-        annotation_name_gp = grid::gpar(fontsize = 8),
-        width = unit(1.25, "cm"),
-        height = unit(0.75, "cm")), 
-    show_annotation_name = TRUE,
-    annotation_name_gp = grid::gpar(fontsize = 8)) -> log2fc_ha
-  
-  working_toil_counts %>% 
-  filter(gene %in% filter_values) %>%
-  select(gene) %>% 
-  distinct() %>% 
-  mutate(IRF9 = ifelse(gene %in% irf9_fimo_results$gene, T, F),
-         IRF1 = ifelse(gene %in% irf1_fimo_results$gene, T, F),
-         IRF7 = ifelse(gene %in% irf7_fimo_results$gene, T, F)) %>% 
-  column_to_rownames('gene') %>% 
-  ComplexHeatmap::rowAnnotation(df =.,
-                                col = list(IRF9 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white'),
-                                           IRF1 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white'),
-                                           IRF7 = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
-                                show_legend = F,
-                                annotation_name_gp = grid::gpar(fontsize = 8),
-                                simple_anno_size = unit(2, "mm")) -> gene_motif_anno
-  
-  ComplexHeatmap::Heatmap(toil_hm_counts, 
-                        name = 'z-score', 
-                        show_row_names = show_genes,
-                        show_column_names = F,
-                        row_split = split_vector,
-                        row_title = split_title,
-                        row_title_gp = grid::gpar(fontsize = 7, face = 'bold'),
-                        row_names_side = 'right',
-                        row_dend_width = unit(3, 'mm'),
-                        left_annotation = gene_motif_anno,
-                        right_annotation = log2fc_ha,
-                        top_annotation = toil_sample_anno,
-                        heatmap_legend_param = 
-                          list(labels_gp = grid::gpar(fontsize = 7),
-                               legend_gp = grid::gpar(fontsize = 7),
-                               legend_direction = 'vertical',
-                               legend_height = unit(3.5, "cm"),
-                               title_gp = grid::gpar(fontsize = 7, face = 'bold')),
-                        row_names_gp = grid::gpar(fontsize = 7),
-                        heatmap_width = patch_fig_width*0.875)
-    
-  
-}
-
-salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange > 1.5, gene %in% c(ifn_a, ifn_g)) -> aale_ifn
-
-unique_peak_aale_ifn_list <- unique(c(uniq_kras_peak_genes$`Gene Name`, aale_ifn$gene))
-
-aale_ifn_chm <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = T)
-
-aale_ifn_chm_rowOrder <- ComplexHeatmap::row_order(ComplexHeatmap::draw(aale_ifn_chm))
-
-ifn_high_hm_zoom <- aale_ifn_chm[aale_ifn_chm_rowOrder[1:18], ]
-
-aale_ifn_chm_no_rownames <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = F, split_vector = 2, split_title = "cluster_%s")
-aale_ifn_chm_no_rownames
-```
-## patchwork
-```{r}
-msig.df[grepl('INTERFERON', names(msig.df))] %>% 
-                             unlist() %>% unname() -> ifn_gene_list
-
-salmon.quant$aale$intra$deseq$de %>% 
-  mutate(padj = ifelse(padj == 0, 
-                       min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
-  mutate(gene_set = ifelse(gene %in% ifn_gene_list,'IFN', 'other'),
-         gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP | gene == 'KRAS', 'KRAS', gene_set),
-         gene_set = ifelse(gene %in% meta.data$trono.krab.znfs$gene, 'ZNF', gene_set)) %>% 
-  mutate(gene_set = factor(gene_set, levels = c('IFN','KRAS','ZNF', 'other'))) %>% 
-  filter(padj < 0.05, gene_set != 'other') %>% 
-  mutate(kras = ifelse(gene == 'KRAS', T, F)) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = kras)) + 
-  geom_point(alpha = 0.6) + 
-  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
-                                                padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, '')),
-                           size = txt.mm_to_pts(0.8)) +
-  facet_col(~gene_set, scales = 'free_y') +
-  scale_color_manual(values = c('black', 'red'), guide = 'none') +
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_1A.plt
-
-salmon.quant$aale$intra$deseq$H.fgsea %>% 
-  arrange(NES) %>% 
-  mutate(rank = row_number()) %>% 
-  group_by(pathway) %>% 
-  mutate(pathway = str_replace_all(pathway, 'HALLMARK ', ''),
-         pathway = str_replace_all(pathway, ' ', '\n'),
-         observed = length(unlist(leadingEdge)),
-         NES = round(NES, 3)) %>% 
-  # arrange(-NES, padj) %>% 
-  filter(!grepl('ZNF', pathway)) %>% 
-  ggplot(aes(NES, rank, color = padj)) + 
-  geom_point(size = 4) +
-  geom_segment(aes(x=0, xend=NES, y=rank, yend=rank)) +
-  geom_text(aes(label = paste0(observed, '/', size), 
-                x = NES - 0.75 * sign(NES)), 
-            nudge_y = 0.15, 
-            color = 'black', 
-            size = txt.mm_to_pts(0.8)) + 
-  geom_text(aes(label = pathway, 
-              x = - .9 * sign(NES)), 
-              nudge_y = 0.05, 
-              color = 'black', 
-              size = txt.mm_to_pts(0.8)) + 
-  scale_color_gsea(reverse = T) +
-  ylab('gene set') + 
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
-  theme(legend.position = c(0.95, 0.17),
-        axis.ticks.y = element_blank(),
-        axis.text.y = element_blank()) -> plt_1B.plt
-
-salmon.quant$aale$intra$deseq$de %>% 
-  dplyr::rename('AALE' = log2FoldChange) %>% 
-  filter(padj < 0.05,
-         gene %in% c(ifn_a, ifn_g)) %>% 
-  merge(salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
-          dplyr::rename('HBEC' = log2FoldChange) %>% 
-          filter(padj < 0.05) %>% 
-          mutate(HBEC = HBEC), by = 'gene') %>% 
-  ggplot(aes(AALE, HBEC)) +
-  geom_point() + 
-  xlab('AALE log2FC') + ylab('HBEC log2FC') +
-  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
-  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
-  geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')), 
-                  size = txt.mm_to_pts(0.8),show.legend = F) + 
-  theme(legend.position = c(0.99, 0.22)) -> plt_1C.plt
-
-salmon.quant$aale$intra$deseq$de %>% 
-  merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
-  geom_point() + 
-  geom_text_repel(color = 'black', size = txt.mm_to_pts(0.8)) + 
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
-  theme(legend.position = c(0.35, 0.79)) -> plt_1D.plt
-
-fig_1_patch <- "
-AB
-AB
-CD
-EE
-"
-
-wrap_plots(plt_1A.plt,
-           plt_1B.plt,
-           plt_1C.plt,
-           plt_1D.plt,
-           patchwork::wrap_elements(full = 
-                                      grid::grid.grabExpr(ComplexHeatmap::draw(ifn_high_hm_zoom,
-                                                                               heatmap_legend_side = 'right'), 
-                                                                               width = patch_fig_width)), 
-           heights = c(1,1,0.75,1.25),
-           design = fig_1_patch) + 
-  plot_annotation(tag_levels = 'A') &
-  theme(plot.tag = element_text(size = rel(0.95), face = 'bold'),
-        plot.tag.position = c(0.01, 0.99)) -> figure_1_patchwork.fig
-
-
-ggsave(plot = figure_1_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.1', 'figure_1_patchwork.pdf'),
-       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
-
-```
-## Figure S1
-```{r}
-salmon.quant$aale$intra$deseq$de %>% 
-  mutate(padj = ifelse(padj == 0, 
-                       min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
-  mutate(biotype = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', 'protein-coding')) %>% 
-  mutate(biotype = factor(biotype, levels = c('protein-coding','lncRNA'))) %>% 
-  filter(padj < 0.05) %>%
-  ggplot(aes(log2FoldChange, -log10(padj), label = gene)) + 
-  geom_point(alpha = 0.6) + 
-  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 |
-                                                -log10(padj) > 250, gene, '')),
-                           size = txt.mm_to_pts(0.8)) +
-  facet_col(~biotype, scales = 'free') -> plt_S1A.plt
-
-salmon.quant$aale$intra$deseq$pca$pca.out %>% 
-  rownames_to_column('sample') %>% 
-  ggplot(aes(PC1, PC2,
-             fill = condition,
-             color = condition)) + 
-    geom_point(size = rel(2)) + 
-    scale_size_continuous(range = c(0.1, 2.5), breaks = c(0,5,10,15,20)) + 
-    xlab(paste('PC1', round(cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[1], digits = 3), sep = ' ')) +
-    ylab(paste('PC2', round(cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[2] - cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[1],
-                            digits = 3), sep = ' ')) +
-    scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
-    geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
-    geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) + 
-    theme(legend.position = c(0.30, 0.45),
-            legend.key.width = unit(0.125,'cm'),
-            legend.key.height = unit(0.4, 'cm')) -> plt_S1B.plt
-
-salmon.quant$hbec$lacz_v_v12$deseq$de %>% 
-  mutate(padj = ifelse(padj == 0, 
-                       min(filter(salmon.quant$hbec$lacz_v_v12$deseq$de, padj != 0)$padj), padj)) %>% 
-  mutate(gene_set = ifelse(gene %in% ifn_gene_list,'HBEC-IFN', 'other'),
-         gene_set = ifelse(gene %in% msig.df$HALLMARK_KRAS_SIGNALING_UP | gene == 'KRAS', 'HBEC-KRAS', gene_set),
-         gene_set = ifelse(gene %in% meta.data$trono.krab.znfs$gene, 'HBEC-ZNF', gene_set)) %>% 
-  mutate(gene_set = factor(gene_set, levels = c('HBEC-IFN','HBEC-KRAS','HBEC-ZNF', 'other'))) %>% 
-  filter(padj < 0.05, gene_set != 'other') %>% 
-  mutate(kras = ifelse(gene == 'KRAS', T, F)) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = kras)) + 
-  geom_point(alpha = 0.6, shape = 24) + 
-  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
-                                                padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, '')),
-                           size = txt.mm_to_pts(0.8)) +
-  facet_col(~gene_set, scales = 'free_y') +
-  scale_color_manual(values = c('black', 'red'), guide = 'none') +
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_S1C.plt
-
-
-fig_S1_patch <- "
-AC
-AC
-BC
-EE
-"
-
-wrap_plots(plt_S1A.plt,
-           plt_S1B.plt,
-           plt_S1C.plt,
-           patchwork::wrap_elements(full = 
-                          grid::grid.grabExpr(ComplexHeatmap::draw(aale_ifn_chm_no_rownames,
-                                                                   heatmap_legend_side = 'right'), 
-                                                                   width = patch_fig_width)), 
-           design = fig_S1_patch,
-           heights = c(0.75,0.75,0.75, 1.75)) + 
-  plot_annotation(tag_levels = 'A') &
-  theme(plot.tag = element_text(size = rel(0.95), face = 'bold'),
-        plot.tag.position = c(0.01, 0.99)) -> figure_S1_patchwork.fig
-
-
-ggsave(plot = figure_S1_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.1', 'figure_S1_patchwork.pdf'),
-       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
-
-
-```
-
-# Figure 2
-```{r}
-rbind(kras_de_prom_df, ctrl_de_prom_df) %>%
-  ggplot(aes(position, cov, group = condition, color = condition)) +
-    stat_summary(geom="ribbon", fun.data=mean_cl_boot, width=0.1, conf.int=0.95, 
-                 fill='grey', alpha = 0.1, size = rel(0.05), show.legend = F)+
-    stat_summary(geom="point", fun=mean, alpha = 1, size = rel(1), show.legend = T) +
-    scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
-    xlab('distance to TSS') +
-    ylab('mean CPM (95% CI)') + 
-    xlim(-1000, 500) + 
-    theme(legend.position = c(0.3, 0.99)) -> plt_2A.plt
-
-salmon.quant$aale$intra$deseq$de %>% 
-  merge(uniq_kras_peak_genes, by.x = 'gene', by.y = 'Gene Name') %>% 
-  mutate(`unique peaks` = ifelse(gene %in% c(ifn_a, ifn_g), 'ISG', 'other')) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = `unique peaks`)) + 
-  geom_point() +
-  scale_color_manual(values = c('black', 'grey')) +
-  geom_text_repel(aes(label = ifelse(`unique peaks` == 'ISG' | log2FoldChange > 6, gene, '')), 
-                  size = txt.mm_to_pts(0.8), show.legend = F) + 
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
-  theme(legend.position = c(0.99, 0.99)) -> plt_2B.plt
-
-base::do.call(rbind, tb) %>% 
-  group_by(Ontology) %>% 
-  top_n(30, -HyperFdrQ) %>%
-  filter(HyperFdrQ < 0.05,
-         NumFgGenesHit > 1, 
-         Ontology != "GO Biological Process") %>% 
-  ggplot(aes(NumFgGenesHit, -log10(HyperFdrQ), label = Desc)) + 
-  geom_point() + 
-  ggrepel::geom_text_repel(show.legend = F, color = 'black', size = txt.mm_to_pts(0.6)) +
-  xlab('observed genes') +
-  facet_row(~Ontology, scales = 'free') -> plt_2D.plt
-
-fig_2_patch <- "
-AB
-CC
-DD
-"
-
-wrap_plots(plt_2A.plt + labs(tag = 'A'),
-           plt_2B.plt + labs(tag = 'B'),
-           ifn_atac_6.plt,
-           plt_2D.plt + labs(tag = 'D'),
-           heights = c(0.75,1.5,0.75),
-           design = fig_2_patch) -> figure_2_patchwork.fig
-
-
-ggsave(plot = figure_2_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.2', 'figure_2_patchwork.pdf'),
-       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
-
-
-```
-
 
 
 
