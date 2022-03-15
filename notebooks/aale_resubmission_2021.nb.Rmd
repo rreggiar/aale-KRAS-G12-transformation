@@ -2018,21 +2018,42 @@ plot_big_wig_coverage <- function(loci, finish_plot = F, gene_name, y_lab = '', 
 
 # , y_lab = 'norm.\nread depth'
 
-plot_big_wig_coverage(loci = 'chr14:24,158,954-24,163,321', gene_name = 'IRF9' , y_lab = 'norm.\nread depth', lab_tag = 'C') -> irf9_atac.plt
+plot_big_wig_coverage(loci = 'chr14:24,158,954-24,163,321', gene_name = 'IRF9') -> irf9_atac.plt
 
 plot_big_wig_coverage(loci = 'chr11:613,326-618,086', gene_name = 'IRF7') -> irf7_atac.plt
 
 plot_big_wig_coverage(loci = 'chr14:94,109,404-94,112,652', gene_name = 'IFI27') -> ifi27_atac.plt
 
-plot_big_wig_coverage(loci = 'chr12:112,978,011-112,986,730', gene_name = 'OAS2' , y_lab = 'norm.\nread depth') -> oas2_atac.plt
+plot_big_wig_coverage(loci = 'chr12:112,978,011-112,986,730', gene_name = 'OAS2') -> oas2_atac.plt
 
 plot_big_wig_coverage(loci = 'chr1:78,649,502-78,650,799', gene_name = 'IFI44') -> ifi44_atac.plt
 
 plot_big_wig_coverage(loci = 'chr21:41,418,539-41,427,685', gene_name = 'MX1') -> mx1_atac.plt
 
+# ifn_atac_layout <- "
+# ABC
+# DEF
+# "
+# 
+# p4 <- ggplot(data.frame(l = 'scaled read depth', x = 1, y = 1)) +
+#       geom_text(aes(x, y, label = l), angle = 90, size = txt.mm_to_pts(0.9)) + 
+#       theme_void() +
+#       coord_cartesian(clip = "off")
+#   
+# wrap_plots(irf9_atac.plt,
+#            irf7_atac.plt,
+#            ifi27_atac.plt,
+#            oas2_atac.plt,
+#            ifi44_atac.plt,
+#            mx1_atac.plt,
+#            design = ifn_atac_layout,
+#            widths = c(1, 1, 1)) -> ifn_atac_6.plt
+
+
+
 ifn_atac_layout <- "
-ABC
-DEF
+GABC
+GDEF
 "
 
 p4 <- ggplot(data.frame(l = 'scaled read depth', x = 1, y = 1)) +
@@ -2046,8 +2067,9 @@ wrap_plots(irf9_atac.plt,
            oas2_atac.plt,
            ifi44_atac.plt,
            mx1_atac.plt,
+           p4,
            design = ifn_atac_layout,
-           widths = c(1, 1, 1)) -> ifn_atac_6.plt
+           widths = c(0.1, 1, 1, 1)) -> ifn_atac_6.plt
 
 
 ```
@@ -2270,7 +2292,8 @@ aale_ifn_chm_rowOrder <- ComplexHeatmap::row_order(ComplexHeatmap::draw(aale_ifn
 
 ifn_high_hm_zoom <- aale_ifn_chm[aale_ifn_chm_rowOrder[1:18], ]
 
-aale_ifn_chm_no_rownames <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = F, split_vector = 2, split_title = "cluster_%s")
+aale_ifn_chm_no_rownames <- plot_complex_heatmap(unique_peak_aale_ifn_list, 
+                                                 show_genes = F, split_vector = 2, split_title = "cluster_%s")
 aale_ifn_chm_no_rownames
 ```
 ## patchwork
@@ -2482,88 +2505,24 @@ salmon.quant$aale$intra$deseq$de %>%
   theme(legend.position = c(0.3, 0.99)) -> plt_2B.plt
 
 
-base::do.call(rbind, tb) %>% 
-  group_by(Ontology) %>% 
-  top_n(30, -HyperFdrQ) %>%
+base::do.call(rbind, tb) %>%
+  group_by(Ontology) %>%
+  top_n(30, -HyperFdrQ) %>% 
   filter(HyperFdrQ < 0.05,
-         NumFgGenesHit > 1, 
+         NumFgGenesHit > 1,
          grepl('interferon|virus|RNA|oligo|^ex', Desc),
-         !grepl('part', Desc)) %>% 
-  ggplot(aes(-log10(HyperFdrQ), FgRegionsHit, label = Desc)) + 
-  geom_point() +
-  geom_text_repel(size = txt.mm_to_pts(0.8), show.legend = F) +
-  ggforce::facet_row(~Ontology) +
-  ylab('observed regions') -> plt_2D.plt
-
-
-# base::do.call(rbind, tb) %>% 
-#   group_by(Ontology) %>% 
-#   top_n(30, -HyperFdrQ) %>%
-#   filter(HyperFdrQ < 0.05,
-#          NumFgGenesHit > 1, 
-#          Ontology == 'GO Cellular Component',
-#          grepl('interferon|virus|dsRNA|oligo|^ex', Desc),
-#          !grepl('part', Desc)) %>% 
-#   # mutate(Desc = str_replace_all(Desc, ' ', '\n')) %>% 
-#   ggplot(aes(-log10(HyperFdrQ), reorder(Desc, -HyperFdrQ), label = Desc)) + 
-#   geom_point(size = 4) +
-#   geom_segment(aes(x=0, xend = -log10(HyperFdrQ), y=Desc, yend=Desc)) +
-#   geom_text(aes(label = Desc, 
-#             x = 3), 
-#             nudge_y = 0.5, 
-#             color = 'black', 
-#             size = txt.mm_to_pts(0.8)) + 
-#   theme(axis.text.y = element_blank(),
-#         axis.ticks.y = element_blank(),
-#         plot.title = element_text(size = rel(0.7), face = 'plain')) +
-#   # ylab('') +
-#   ylab('GO Cellular Component') -> plt_2D.plt
-# 
-# base::do.call(rbind, tb) %>% 
-#   group_by(Ontology) %>% 
-#   top_n(30, -HyperFdrQ) %>%
-#   filter(HyperFdrQ < 0.05,
-#          NumFgGenesHit > 1, 
-#          Ontology == 'GO Molecular Function',
-#          grepl('oligo|RNA', Desc),
-#          !grepl('part', Desc)) %>% 
-#   mutate(Desc = str_replace_all(Desc, ' ', '\n')) %>%
-#   ggplot(aes(-log10(HyperFdrQ), reorder(Desc, -HyperFdrQ), label = Desc)) + 
-#   geom_point(size = 4) +
-#   geom_segment(aes(x=0, xend = -log10(HyperFdrQ), y=Desc, yend=Desc)) +
-#   geom_text(aes(label = Desc, 
-#             x = -log10(HyperFdrQ) - 2), 
-#             nudge_y = 0.25, 
-#             color = 'black', 
-#             size = txt.mm_to_pts(0.8)) + 
-#   theme(axis.text.y = element_blank(),
-#         axis.ticks.y = element_blank(),
-#         plot.title = element_text(size = rel(0.7), face = 'plain')) +
-#   # ylab('') +
-#   ylab('GO Molecular Function') -> plt_2E.plt
-# 
-# base::do.call(rbind, tb) %>% 
-#   group_by(Ontology) %>% 
-#   top_n(30, -HyperFdrQ) %>%
-#   filter(HyperFdrQ < 0.05,
-#          NumFgGenesHit > 1, 
-#          Ontology == 'GO Biological Process',
-#          grepl('interferon|virus', Desc)) %>% 
-#   mutate(Desc = str_replace_all(Desc, 'pathway', '')) %>%
-#   ggplot(aes(-log10(HyperFdrQ), reorder(Desc, -HyperFdrQ), label = Desc)) + 
-#   geom_point(size = 4) +
-#   geom_segment(aes(x=0, xend = -log10(HyperFdrQ), y=Desc, yend=Desc)) +
-#   geom_text(aes(label = Desc, 
-#             x = -log10(HyperFdrQ) - 7), 
-#             nudge_y = 0.25, 
-#             color = 'black', 
-#             size = txt.mm_to_pts(0.8)) + 
-#   theme(axis.text.y = element_blank(),
-#         axis.ticks.y = element_blank(),
-#         plot.title = element_text(size = rel(0.7), face = 'plain')) +
-#   # ylab('') +
-#   ylab('GO Biological Process') -> plt_S2F.plt
-
+         !grepl('part|poly', Desc)) %>%
+  ggplot(aes(log2(RegionFoldEnrich), reorder(Desc, RegionFoldEnrich), label = Desc, color = -log10(HyperFdrQ))) +
+  geom_point(aes(size = NumFgGenesHit)) +
+  geom_text_repel(aes(label = Desc), 
+                size = txt.mm_to_pts(0.8), show.legend = F, point.padding = unit(2, 'mm'), color = 'black') + 
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        plot.title = element_text(size = rel(0.7), face = 'plain'),
+        legend.position = c(0.99,0.35), legend.direction = 'horizontal') +
+  scale_x_continuous() +
+  ylab('GO Term') + xlab('log2(FoldEnrichment)') +
+  scale_color_viridis_c() -> plt_2D.plt
 
 
 fig_2_patch <- "
@@ -2572,14 +2531,13 @@ CC
 DD
 "
 
-wrap_plots(plt_2A.plt + labs(tag = 'A'),
-           plt_2B.plt + labs(tag = 'B'),
-           ifn_atac_6.plt,
-           plt_2D.plt + labs(tag = 'D'),
-           # plt_2E.plt + labs(tag = 'E'),
-           # plt_S2F.plt + labs(tag = 'F'),
-           heights = c(1,1.5,0.50),
-           design = fig_2_patch) -> figure_2_patchwork.fig
+wrap_plots(plt_2A.plt,
+           plt_2B.plt,
+           wrap_elements(full = ifn_atac_6.plt),
+           plt_2D.plt,
+           heights = c(0.75,1.5,0.75),
+           design = fig_2_patch) +
+  plot_annotation(tag_levels = 'A') -> figure_2_patchwork.fig
 
 
 ggsave(plot = figure_2_patchwork.fig,
@@ -2590,51 +2548,103 @@ ggsave(plot = figure_2_patchwork.fig,
 ```
 ## Figure S2
 ```{r}
-base::do.call(rbind, tb) %>% 
-  group_by(Ontology) %>% 
-  top_n(30, -HyperFdrQ) %>%
-  filter(HyperFdrQ < 0.05,
-         NumFgGenesHit > 1, 
-         Ontology == 'GO Biological Process',
-         grepl('interferon|virus', Desc)) %>% 
-  mutate(Desc = str_replace_all(Desc, ' ', '\n')) %>% 
-  ggplot(aes(-log10(HyperFdrQ), reorder(Desc, -HyperFdrQ), label = Desc)) + 
-  geom_point(size = 4) +
-  geom_segment(aes(x=0, xend = -log10(HyperFdrQ), y=Desc, yend=Desc)) +
-  geom_text(aes(label = NumFgGenesHit, 
-              x = -log10(HyperFdrQ) - 0.75), 
-          nudge_y = 0.15, 
-          color = 'black', 
-          size = txt.mm_to_pts(0.8)) +
-  ylab('') +
-  ggtitle('GO Biological Process') -> plt_S2A.plt
 
-salmon.quant$aale$intra$deseq$counts %>% 
-  filter(grepl('^IFN', gene)) %>% 
+salmon.quant$aale$intra$deseq$counts %>%
+  filter(grepl('^IFN', gene),
+         !grepl('P', gene)) %>% 
   select(gene, contains('.')) %>% 
-  gather(names, counts, -gene) %>% 
-  merge(salmon.quant$aale$intra$deseq$col.data, by = 'names') %>% 
-  ggplot(aes(reorder(gene, counts), counts, color = condition)) + 
-  scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
-  geom_boxplot(fill = NA) + 
-  coord_flip() + 
-  theme(legend.position = c(0.99, 0.15)) + 
-  xlab('') -> plt_S2B.plt
+  gather(sample, count, -gene) %>% 
+  mutate(count = scale(log1p(count), center = T)) %>%
+  select(sample, gene, count) %>%
+  pivot_wider(names_from = gene, values_from = count) %>%
+  distinct() %>% 
+  column_to_rownames('sample') %>% 
+  t() -> IFN_hm_counts
+
+IFN_hm_counts %>% 
+  colnames() %>% 
+  as.data.frame() %>% 
+  rename('.' = 'sample') %>% 
+  mutate(condition = ifelse(grepl('ctrl', sample), 'ctrl', 'kras')) %>% 
+  column_to_rownames('sample') %>% 
+  ComplexHeatmap::columnAnnotation(df = . , 
+                                   col = list(condition = c('ctrl' = viridis(3)[1], 
+                                                            'kras' = viridis(3)[2])),
+                                    show_legend = T,
+                                    annotation_legend_param = list(condition = 
+                                                                     list(nrow = 1, title_position = 'lefttop',
+                                                                          title_gp = grid::gpar(fontsize = 7, face = 'bold'))),
+                                    annotation_name_gp = grid::gpar(fontsize = 8),
+                                    simple_anno_size = unit(4.5, "mm")) -> IFN_sample_anno
+
+IFN_hm_counts %>% 
+  rownames() %>% 
+  as.data.frame() %>% 
+  rename('.' = 'gene') %>% 
+  merge(salmon.quant$aale$intra$deseq$de %>% select(gene, log2FoldChange), by = 'gene', all.x = T) %>% 
+  column_to_rownames('gene') -> IFN_de
+  
+IFN_de[order(match(rownames(IFN_de), rownames(IFN_hm_counts))), , drop =F] -> IFN_de
+  
+toil_de_list <- setNames(IFN_de$log2FoldChange, rownames(IFN_de))
+  
+ComplexHeatmap::rowAnnotation(
+  `AALE log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
+      bar_width = 1, 
+      which = 'row',
+      gp = grid::gpar(col = "black", fill = viridis(3)[2]), 
+      border = FALSE,
+      annotation_name_gp = grid::gpar(fontsize = 8),
+      width = unit(1.25, "cm"),
+      height = unit(0.75, "cm")), 
+  show_annotation_name = TRUE,
+  annotation_name_gp = grid::gpar(fontsize = 8)) -> log2fc_ha
+
+ComplexHeatmap::Heatmap(IFN_hm_counts, 
+                      name = 'z-score', 
+                      show_row_names = T,
+                      row_dend_side = 'left',
+                      show_column_names = F,
+                      row_split = NULL,
+                      row_title = NULL,
+                      row_title_gp = grid::gpar(fontsize = 7, face = 'bold'),
+                      row_names_side = 'right',
+                      row_dend_width = unit(3, 'mm'),
+                      top_annotation = IFN_sample_anno,
+                      right_annotation = log2fc_ha,
+                      # top_annotation = toil_sample_anno,
+                      heatmap_legend_param = 
+                        list(labels_gp = grid::gpar(fontsize = 7),
+                             legend_gp = grid::gpar(fontsize = 7),
+                             legend_direction = 'vertical',
+                             legend_height = unit(3.5, "cm"),
+                             title_gp = grid::gpar(fontsize = 7, face = 'bold')),
+                      row_names_gp = grid::gpar(fontsize = 7),
+                      heatmap_width = patch_fig_width*0.375) -> IFN_expression_hm.plt
 
 plot_big_wig_coverage(loci = 'chr19:39,294,877-39,297,773', 
-                      gene_name = 'IFNL1', y_lab = 'norm.\nread depth', lab_tag = 'C') -> ifnl1_atac.plt
+                      gene_name = 'IFNL1', y_lab = 'scaled read depth') -> plt_S2A.plt
 
 fig_S2_patch <- "
 AB
 CB
-DB
+DD
 "
 
-wrap_plots(plt_S2A.plt,
-           plt_S2B.plt,
-           ifnl1_atac.plt,
+
+
+wrap_plots(wrap_elements(full = plt_S2A.plt),
+           patchwork::wrap_elements(full = grid::grid.grabExpr(ComplexHeatmap::draw(IFN_expression_hm.plt,
+                                                                         heatmap_legend_side = 'right',
+                                                                         annotation_legend_side = 'top'), 
+                                                                         width = patch_fig_width*0.375)),
            patchwork::plot_spacer(),
-           design = fig_S2_patch) -> figure_S2_patchwork.fig
+           patchwork::plot_spacer(),
+           widths = c(1, 1),
+           design = fig_S2_patch) +
+  plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = rel(0.95), face = 'bold'),
+        plot.tag.position = c(0.01, 0.99)) -> figure_S2_patchwork.fig
 
 
 ggsave(plot = figure_S2_patchwork.fig,
@@ -2745,7 +2755,9 @@ EF
 wrap_plots(plt_3A.plt,
            plt_3B.plt,
            plt_3C.plt,
-           plt_3D.plt,
+           wrap_elements(full = plt_3D.plt),
+           plot_spacer(),
+           plot_spacer(),
            design = fig_3_patch) + 
   plot_annotation(tag_levels = 'A')  -> figure_3_patchwork.fig
 
