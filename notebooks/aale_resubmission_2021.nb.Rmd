@@ -2831,12 +2831,13 @@ salmon.quant$aale$exo$deseq$pca$pca.out %>%
     geom_point(size = rel(2)) + 
     scale_size_continuous(range = c(0.1, 2.5), breaks = c(0,5,10,15,20)) + 
     xlab(paste('PC1', round(cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[1], digits = 3), sep = ' ')) +
-    ylab(paste('PC2', round(cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[2] - cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[1],
+    ylab(paste('PC2', round(cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[2] - 
+                              cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[1],
                             digits = 3), sep = ' ')) +
     scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
     geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
     geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) + 
-    theme(legend.position = c(0.99, 0.25),
+    theme(legend.position = c(0.99, 0.30),
             legend.key.width = unit(0.125,'cm'),
             legend.key.height = unit(0.4, 'cm')) -> plt_S3A.plt
 
@@ -2849,10 +2850,17 @@ ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>%
   separate(sample, sep = '[.]', into = c(NA, NA, NA, 'condition')) %>%
   ggplot(aes(condition, log1p(count))) + 
   geom_boxplot(outlier.colour = NA, fill = NA) +
-  geom_jitter(alpha = 0.2, color = 'black') + 
-  facet_col(~clade) +
-  scale_y_continuous(limits = c(0,17)) +
-  stat_compare_means(method = 'wilcox', label = 'p.format', label.y = 15) -> plt_S3B.plt
+  geom_jitter(alpha = 0.1, color = 'black', width = 0.15) + 
+  facet_col(~clade, scales = 'free_y') +
+  # scale_y_continuous(limits = c(0,13)) +
+  stat_compare_means(method = 'wilcox', 
+                     label = 'p.format', 
+                     # label.y = 2, 
+                     # label.x = 0.5,
+                     method.args = list(alternative = 'greater'),
+                     ref.group = 'ctrl') + 
+  theme(strip.placement = 'inside') + 
+  coord_cartesian(clip = 'off')-> plt_S3B.plt
 
 
 ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>% 
@@ -2869,15 +2877,15 @@ ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>%
   group_by(sample) %>% 
   mutate(frac = clade_counts/sum(clade_counts)) %>% 
   mutate(clade = factor(clade, levels = c('DNA', "LINE",'LTR', 'Satellite', 'SINE', 'lncRNA', 'coding'))) %>% 
-  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'lncRNA')) %>%
-  ggplot(aes(sample, frac, fill = clade)) + 
-  geom_col() + 
-  geom_hline(yintercept = seq(0,1,0.25), color = 'white', alpha = 0.6) +
-  scale_fill_viridis_d(direction = -1) + 
-  facet_col(~condition, scales = 'free_x') + 
-  xlab('') + 
-  ylab('fraction of norm. counts') + 
-  ggtitle('extracellular') + 
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'coding', 'lncRNA')) %>% 
+  ggplot(aes(sample, frac, fill = clade)) +
+  geom_col(color = 'white') +
+  # geom_hline(yintercept = seq(0,1,0.25), color = 'white', alpha = 0.6) +
+  scale_fill_viridis_d(direction = -1) +
+  facet_col(~condition, scales = 'free_x') +
+  xlab('') +
+  ylab('fraction of norm. counts') +
+  ggtitle('extracellular') +
   theme(legend.position = 'top', legend.justification = 'center') -> plt_S3C.plt
 
 ucsc.rmsk.salmon.quant$aale$intra$deseq$counts %>% 
@@ -2894,20 +2902,34 @@ ucsc.rmsk.salmon.quant$aale$intra$deseq$counts %>%
   group_by(sample) %>% 
   mutate(frac = clade_counts/sum(clade_counts)) %>% 
   mutate(clade = factor(clade, levels = c('DNA', "LINE",'LTR', 'Satellite', 'SINE', 'lncRNA', 'coding'))) %>% 
-  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'lncRNA')) %>%
-  ggplot(aes(sample, frac, fill = clade)) + 
-  geom_col() + 
-  # geom_hline(yintercept = seq(0,,0.25), color = 'white', alpha = 0.6) +
-  scale_fill_viridis_d(direction = -1) + 
-  facet_col(~condition, scales = 'free_x') + 
-  xlab('') + 
-  ylab('fraction of norm. counts') + 
-  ggtitle('intracellular') + 
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'coding', 'lncRNA')) %>% 
+  ggplot(aes(sample, frac, fill = clade)) +
+  geom_col(color = 'white') +
+  # geom_hline(yintercept = seq(0,1,0.25), color = 'white', alpha = 0.6) +
+  scale_fill_viridis_d(direction = -1) +
+  facet_col(~condition, scales = 'free_x') +
+  xlab('') +
+  ylab('fraction of norm. counts') +
+  ggtitle('intracellular') +
   theme(legend.position = 'top', legend.justification = 'center') -> plt_S3D.plt
+
+# exo_biotype.df %>% 
+#   mutate(context = 'extracellular') %>% 
+#   rbind(intra_biotype.df %>% 
+#           mutate(context = 'intracellular')) %>% 
+#   ggplot(aes(context, frac, color = condition)) + 
+#   geom_boxplot(outlier.colour = NA, fill = NA) + 
+#   # geom_jitter(alpha = 0.6, width = 1) + 
+#   facet_wrap(~clade, scales = 'free_y', ncol = 2) + 
+#   xlab('') + ylab('fraction of norm. counts') + 
+#   # stat_compare_means(method = 'wilcox', comparisons = list(c('intracellular', 'extracellular'))) +
+#   scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) + 
+#   theme(legend.position = c(0.99, 0.15)) -> plt_S3B.plt
+
 
 fig_S3_patch <- "
 AB
-#B
+AB
 DC
 "
 
@@ -2923,6 +2945,11 @@ ggsave(plot = figure_S3_patchwork.fig,
        filename = file.path(figure.dir, 'fig.3', 'figure_S3_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
+
+```
+
+# Figure 4
+```{r}
 
 ```
 
