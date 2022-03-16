@@ -2233,7 +2233,7 @@ plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = N
     `AALE log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
         bar_width = 1, 
         which = 'row',
-        gp = grid::gpar(col = "black", fill = "white"), 
+        gp = grid::gpar(col = "black", fill = viridis(3)[2]), 
         border = FALSE,
         annotation_name_gp = grid::gpar(fontsize = 8),
         width = unit(1.25, "cm"),
@@ -2281,20 +2281,39 @@ plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = N
   
 }
 
+consensus_atac_boolean_anno %>% 
+  filter(ctrl_R1.mLb.clN.bool == F) %>% 
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+  # filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>%
+  # group_by(annotation) %>%
+  group_by(`Gene Name`) %>%
+  tally() -> aale_uniq_up
+
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, log2FoldChange > 1.5, gene %in% c(ifn_a, ifn_g)) -> aale_ifn
 
-unique_peak_aale_ifn_list <- unique(c(uniq_kras_peak_genes$`Gene Name`, aale_ifn$gene))
+unique_peak_aale_ifn_list <- unique(c(aale_uniq_up$`Gene Name`, aale_ifn$gene))
+
+aale_ifn_chm <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = T, split_vector = 2, split_title = "cluster_%s")
+
+# aale_ifn_chm
+
+aale_ifn_chm_no_rownames <- aale_ifn_chm
+aale_ifn_chm_no_rownames@row_names_param$show <- FALSE
+
+split_rowOrder <- ComplexHeatmap::row_order(ComplexHeatmap::draw(aale_ifn_chm_no_rownames))
 
 aale_ifn_chm <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = T)
+# aale_ifn_chm
 
 aale_ifn_chm_rowOrder <- ComplexHeatmap::row_order(ComplexHeatmap::draw(aale_ifn_chm))
 
-ifn_high_hm_zoom <- aale_ifn_chm[aale_ifn_chm_rowOrder[1:18], ]
+ifn_high_hm_zoom <- aale_ifn_chm[split_rowOrder[[1]], ]
 
-aale_ifn_chm_no_rownames <- plot_complex_heatmap(unique_peak_aale_ifn_list, 
-                                                 show_genes = F, split_vector = 2, split_title = "cluster_%s")
-aale_ifn_chm_no_rownames
+# ifn_high_hm_zoom
+
 ```
 ## patchwork
 ```{r}
@@ -2329,7 +2348,7 @@ salmon.quant$aale$intra$deseq$H.fgsea %>%
          NES = round(NES, 3)) %>% 
   # arrange(-NES, padj) %>% 
   filter(!grepl('ZNF', pathway)) %>% 
-  ggplot(aes(NES, rank, color = padj)) + 
+  ggplot(aes(NES, rank, color = -log10(padj))) + 
   geom_point(size = 4) +
   geom_segment(aes(x=0, xend=NES, y=rank, yend=rank)) +
   geom_text(aes(label = paste0(observed, '/', size), 
@@ -2342,10 +2361,10 @@ salmon.quant$aale$intra$deseq$H.fgsea %>%
               nudge_y = 0.05, 
               color = 'black', 
               size = txt.mm_to_pts(0.8)) + 
-  scale_color_gsea(reverse = T) +
+  scale_color_viridis_c() +
   ylab('gene set') + 
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
-  theme(legend.position = c(0.95, 0.17),
+  theme(legend.position = c(0.99, 0.17),
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank()) -> plt_1B.plt
 
@@ -2730,12 +2749,12 @@ salmon.quant$aale$exo$deseq$de %>%
 
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, abs(log2FoldChange) > 0.5) %>% 
-  mutate(context = ifelse(log2FoldChange > 0, 'INTRA_up', 'INTRA_dn')) %>% 
+  mutate(context = ifelse(log2FoldChange > 0, 'intra_up', 'intra_dn')) %>% 
   select(gene, context) %>% 
   rbind(
     salmon.quant$aale$exo$deseq$de %>% 
     filter(padj < 0.05, abs(log2FoldChange) > 0.5) %>% 
-    mutate(context = ifelse(log2FoldChange > 0, 'EXO_up', 'EXO_dn')) %>% 
+    mutate(context = ifelse(log2FoldChange > 0, 'ex_up', 'ex_dn')) %>% 
     select(gene, context)
     ) %>% 
   group_by(gene) %>% 
@@ -2743,7 +2762,7 @@ salmon.quant$aale$intra$deseq$de %>%
   ggplot(aes(contexts)) + 
   geom_bar() + 
   ggupset::scale_x_upset() +
-  geom_text(stat='count', aes(label=after_stat(count)), vjust = -0.5, size = txt.mm_to_pts(0.8)) +
+  geom_text(stat='count', aes(label=after_stat(count)), vjust = -0.23, size = txt.mm_to_pts(0.8)) +
   xlab('') + ylab('overlapping genes') -> plt_3D.plt
 
 salmon.quant$aale$exo$deseq$H.fgsea %>% 
@@ -2759,10 +2778,10 @@ salmon.quant$aale$exo$deseq$H.fgsea %>%
          observed = length(unlist(leadingEdge)),
          NES = round(NES, 3)) %>% 
   filter(!grepl('ZNF', pathway)) %>% 
-  ggplot(aes(NES, context, color = padj)) + 
+  ggplot(aes(NES, context, color = -log10(padj))) + 
   geom_point(size = 4) +
   geom_segment(aes(x=0, xend=NES, y=context, yend=context)) +
-  scale_color_gsea(reverse = T) +
+  scale_color_viridis_c() +
   ylab('context') + 
   ggforce::facet_col(~pathway, scales = 'free_y') +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
@@ -2800,6 +2819,110 @@ wrap_plots(plt_3A.plt,
 ggsave(plot = figure_3_patchwork.fig,
        filename = file.path(figure.dir, 'fig.3', 'figure_3_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+```
+## Figure S3
+```{r}
+salmon.quant$aale$exo$deseq$pca$pca.out %>% 
+  rownames_to_column('sample') %>% 
+  ggplot(aes(PC1, PC2,
+             fill = condition,
+             color = condition)) + 
+    geom_point(size = rel(2)) + 
+    scale_size_continuous(range = c(0.1, 2.5), breaks = c(0,5,10,15,20)) + 
+    xlab(paste('PC1', round(cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[1], digits = 3), sep = ' ')) +
+    ylab(paste('PC2', round(cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[2] - cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[1],
+                            digits = 3), sep = ' ')) +
+    scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+    geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
+    geom_hline(yintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) + 
+    theme(legend.position = c(0.99, 0.25),
+            legend.key.width = unit(0.125,'cm'),
+            legend.key.height = unit(0.4, 'cm')) -> plt_S3A.plt
+
+ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>% 
+  filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
+  merge(meta.data$te.families.clades, by = 'gene') %>%
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite')) %>% 
+  mutate(clade = factor(clade, levels = c('DNA', 'LINE', 'LTR', 'Satellite', 'SINE'))) %>% 
+  gather(sample, count, -gene, -clade, -family) %>% 
+  separate(sample, sep = '[.]', into = c(NA, NA, NA, 'condition')) %>%
+  ggplot(aes(condition, log1p(count))) + 
+  geom_boxplot(outlier.colour = NA, fill = NA) +
+  geom_jitter(alpha = 0.2, color = 'black') + 
+  facet_col(~clade) +
+  scale_y_continuous(limits = c(0,17)) +
+  stat_compare_means(method = 'wilcox', label = 'p.format', label.y = 15) -> plt_S3B.plt
+
+
+ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>% 
+  # filter(gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
+  merge(meta.data$te.families.clades, by = 'gene', all.x = T) %>% 
+  mutate(clade = ifelse(is.na(clade), 'coding', clade),
+         clade = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', clade)) %>% 
+  gather(sample, count, -family, -clade, -gene) %>% 
+  filter(!grepl('^MT|^RP', gene)) %>% 
+  mutate(condition = ifelse(grepl('ctrl', sample), 'ctrl', 'kras'),
+         sample = str_replace(sample, 'rnaEASY.aale.', '')) %>% 
+  group_by(sample, condition, clade) %>% 
+  summarize(clade_counts = sum(count)) %>% 
+  group_by(sample) %>% 
+  mutate(frac = clade_counts/sum(clade_counts)) %>% 
+  mutate(clade = factor(clade, levels = c('DNA', "LINE",'LTR', 'Satellite', 'SINE', 'lncRNA', 'coding'))) %>% 
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'lncRNA')) %>%
+  ggplot(aes(sample, frac, fill = clade)) + 
+  geom_col() + 
+  geom_hline(yintercept = seq(0,1,0.25), color = 'white', alpha = 0.6) +
+  scale_fill_viridis_d(direction = -1) + 
+  facet_col(~condition, scales = 'free_x') + 
+  xlab('') + 
+  ylab('fraction of norm. counts') + 
+  ggtitle('extracellular') + 
+  theme(legend.position = 'top', legend.justification = 'center') -> plt_S3C.plt
+
+ucsc.rmsk.salmon.quant$aale$intra$deseq$counts %>% 
+  # filter(gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
+  merge(meta.data$te.families.clades, by = 'gene', all.x = T) %>% 
+  mutate(clade = ifelse(is.na(clade), 'coding', clade),
+         clade = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', clade)) %>% 
+  gather(sample, count, -family, -clade, -gene) %>% 
+  filter(!grepl('^MT|^RP', gene)) %>% 
+  mutate(condition = ifelse(grepl('ctrl', sample), 'ctrl', 'kras'),
+         sample = str_replace(sample, 'rnaEASY.aale.', '')) %>% 
+  group_by(sample, condition, clade) %>% 
+  summarize(clade_counts = sum(count)) %>% 
+  group_by(sample) %>% 
+  mutate(frac = clade_counts/sum(clade_counts)) %>% 
+  mutate(clade = factor(clade, levels = c('DNA', "LINE",'LTR', 'Satellite', 'SINE', 'lncRNA', 'coding'))) %>% 
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'lncRNA')) %>%
+  ggplot(aes(sample, frac, fill = clade)) + 
+  geom_col() + 
+  # geom_hline(yintercept = seq(0,,0.25), color = 'white', alpha = 0.6) +
+  scale_fill_viridis_d(direction = -1) + 
+  facet_col(~condition, scales = 'free_x') + 
+  xlab('') + 
+  ylab('fraction of norm. counts') + 
+  ggtitle('intracellular') + 
+  theme(legend.position = 'top', legend.justification = 'center') -> plt_S3D.plt
+
+fig_S3_patch <- "
+AB
+#B
+DC
+"
+
+wrap_plots(plt_S3A.plt,
+           plt_S3B.plt,
+           plt_S3C.plt,
+           plt_S3D.plt,
+           design = fig_S3_patch) + 
+  plot_annotation(tag_levels = 'A')  -> figure_S3_patchwork.fig
+
+
+ggsave(plot = figure_S3_patchwork.fig,
+       filename = file.path(figure.dir, 'fig.3', 'figure_S3_patchwork.pdf'),
+       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
 
 ```
 
@@ -3003,12 +3126,13 @@ panel.save(figure = 3, name = 'exo_nanosight_dist', width = 'single', height = '
 ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>% 
   filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
   merge(meta.data$te.families.clades, by = 'gene') %>%
-  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR')) %>% 
+  filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite')) %>% 
+  mutate(clade = factor(clade, levels = c('DNA', 'LINE', 'LTR', 'Satellite', 'SINE'))) %>% 
   gather(sample, count, -gene, -clade, -family) %>% 
   separate(sample, sep = '[.]', into = c(NA, NA, NA, 'condition')) %>%
   ggplot(aes(condition, log1p(count))) + 
   geom_boxplot(outlier.colour = NA, fill = NA) +
-  geom_jitter(alpha = 0.2) + 
+  geom_jitter(alpha = 0.2, color = 'black') + 
   facet_wrap(~clade) +
   stat_compare_means(method = 'wilcox', label = 'p.format')
   
@@ -3166,7 +3290,7 @@ ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>%
   summarize(clade_counts = sum(count)) %>% 
   group_by(sample) %>% 
   mutate(frac = clade_counts/sum(clade_counts)) %>% 
-  mutate(clade = factor(clade, levels = c('SINE', "LINE",'DNA', 'LTR', 'Satellite', 'lncRNA', 'coding'))) %>% 
+  mutate(clade = factor(clade, levels = c('DNA', "LINE",'LTR', 'Satellite', 'SINE', 'lncRNA', 'coding'))) %>% 
   filter(clade %in% c('DNA', "LINE",'SINE', 'LTR', 'Satellite', 'coding', 'lncRNA')) %>%
   ggplot(aes(sample, frac, fill = clade)) + 
   geom_col() + 
