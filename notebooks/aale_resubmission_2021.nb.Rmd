@@ -2929,8 +2929,8 @@ EF
 "
 
 wrap_plots(plt_3A.plt,
-           plt_3B.plt,
            plt_3C.plt,
+           plt_3B.plt,
            wrap_elements(full = plt_3D.plt),
            plt_3E.plt,
            plt_3F.plt,
