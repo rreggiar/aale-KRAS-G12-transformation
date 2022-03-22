@@ -2351,7 +2351,7 @@ plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = N
   toil_de_list <- setNames(toil_de$log2FoldChange, rownames(toil_de))
   
   ComplexHeatmap::rowAnnotation(
-    `AALE log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
+    `AALE RNA log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
         bar_width = 1, 
         which = 'row',
         gp = grid::gpar(col = "black", fill = viridis(3)[2]), 
@@ -2556,7 +2556,8 @@ salmon.quant$aale$intra$deseq$de %>%
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 |
                                                 -log10(padj) > 250, gene, '')),
                            size = txt.mm_to_pts(0.8), segment.color = NA, force = 10, num.overlaps = 5) +
-  facet_col(~biotype, scales = 'free') -> plt_S1A.plt
+  facet_col(~biotype, scales = 'free') +
+  xlab('RNA log2FoldChange') -> plt_S1A.plt
 
 salmon.quant$aale$intra$deseq$pca$pca.out %>% 
   rownames_to_column('sample') %>% 
@@ -2590,9 +2591,10 @@ salmon.quant$hbec$lacz_v_v12$deseq$de %>%
   geom_point(alpha = 0.6, shape = 24) + 
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
                                                 padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, '')),
-                           size = txt.mm_to_pts(0.8)) +
+                           size = txt.mm_to_pts(0.8), segment.color = NA) +
   facet_col(~gene_set, scales = 'free_y') +
   scale_color_manual(values = c('black', 'red'), guide = 'none') +
+  xlab('RNA log2FoldChange') +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_S1C.plt
 
 
@@ -2863,7 +2865,7 @@ salmon.quant$aale$exo$deseq$de %>%
   annotate(geom = 'text', x = 2.35, y = -2, fontface = 'italic',
            label = paste0('y', ' ', ' = ',b,' + ',m,'x; \nadj. R2 = ', r2), 
            size = rel(3.75), alpha = 0.8) + 
-  ylab('intracellular log2FC') + xlab('extracellular log2FC') -> plt_3B.plt
+  ylab('intracellular RNA log2FC') + xlab('extracellular RNA log2FC') -> plt_3B.plt
 
 salmon.quant$aale$exo$deseq$de %>% 
   mutate(biotype = ifelse(gene %in% meta.data$gencode.35.lnc.gene.names$gene, 'lncRNA', 'coding')) %>%
@@ -2993,6 +2995,7 @@ ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>%
                      method.args = list(alternative = 'greater'),
                      ref.group = 'ctrl') + 
   theme(strip.placement = 'inside') + 
+  ylab('log(norm. count + 1)') +
   coord_cartesian(clip = 'off')-> plt_S3B.plt
 
 
@@ -3199,6 +3202,7 @@ intra.aale.te_ranges_list$znf_plts$de_list %>%
                                max.overlaps = 20, size = txt.mm_to_pts(0.8)) + 
   theme(legend.position = c(0.99,0.99)) +
   facet_col(~clade) +
+  xlab('RNA log2FoldChange') +
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
   ggtitle('AALE in. DE ZNFs targeting TE clades') -> plt_S4A.plt
 
@@ -3215,6 +3219,7 @@ exo.aale.te_ranges_list$znf_plts$de_list %>%
                                max.overlaps = 20, size = txt.mm_to_pts(0.8)) + 
   theme(legend.position = c(0.99,0.99)) +
   facet_col(~clade) +
+  xlab('RNA log2FoldChange') +
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
   ggtitle('AALE ex. DE ZNFs targeting TE clades') -> plt_S4B.plt
 
@@ -3231,6 +3236,7 @@ hbec.aale.te_ranges_list$znf_plts$de_list %>%
                                max.overlaps = 20, size = txt.mm_to_pts(0.8)) + 
   theme(legend.position = c(0.99,0.99)) +
   facet_col(~clade) +
+  xlab('RNA log2FoldChange') +
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
   ggtitle('HBEC in. DE ZNFs targeting TE clades') -> plt_S4C.plt
 
@@ -3349,7 +3355,8 @@ salmon.quant$aale$intra$deseq$de %>%
   scale_color_manual(values = c('grey', 'black'), name = 'unique ATAC peak') +
   geom_text_repel(aes(label = ifelse(`unique peaks` == 'ZNF' | abs(log2FoldChange) > 4, gene, '')), 
                   size = txt.mm_to_pts(0.8), show.legend = F, max.overlaps = 30, segment.color = NA) + 
-  geom_vline(xintercept = c(0), alpha = c(0.3), linetype = 'dashed') + 
+  geom_vline(xintercept = c(0), alpha = c(0.3), linetype = 'dashed') +
+  xlab('RNA log2FoldChange') +
   theme(legend.position = c(0.40, 0.99)) -> plt_6B.plt
 
 salmon.quant$aale$intra$deseq$de %>% 
@@ -3453,7 +3460,7 @@ plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = N
   toil_de_list <- setNames(toil_de$log2FoldChange, rownames(toil_de))
   
   ComplexHeatmap::rowAnnotation(
-    `AALE log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
+    `AALE RNA log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
         bar_width = 1, 
         which = 'row',
         gp = grid::gpar(col = "black", fill = viridis(3)[2]), 
