@@ -1632,7 +1632,7 @@ te_tf_plots <- function(ame_tf_list, upreg_te_list, de_list) {
     mutate(gene_set = factor(gene_set, levels = c('KRAS', 'IFN', 'ZNF', 'other'))) %>% 
     ggplot(aes(log2FoldChange, -log10(padj), color = gene_set)) + 
     geom_point(alpha = 0.4) + 
-    scale_color_manual(values = c(viridis(4)[1], viridis(4)[2], viridis(4)[3], 'grey'), name = 'sig. diff. exp. TF classification') +
+    scale_color_manual(values = c(viridis(4)[1], viridis(4)[2], viridis(4)[3], 'grey'), name = 'TF classification') +
     ggrepel::geom_text_repel(aes(label = ifelse(gene_set != 'other' | TF == 'FOS' | abs(log2FoldChange) > 2, TF, '')), 
                                  show.legend = F,
                                  max.overlaps = 20, 
@@ -1694,11 +1694,11 @@ te_znf_plots <- function(ame_znf_list, upreg_te_list, de_list) {
   tmp %>% 
     filter(padj.x < 0.05) %>% 
     ggplot(aes(reorder(TE, -log2FoldChange.y), log2FoldChange.x, color = log2FoldChange.y)) + 
-    geom_boxplot(outlier.colour = NA, fill = NA, size = 0.5) +
+    # geom_boxplot(outlier.colour = NA, fill = NA, size = 0.5) +
     geom_point() +
     ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange.x < -2, TF, '')), size = txt.mm_to_pts(0.8), color = 'black') + 
-    ylab('log2FoldChange') + 
-    xlab('') + 
+    ylab('ZNF RNA log2FoldChange') + 
+    xlab('putatively bound TE') + 
     scale_color_viridis_c(guide = guide_colorbar(title = 'TE log2FC')) +
     theme(axis.text.x = element_text(angle = 40, hjust = 1)) +
     facet_row(~clade, scales = 'free_x', space = 'free') -> target_plot
@@ -1747,8 +1747,8 @@ te_znf_plots <- function(ame_znf_list, upreg_te_list, de_list) {
     ggrepel::geom_text_repel(show.legend = F, size = txt.mm_to_pts(0.8)) + 
     geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) +
     geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
-    scale_color_manual(values = te_alone_color_pal, name = 'Clade of diff. exp. TE targeted by diff. exp. ZNF') +
-    ylab('avg(ZNF expression)') +
+    scale_color_manual(values = te_alone_color_pal, name = 'TE Clade') +
+    ylab('avg(ZNF log2FoldChange)') +
     xlab('TE [with binding site] expression') +
     theme(legend.position = c(0.99,0.99)) -> scatter_plot
   
@@ -1804,7 +1804,7 @@ znf_score_plt <- function(gencode_de_list, te_de_list) {
     geom_point() +
     scale_color_viridis_c(name = 'znf log2FC') +
     ggrepel::geom_text_repel(aes(label = ifelse(rank < 12, gene, '')), size = txt.mm_to_pts(0.8)) +
-    xlab('') +
+    xlab('putatively bound TE') + ylab('binding score rank') +
     theme(legend.position = c(0.99,0.99),
           axis.text.x = element_text(angle = 40, hjust = 1)) +
     facet_row(~clade, scales = 'free_x', space = 'free')
@@ -2379,7 +2379,7 @@ plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = N
                                 simple_anno_size = unit(2, "mm")) -> gene_motif_anno
   
   ComplexHeatmap::Heatmap(toil_hm_counts, 
-                        name = 'z-score', 
+                        name = 'TCGA\nz-score', 
                         show_row_names = show_genes,
                         show_column_names = F,
                         row_split = split_vector,
@@ -2454,8 +2454,9 @@ salmon.quant$aale$intra$deseq$de %>%
   geom_point(alpha = 0.6) + 
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 & gene_set != 'other' | 
                                                 padj < 0.0001 & gene_set != 'other' | gene == "KRAS", gene, '')),
-                           size = txt.mm_to_pts(0.8)) +
+                           size = txt.mm_to_pts(0.8), segment.color = NA) +
   facet_col(~gene_set, scales = 'free_y') +
+  xlab('RNA log2FoldChange') +
   scale_color_manual(values = c('black', 'red'), guide = 'none') +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') -> plt_1A.plt
 
@@ -2483,7 +2484,7 @@ salmon.quant$aale$intra$deseq$H.fgsea %>%
               color = 'black', 
               size = txt.mm_to_pts(0.8)) + 
   scale_color_viridis_c() +
-  ylab('gene set') + 
+  ylab('gene set') + xlab('GSEA NES') +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
   theme(legend.position = c(0.99, 0.17),
         axis.ticks.y = element_blank(),
@@ -2499,7 +2500,7 @@ salmon.quant$aale$intra$deseq$de %>%
           mutate(HBEC = HBEC), by = 'gene') %>% 
   ggplot(aes(AALE, HBEC)) +
   geom_point() + 
-  xlab('AALE log2FC') + ylab('HBEC log2FC') +
+  xlab('AALE ISG RNA log2FC') + ylab('HBEC ISG RNA log2FC') +
   geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
   geom_text_repel(aes(label = ifelse(AALE > 1 & HBEC > 1, gene, '')), 
@@ -2512,6 +2513,7 @@ salmon.quant$aale$intra$deseq$de %>%
   geom_point() + 
   geom_text_repel(color = 'black', size = txt.mm_to_pts(0.8)) + 
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  xlab('ISG-binding TF RNA log2FC') +
   theme(legend.position = c(0.35, 0.79)) -> plt_1D.plt
 
 fig_1_patch <- "
@@ -2553,7 +2555,7 @@ salmon.quant$aale$intra$deseq$de %>%
   geom_point(alpha = 0.6) + 
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 5 |
                                                 -log10(padj) > 250, gene, '')),
-                           size = txt.mm_to_pts(0.8)) +
+                           size = txt.mm_to_pts(0.8), segment.color = NA, force = 10, num.overlaps = 5) +
   facet_col(~biotype, scales = 'free') -> plt_S1A.plt
 
 salmon.quant$aale$intra$deseq$pca$pca.out %>% 
@@ -2563,8 +2565,10 @@ salmon.quant$aale$intra$deseq$pca$pca.out %>%
              color = condition)) + 
     geom_point(size = rel(2)) + 
     scale_size_continuous(range = c(0.1, 2.5), breaks = c(0,5,10,15,20)) + 
-    xlab(paste('PC1', round(cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[1], digits = 3), sep = ' ')) +
-    ylab(paste('PC2', round(cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[2] - cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[1],
+    xlab(paste('AALE in. PC1', 
+               round(cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[1], digits = 3), sep = ' ')) +
+    ylab(paste('AALE in. PC2', round(cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[2] - 
+                                       cumsum(salmon.quant$aale$intra$deseq$pca$pcs.props)[1],
                             digits = 3), sep = ' ')) +
     scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
     geom_vline(xintercept = 0, linetype = 'dotted', alpha = 0.3, size = 0.25) +
@@ -2622,7 +2626,8 @@ ggsave(plot = figure_S1_patchwork.fig,
 
 # Figure 2
 ```{r}
-rbind(kras_de_prom_df, ctrl_de_prom_df) %>%
+rbind(kras_de_prom_df, ctrl_de_prom_df) %>% 
+  mutate(condition = toupper(condition)) %>% 
   ggplot(aes(position, cov, group = condition, color = condition)) +
     stat_summary(geom="ribbon", fun.data=mean_cl_boot, width=0.1, conf.int=0.95, 
                  fill='grey', alpha = 0.1, size = rel(0.05), show.legend = F)+
@@ -2633,18 +2638,17 @@ rbind(kras_de_prom_df, ctrl_de_prom_df) %>%
     xlim(-1000, 500) + 
     theme(legend.position = c(0.3, 0.99)) -> plt_2A.plt
 
-plt_2A.plt
-
 salmon.quant$aale$intra$deseq$de %>% 
   merge(uniq_kras_peak_genes, by.x = 'gene', by.y = 'Gene Name') %>% 
   mutate(`unique peaks` = ifelse(gene %in% c(ifn_a, ifn_g), 'ISG', 'other')) %>% 
   ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = `unique peaks`)) + 
   geom_point() +
-  scale_color_manual(values = c('black', 'grey')) +
+  scale_color_manual(values = c('black', 'grey'), name = 'unique ATAC peak') +
   geom_text_repel(aes(label = ifelse(`unique peaks` == 'ISG' | log2FoldChange > 6, gene, '')), 
-                  size = txt.mm_to_pts(0.8), show.legend = F) + 
+                  size = txt.mm_to_pts(0.8), show.legend = F, segment.color = NA) + 
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
-  theme(legend.position = c(0.3, 0.99)) -> plt_2B.plt
+  xlab('RNA log2FoldChange')+
+  theme(legend.position = c(0.40, 1)) -> plt_2B.plt
 
 
 base::do.call(rbind, uniq_kras_great_tb) %>%
@@ -2663,7 +2667,7 @@ base::do.call(rbind, uniq_kras_great_tb) %>%
         plot.title = element_text(size = rel(0.7), face = 'plain'),
         legend.position = c(0.99,0.35), legend.direction = 'horizontal') +
   scale_x_continuous() +
-  ylab('GO Term') + xlab('log2(FoldEnrichment)') +
+  ylab('GO Term') + xlab('ATAC region GREAT log2(FoldEnrichment)') +
   scale_color_viridis_c() -> plt_2D.plt
 
 
@@ -2811,7 +2815,8 @@ nano_sight %>%
   select(size, r1, r2, r3, condition) %>% 
   gather(rep, value, -condition, -size) %>% 
   filter(size <= 400) %>% 
-  mutate(value = value/1e6) %>% 
+  mutate(value = value/1e6,
+         condition = paste0(toupper(condition), ' EV')) %>% 
   group_by(size, condition) %>% 
   summarize(y = mean(value),
             ymin = mean(value) - sd(value),
@@ -2822,6 +2827,7 @@ nano_sight %>%
   scale_fill_manual(values = c(viridis(3)[1], viridis(3)[2]), guide = F) +
   stat_peaks(geom = 'text', span = 35, vjust = -0.5, y.label.fmt = '%#f') +
   facet_row(~condition) + 
+  coord_cartesian(clip = 'off') +
   ylab('1e6 particles per mL') + xlab('nm') -> plt_3A.plt
 
 salmon.quant$aale$exo$deseq$de %>% 
@@ -2851,7 +2857,7 @@ salmon.quant$aale$exo$deseq$de %>%
   geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
   geom_text_repel(aes(label = ifelse(abs(EXO_aale) > 1 & abs(INTRA_aale) > 1 | unique != 'none', gene, '')), 
-                  size = txt.mm_to_pts(0.8), show.legend = F) +
+                  size = txt.mm_to_pts(0.8), show.legend = F, segment.color = NA) +
   theme(legend.position = c(0.99, 0.23)) +
   geom_line(stat = 'smooth', method = 'lm', linetype = 'dashed', alpha = 0.8, color = 'purple') +
   annotate(geom = 'text', x = 2.35, y = -2, fontface = 'italic',
@@ -2868,11 +2874,12 @@ salmon.quant$aale$exo$deseq$de %>%
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1, gene, '')), size = txt.mm_to_pts(0.8),
                            show.legend = F) +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
-  theme(legend.position = c(0.99,0.85)) -> plt_3C.plt
+  xlab('ex. RNA log2FoldChange') +
+  theme(legend.position = c(0.25,0.99)) -> plt_3C.plt
 
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, abs(log2FoldChange) > 0.5) %>% 
-  mutate(context = ifelse(log2FoldChange > 0, 'intra_up', 'intra_dn')) %>% 
+  mutate(context = ifelse(log2FoldChange > 0, 'in_up', 'in_dn')) %>% 
   select(gene, context) %>% 
   rbind(
     salmon.quant$aale$exo$deseq$de %>% 
@@ -2885,8 +2892,9 @@ salmon.quant$aale$intra$deseq$de %>%
   ggplot(aes(contexts)) + 
   geom_bar() + 
   ggupset::scale_x_upset() +
-  geom_text(stat='count', aes(label=after_stat(count)), vjust = -0.23, size = txt.mm_to_pts(0.8)) +
-  xlab('') + ylab('overlapping genes') -> plt_3D.plt
+  geom_text(stat='count', aes(label=after_stat(count)), vjust = -0.05, size = txt.mm_to_pts(0.8)) +
+  xlab('') + ylab('overlapping DE genes') -> plt_3D.plt
+
 
 salmon.quant$aale$exo$deseq$H.fgsea %>% 
   filter(pathway %in% salmon.quant$aale$intra$deseq$H.fgsea$pathway) %>% 
@@ -2905,7 +2913,7 @@ salmon.quant$aale$exo$deseq$H.fgsea %>%
   geom_point(size = 4) +
   geom_segment(aes(x=0, xend=NES, y=context, yend=context)) +
   scale_color_viridis_c() +
-  ylab('context') + 
+  ylab('context') + xlab('GSEA NES') +
   ggforce::facet_col(~pathway, scales = 'free_y') +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') +
   theme(legend.position = c(0.25, 0.99),
@@ -2920,7 +2928,8 @@ ucsc.rmsk.salmon.quant$aale$exo$deseq$de %>%
   # xlim(-2, 2) +
   scale_color_viridis_d(direction = -1) +
   ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) >= 1.15, gene, '')), show.legend = F) + 
-  theme(legend.position = c(0.99,0.95)) -> plt_3F.plt
+  theme(legend.position = c(0.99,0.95)) +
+  xlab('ex. TE RNA log2FoldChange')-> plt_3F.plt
 
 fig_3_patch <- "
 AB
@@ -2948,13 +2957,14 @@ ggsave(plot = figure_3_patchwork.fig,
 ```{r}
 salmon.quant$aale$exo$deseq$pca$pca.out %>% 
   rownames_to_column('sample') %>% 
+  mutate(condition = toupper(condition)) %>% 
   ggplot(aes(PC1, PC2,
              fill = condition,
              color = condition)) + 
     geom_point(size = rel(2)) + 
     scale_size_continuous(range = c(0.1, 2.5), breaks = c(0,5,10,15,20)) + 
-    xlab(paste('PC1', round(cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[1], digits = 3), sep = ' ')) +
-    ylab(paste('PC2', round(cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[2] - 
+    xlab(paste('AALE ex. PC1', round(cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[1], digits = 3), sep = ' ')) +
+    ylab(paste('AALE ex. PC2', round(cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[2] - 
                               cumsum(salmon.quant$aale$exo$deseq$pca$pcs.props)[1],
                             digits = 3), sep = ' ')) +
     scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
@@ -3009,7 +3019,8 @@ ucsc.rmsk.salmon.quant$aale$exo$deseq$counts %>%
   xlab('') +
   ylab('fraction of norm. counts') +
   ggtitle('extracellular') +
-  theme(legend.position = 'top', legend.justification = 'center') -> plt_S3C.plt
+  theme(legend.position = 'top', legend.justification = 'center', 
+        axis.text.x = element_blank(), axis.ticks.x = element_blank()) -> plt_S3C.plt
 
 ucsc.rmsk.salmon.quant$aale$intra$deseq$counts %>% 
   # filter(gene %in% meta.data$gencode.35.tx.to.gene$gene) %>% 
@@ -3034,7 +3045,8 @@ ucsc.rmsk.salmon.quant$aale$intra$deseq$counts %>%
   xlab('') +
   ylab('fraction of norm. counts') +
   ggtitle('intracellular') +
-  theme(legend.position = 'top', legend.justification = 'center') -> plt_S3D.plt
+  theme(legend.position = 'top', legend.justification = 'center', 
+        axis.text.x = element_blank(), axis.ticks.x = element_blank()) -> plt_S3D.plt
 
 # exo_biotype.df %>% 
 #   mutate(context = 'extracellular') %>% 
@@ -3053,13 +3065,13 @@ ucsc.rmsk.salmon.quant$aale$intra$deseq$counts %>%
 fig_S3_patch <- "
 AB
 AB
-DC
+CD
 "
 
 wrap_plots(plt_S3A.plt,
            plt_S3B.plt,
-           plt_S3C.plt,
            plt_S3D.plt,
+           plt_S3C.plt,
            design = fig_S3_patch) + 
   plot_annotation(tag_levels = 'A')  -> figure_S3_patchwork.fig
 
@@ -3089,6 +3101,7 @@ ucsc.rmsk.salmon.quant$aale$intra$deseq$de %>%
                            show.legend = F, max.overlaps = 30, size = txt.mm_to_pts(0.8)) +
   scale_color_viridis_d(direction = -1, name = 'TE Clade') +
   facet_col(~context, scales = 'free_y') +
+  xlab('RNA log2FoldChange') +
   xlim(-6,4) +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
   theme(legend.position = c(0.35,0.35)) -> plt_4A.plt
@@ -3104,7 +3117,7 @@ salmon.quant$aale$intra$deseq$de %>%
   merge(meta.data$trono.krab.znfs, by = 'gene') %>% 
   ggplot(aes(AALE, HBEC, color = ZNF)) + 
   geom_point() + 
-  scale_color_viridis_d(name = 'ZNF type Imbeault, et al') +
+  scale_color_viridis_d(name = 'ZNF type') +
   xlab('AALE log2FoldChange') + ylab('HBEC log2FoldChange') +
   geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
@@ -3119,16 +3132,16 @@ BCD
 EEE
 "
 
-p4 <- ggplot(data.frame(l = intra.aale.te_ranges_list$plts$volcano_plt$labels$x, x = 1, y = 1)) +
+p4 <- ggplot(data.frame(l = 'DE TF RNA log2FoldChange', x = 1, y = 1)) +
       geom_text(aes(x, y, label = l), angle = 0, size = txt.mm_to_pts(0.8)) + 
       theme_void() +
       theme(plot.margin = margin(t = -6, unit = 'mm')) +
       coord_cartesian(clip = "off")
 
 wrap_elements(full = wrap_plots(guide_area(),
-                              intra.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE intra.') + xlab(''),
-                              exo.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE exo.') + ylab('') + xlab(''),
-                              hbec.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('HBEC intra.') + ylab('') + xlab(''), 
+                              intra.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE in.') + xlab(''),
+                              exo.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE ex.') + ylab('') + xlab(''),
+                              hbec.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('HBEC in.') + ylab('') + xlab(''), 
                               p4,
                               guides = 'collect', heights = c(0.05, 1, 0.005), design = plt_4C_patch)) -> plt_4C.plt
 
@@ -3138,15 +3151,15 @@ BCD
 EEE
 "
 
-p4 <- ggplot(data.frame(l = intra.aale.te_ranges_list$znf_plts$scatter_plt$labels$x, x = 1, y = 1)) +
+p4 <- ggplot(data.frame(l = 'TE [target of ZNF] RNA log2FoldChange', x = 1, y = 1)) +
       geom_text(aes(x, y, label = l), angle = 0, size = txt.mm_to_pts(0.8)) + 
       theme_void() +
       coord_cartesian(clip = "off")
   
 wrap_elements(full = wrap_plots(guide_area(),
-                              intra.aale.te_ranges_list$znf_plts$scatter_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE intra.') + xlab(''),
-                              exo.aale.te_ranges_list$znf_plts$scatter_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE exo.') + ylab('') + xlab(''),
-                              hbec.aale.te_ranges_list$znf_plts$scatter_plt + theme(legend.direction = 'horizontal') + ggtitle('HBEC intra.') + ylab('') + xlab(''), 
+                              intra.aale.te_ranges_list$znf_plts$scatter_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE in.') + xlab(''),
+                              exo.aale.te_ranges_list$znf_plts$scatter_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE ex.') + ylab('') + xlab(''),
+                              hbec.aale.te_ranges_list$znf_plts$scatter_plt + theme(legend.direction = 'horizontal') + ggtitle('HBEC in.') + ylab('') + xlab(''), 
                               p4,
                               guides = 'collect', heights = c(0.05, 1, 0.005), design = plt_4D_patch)) -> plt_4D.plt
 
@@ -3187,7 +3200,7 @@ intra.aale.te_ranges_list$znf_plts$de_list %>%
   theme(legend.position = c(0.99,0.99)) +
   facet_col(~clade) +
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
-  ggtitle('AALE intra. DE ZNFs targeting TE clades') -> plt_S4A.plt
+  ggtitle('AALE in. DE ZNFs targeting TE clades') -> plt_S4A.plt
 
 exo.aale.te_ranges_list$znf_plts$de_list %>% 
   select(TF, log2FoldChange.x, padj.x, clade, context) %>% 
@@ -3203,7 +3216,7 @@ exo.aale.te_ranges_list$znf_plts$de_list %>%
   theme(legend.position = c(0.99,0.99)) +
   facet_col(~clade) +
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
-  ggtitle('AALE exo. DE ZNFs targeting TE clades') -> plt_S4B.plt
+  ggtitle('AALE ex. DE ZNFs targeting TE clades') -> plt_S4B.plt
 
 hbec.aale.te_ranges_list$znf_plts$de_list %>% 
   select(TF, log2FoldChange.x, padj.x, clade, context) %>% 
@@ -3219,7 +3232,7 @@ hbec.aale.te_ranges_list$znf_plts$de_list %>%
   theme(legend.position = c(0.99,0.99)) +
   facet_col(~clade) +
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
-  ggtitle('HBEC intra. DE ZNFs targeting TE clades') -> plt_S4C.plt
+  ggtitle('HBEC in. DE ZNFs targeting TE clades') -> plt_S4C.plt
 
 fig_S4_patch <- "
 AD
@@ -3258,7 +3271,7 @@ a549_de$de_682 %>%
   facet_col(~oe) +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
   geom_hline(yintercept = 0, alpha = 0.3, linetype = 'dashed') + 
-  ylab('AALE log2FC') + xlab('A549 log2FC') -> plt_5C.plt
+  ylab('<--- WT   AALE log2FC   G12D --->') + xlab('A549 log2FC') -> plt_5C.plt
 
 
 a549_te_de$de_682 %>% 
@@ -3276,6 +3289,7 @@ a549_te_de$de_682 %>%
   ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange < -0.5, gene_id, '')), 
                            show.legend = F) +
   facet_col(~oe) + 
+  xlab('RNA log2FoldChange') +
   theme(legend.position = c(0.3, 0.99)) -> plt_5D.plt
 
 fig_5_patch <- "
@@ -3284,8 +3298,8 @@ CD
 CD
 "
 
-wrap_plots(intra.aale.te_ranges_list$znf_plts$target_plt + theme(legend.position = c(0.3,0.3)) + ggtitle('Hughes, et al motif binding'),
-           intra.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = c(0.99,0.99)) + ggtitle('Imbeault, et al binding score rank'),
+wrap_plots(intra.aale.te_ranges_list$znf_plts$target_plt + theme(legend.position = c(0.3,0.3)) + ggtitle('ZNF motif binding'),
+           intra.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = c(0.99,0.99)) + ggtitle('ZNF binding score rank'),
            plt_5C.plt,
            plt_5D.plt,
            design = fig_5_patch) + 
@@ -3303,8 +3317,8 @@ AA
 BB
 "
 
-wrap_plots(exo.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = c(0.99,0.99)) + ggtitle('AALE exo-Imbeault, et al binding score rank'),
-           hbec.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = c(0.99,0.99)) + ggtitle('HBEC-Imbeault, et al binding score rank'),
+wrap_plots(exo.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = c(0.99,0.99)) + ggtitle('AALE ex. binding score rank'),
+           hbec.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = c(0.99,0.99)) + ggtitle('HBEC in. binding score rank'),
            design = fig_S5_patch) + 
   plot_annotation(tag_levels = 'A')  -> figure_S5_patchwork.fig
 
@@ -3332,11 +3346,11 @@ salmon.quant$aale$intra$deseq$de %>%
   mutate(`unique peaks` = ifelse(gene %in% meta.data$trono.krab.znfs$gene | grepl('ZNF', gene), 'ZNF', 'other')) %>% 
   ggplot(aes(log2FoldChange, -log10(padj), label = gene, color = `unique peaks`)) + 
   geom_point() +
-  scale_color_manual(values = c('grey', 'black')) +
+  scale_color_manual(values = c('grey', 'black'), name = 'unique ATAC peak') +
   geom_text_repel(aes(label = ifelse(`unique peaks` == 'ZNF' | abs(log2FoldChange) > 4, gene, '')), 
-                  size = txt.mm_to_pts(0.8), show.legend = F, max.overlaps = 30) + 
-  geom_vline(xintercept = c(0, -4.5), alpha = c(0.3,0.2), linetype = 'dashed') + 
-  theme(legend.position = c(0.30, 0.99)) -> plt_6B.plt
+                  size = txt.mm_to_pts(0.8), show.legend = F, max.overlaps = 30, segment.color = NA) + 
+  geom_vline(xintercept = c(0), alpha = c(0.3), linetype = 'dashed') + 
+  theme(legend.position = c(0.40, 0.99)) -> plt_6B.plt
 
 salmon.quant$aale$intra$deseq$de %>% 
   merge(znf_ame_out, by.x = 'gene', by.y = 'TF') %>% 
@@ -3346,7 +3360,9 @@ salmon.quant$aale$intra$deseq$de %>%
   mutate(gene_set = factor(gene_set, levels = c('KRAS','IFN','ZNF', 'other'))) %>% 
   ggplot(aes(log2FoldChange, -log10(padj), color = gene_set, label = gene)) + 
   geom_point() + 
-  scale_color_viridis_d(name = 'sig. DE TF classification') +
+  scale_color_viridis_d(name = 'TF classification') +
+  xlab('DE TF RNA log2FoldChange') +
+  xlim(-2.5,2.5)+
   geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 0, gene, '')), color = 'black') + 
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
   theme(legend.position = 'top') -> plt_6D.plt
@@ -3461,7 +3477,7 @@ plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = N
                                 simple_anno_size = unit(2, "mm")) -> gene_motif_anno
   
   ComplexHeatmap::Heatmap(toil_hm_counts, 
-                        name = 'z-score', 
+                        name = 'TCGA\nz-score', 
                         show_row_names = show_genes,
                         show_column_names = F,
                         row_split = split_vector,
@@ -3511,73 +3527,6 @@ working_toil_counts %>%
   filter(w < 0.05) %>% 
   pull(gene) -> toil_sig_znf
 
-# working_toil_counts %>% 
-#   filter(gene %in% c(aale_znf$gene, aale_ifn$gene)) %>%
-#   group_by(gene) %>%
-#   mutate(count = scale(log1p(count), center = T)) %>%
-#   select(sample, gene, count) %>% 
-#   pivot_wider(names_from = gene, values_from = count) %>% 
-#   distinct() %>% 
-#   column_to_rownames('sample') %>% 
-#   t() -> toil_hm_counts
-# 
-# working_toil_counts %>% 
-#   filter(gene %in% c(aale_znf$gene, aale_ifn$gene)) %>%
-#   select(gene) %>% 
-#   merge(salmon.quant$aale$intra$deseq$de %>% select(gene, log2FoldChange), by = 'gene') %>% 
-#   distinct() %>%
-#   column_to_rownames('gene') -> toil_de
-#   
-# toil_de[order(match(rownames(toil_de), rownames(toil_hm_counts))), , drop =F] -> toil_de
-# 
-# toil_de_list <- setNames(toil_de$log2FoldChange, rownames(toil_de))
-# 
-# ComplexHeatmap::rowAnnotation(
-#   `AALE log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
-#       bar_width = 1, 
-#       which = 'row',
-#       gp = grid::gpar(col = "black", fill = viridis(3)[2]), 
-#       border = FALSE,
-#       annotation_name_gp = grid::gpar(fontsize = 8),
-#       width = unit(1.25, "cm"),
-#       height = unit(0.75, "cm")), 
-#   show_annotation_name = TRUE,
-#   annotation_name_gp = grid::gpar(fontsize = 8)) -> log2fc_ha
-#   
-# working_toil_counts %>%
-#   filter(gene %in% c(aale_znf$gene, aale_ifn$gene)) %>%
-#   select(gene) %>%
-#   distinct() %>%
-#   mutate(gene_set = ifelse(gene %in% aale_znf$gene, 'ZNF', 
-#                            ifelse(gene %in% aale_ifn$gene, 'IFN', 'other'))) %>% 
-#   column_to_rownames('gene') %>% 
-#   ComplexHeatmap::rowAnnotation(df =.,
-#                                 col = list(gene_set = c('ZNF' = viridis(2)[1], 'IFN' = viridis(3)[2])),
-#                                 show_legend = F,
-#                                 annotation_name_gp = grid::gpar(fontsize = 8),
-#                                 simple_anno_size = unit(3, "mm")) -> gene_motif_anno
-# 
-# working_toil_counts %>%
-#   filter(gene %in% c(aale_znf$gene, aale_ifn$gene)) %>%
-#   select(gene) %>%
-#   distinct() %>%
-#   mutate(gene_set = ifelse(gene %in% aale_znf$gene, 'ZNF', 
-#                            ifelse(gene %in% aale_ifn$gene, 'IFN', 'other'))) %>% 
-#   column_to_rownames('gene') %>% 
-#   ComplexHeatmap::columnAnnotation(df =.,
-#                                 col = list(gene_set = c('ZNF' = viridis(2)[1], 'IFN' = viridis(3)[2])),
-#                                 show_legend = T,
-#                                 annotation_name_gp = grid::gpar(fontsize = 8),
-#                                 simple_anno_size = unit(3, "mm")) -> gene_motif_anno_col
-# 
-# 
-# 
-# ComplexHeatmap::Heatmap(cor(t(toil_hm_counts)),
-#                         name = 'pearson',
-#                         show_row_names = F, show_column_names = F,
-#                         left_annotation = log2fc_ha,
-#                         right_annotation = gene_motif_anno, bottom_annotation = gene_motif_anno_col)
-
 ```
 ##
 ```{r}
@@ -3591,7 +3540,7 @@ working_toil_counts %>%
   geom_boxplot(fill = NA, outlier.colour = NA) + 
   geom_point(alpha = 0.1, position = position_jitterdodge(jitter.width = 0.25)) +
   ylab('z-score') + xlab('') + 
-  scale_color_manual(values = c(viridis(3)[2], viridis(3)[1])) + 
+  scale_color_manual(values = c(viridis(3)[2], viridis(3)[1]), name = 'KRAS') + 
   theme(axis.text.x = element_text(angle = 40, hjust = 1),
         legend.position = c(0.99, 0.25)) -> plt_7B.plt
 
