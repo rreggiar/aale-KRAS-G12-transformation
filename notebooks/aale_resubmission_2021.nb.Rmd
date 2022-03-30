@@ -1748,8 +1748,8 @@ te_znf_plots <- function(ame_znf_list, upreg_te_list, de_list) {
     geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) +
     geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
     scale_color_manual(values = te_alone_color_pal, name = 'TE Clade') +
-    ylab('avg(ZNF log2FoldChange)') +
-    xlab('TE [with binding site] expression') +
+    ylab('TE-targeting ZNFs avg. RNA log2FC') +
+    xlab('putatively bound TE RNA log2FoldChange') +
     theme(legend.position = c(0.99,0.99)) -> scatter_plot
   
   return(list('de_list' = tmp, 'target_plt' = target_plot, 'upset_plt' = upset_plot, 'volcano_plt' = volcano_plot, 'scatter_plt' = scatter_plot))
@@ -1759,23 +1759,6 @@ intra.aale.te_ranges_list$znf_plts <- te_znf_plots(intra.aale.te_ranges_list$znf
 exo.aale.te_ranges_list$znf_plts <- te_znf_plots(exo.aale.te_ranges_list$znf_ame_tf, upreg_te$aale_exo, salmon.quant$aale$intra$deseq$de)
 hbec.aale.te_ranges_list$znf_plts <- te_znf_plots(hbec.aale.te_ranges_list$znf_ame_tf, upreg_te$hbec_intra, salmon.quant$hbec$lacz_v_v12$deseq$de)
 
-
-# de_list_promoter_seqs <- getSeq(BSgenome.Hsapiens.UCSC.hg38, de_promoter_regions)
-# 
-# MotifDb::query(MotifDb::MotifDb, "ZNF257") %>% 
-#   universalmotif::convert_motifs()
-# 
-# universalmotif::read_meme(file.path(output.data.dir, 'reference.data', 
-#                       'Hughes_ZNF_motifs.meme')) ->znf_meme
-# 
-# memes::plot_sequence_heatmap(te_seqs)
-# 
-# znf_meme[60]
-# 
-# znf_meme[192]
-# memes::runFimo(sequences = 
-#                  de_list_promoter_seqs[names(de_list_promoter_seqs) == 'ENSG00000089127.14'],
-#                motifs = znf_meme[60]) -> ifn_znf_motif_enrich
 
 znf_score <- read_csv(file = file.path(output.data.dir, 'all.znf.te.score.csv'))
 
@@ -1803,7 +1786,7 @@ znf_score_plt <- function(gencode_de_list, te_de_list) {
     ggplot(aes(TE, rank, color = log2FoldChange.y)) +
     geom_point() +
     scale_color_viridis_c(name = 'znf log2FC') +
-    ggrepel::geom_text_repel(aes(label = ifelse(rank < 12, gene, '')), size = txt.mm_to_pts(0.8)) +
+    ggrepel::geom_text_repel(aes(label = ifelse(rank < 12, gene, '')), size = txt.mm_to_pts(0.8), color = 'black') +
     xlab('putatively bound TE') + ylab('binding score rank') +
     theme(legend.position = c(0.99,0.99),
           axis.text.x = element_text(angle = 40, hjust = 1)) +
@@ -1814,47 +1797,6 @@ znf_score_plt <- function(gencode_de_list, te_de_list) {
 intra.aale.te_ranges_list$znf_plts$znf_score <- znf_score_plt(salmon.quant$aale$intra$deseq$de, ucsc.rmsk.salmon.quant$aale$intra$deseq$de)
 exo.aale.te_ranges_list$znf_plts$znf_score <- znf_score_plt(salmon.quant$aale$intra$deseq$de, ucsc.rmsk.salmon.quant$aale$exo$deseq$de)
 hbec.aale.te_ranges_list$znf_plts$znf_score <- znf_score_plt(salmon.quant$hbec$lacz_v_v12$deseq$de, ucsc.rmsk.salmon.quant$hbec$lacz_v_v12$deseq$de)
-
-
-  
-
-
-# ucsc.rmsk.salmon.quant$aale$exo$deseq$de %>% 
-#            filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
-#                   padj < 0.05, log2FoldChange > 1) -> upreg_te
-# 
-# 
-# rmsk_parsed_bed %>% 
-#   filter(gene %in% upreg_te$gene,
-#          grepl('LTR27C', gene)) %>% 
-#   GenomicRanges::makeGRangesFromDataFrame() -> te_ranges
-# 
-# names(te_ranges) <- rmsk_parsed_bed %>% filter(gene %in% upreg_te$gene, grepl('LTR27C', gene)) %>% select(gene) %>% unlist() %>% unname()
-#   
-# 
-# getSeq(BSgenome.Hsapiens.UCSC.hg38, te_ranges) -> te_seqs
-# 
-# memes::runDreme(te_seqs, control = 'shuffle') -> te_motif_denovo
-# 
-# memes::runAme(te_seqs, control = 'shuffle') -> te_motif_enrich
-# 
-# te_motif_enrich %>% 
-#   mutate(tmp = motif_id) %>% 
-#   separate(tmp, sep = '_', into = c('TF', NA)) %>% 
-#   mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
-#          TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) -> ame_tf
-# %>%
-#   select(TF) %>% unlist() %>% unname() -> ame_tf
-# 
-# salmon.quant$aale$intra$deseq$de %>% 
-#   merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
-#   filter(grepl('ZNF', gene)) %>%
-#   ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
-#   geom_point() + 
-#   scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
-#   geom_text_repel(color = 'black') + 
-#   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
-#   theme(legend.position = c(0.99, 0.99)) 
 
   
 ```
@@ -2197,83 +2139,6 @@ wrap_plots(znf90_atac.plt,
 
 
 ```
-
-```{r}
-
-
-smRNA_de <- read_csv(file = file.path(output.data.dir, 'AALE_DESeq2.csv')) %>% 
-  dplyr::rename(gene = 1,
-                log2fc = 2)
-
-smRNA_de %>% 
-  # filter(gene %in% salmon.quant$aale$exo$deseq$de$gene)
-  filter(padj < 0.05) %>% 
-  # mutate()
-  ggplot(aes(log2fc, -log10(padj))) + 
-  geom_point() + 
-  xlim(-4,4) + 
-  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2fc) > 1.5, gene, '')))
-
-panel.save(figure = 'fig.supplement', name = 'smRNA_exo_de', width = 'single', height = 'single')
-
-
-salmon.quant$aale$exo$deseq$de %>% 
-  # filter(gene %in% salmon.quant$aale$exo$deseq$de$gene)
-  filter(padj < 0.05) %>% 
-  # mutate()
-  ggplot(aes(log2FoldChange, -log10(padj))) + 
-  geom_point() + 
-  # xlim(-4,4) + 
-  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 1.5, gene, '')))
-
-
-smRNA_de %>% 
-  select(gene, log2fc, padj) %>% 
-  filter(padj < 0.05) %>% 
-  merge(salmon.quant$aale$intra$deseq$de %>% filter(padj < 0.05), by = 'gene') %>% 
-  ggplot(aes(log2FoldChange, log2fc)) + 
-  xlab('intra -- RNA') + ylab('exo -- OTTRseq') +
-  geom_point() + 
-  geom_hline(yintercept = 0, linetype = 'dashed', alpha = 0.4) + 
-  geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
-  geom_text_repel(aes(label = gene), show.legend = F)
-
-panel.save(figure = 'fig.supplement', name = 'smRNA_exo_v_intra_de', width = 'single', height = 'single')
-
-
-iso_de <- read_csv(file = file.path(output.data.dir, 'unique_to_exo_DE_isoforms_P05.csv'))[, 2:15]
-
-iso_exo <- read_csv(file = file.path(output.data.dir, 'annotated_unique_exo_isoforms.csv'))
-iso_intra <- read_csv(file = file.path(output.data.dir, 'annotated_unique_intra_isoforms.csv'))
-
-
-iso_exo %>% 
-  filter(gene_biotype %in% c('lncRNA', 'protein_coding')) %>% 
-  group_by(gene_biotype) %>% 
-  summarize(count = length(gene_biotype)) %>% 
-  ggplot(aes(gene_biotype, count, label = count)) + 
-  geom_col() + 
-  geom_hline(yintercept = seq(0,300,50), color = 'white') +
-  coord_flip() +
-  xlab('')
-
-panel.save(figure = 'fig.supplement', name = 'iso_exo_count', width = 'single', height = 'single')
-
-
-iso_de %>% 
-  filter(padj < 0.05) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj))) + 
-  geom_point() +
-  ggrepel::geom_text_repel(aes(label = ifelse(abs(log2FoldChange) > 7.5, gene, '')))
-panel.save(figure = 'fig.supplement', name = 'iso_exo_de', width = 'single', height = 'single')
-
-
-annotated_unique_exo_isoforms.csv
-
-
-
-```
-
 # Figure 1
 ## toil data load and transform
 ```{r}
@@ -3126,27 +2991,27 @@ salmon.quant$aale$intra$deseq$de %>%
   geom_vline(xintercept = 0, linetype = 'dashed', alpha = 0.4) +
   scale_x_continuous(limits = c(-3,3)) +
   scale_y_continuous(limits = c(-2,2)) +
-  geom_text_repel(aes(label = ifelse(AALE < -1 & HBEC < -0.35, gene, '')), show.legend = F, size = txt.mm_to_pts(0.8)) + 
+  geom_text_repel(aes(label = ifelse(AALE < -1 & HBEC < -0.35, gene, '')), show.legend = F, size = txt.mm_to_pts(0.8), color = 'black') + 
   theme(legend.position = c(0.99, 0.99)) -> plt_4B.plt
 
-plt_4C_patch <- "
-AAA
-BCD
-EEE
-"
-
-p4 <- ggplot(data.frame(l = 'DE TF RNA log2FoldChange', x = 1, y = 1)) +
-      geom_text(aes(x, y, label = l), angle = 0, size = txt.mm_to_pts(0.8)) + 
-      theme_void() +
-      theme(plot.margin = margin(t = -6, unit = 'mm')) +
-      coord_cartesian(clip = "off")
-
-wrap_elements(full = wrap_plots(guide_area(),
-                              intra.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE in.') + xlab(''),
-                              exo.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE ex.') + ylab('') + xlab(''),
-                              hbec.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('HBEC in.') + ylab('') + xlab(''), 
-                              p4,
-                              guides = 'collect', heights = c(0.05, 1, 0.005), design = plt_4C_patch)) -> plt_4C.plt
+# plt_4C_patch <- "
+# AAA
+# BCD
+# EEE
+# "
+# 
+# p4 <- ggplot(data.frame(l = 'DE TF RNA log2FoldChange', x = 1, y = 1)) +
+#       geom_text(aes(x, y, label = l), angle = 0, size = txt.mm_to_pts(0.8)) + 
+#       theme_void() +
+#       theme(plot.margin = margin(t = -6, unit = 'mm')) +
+#       coord_cartesian(clip = "off")
+# 
+# wrap_elements(full = wrap_plots(guide_area(),
+#                               intra.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE in.') + xlab(''),
+#                               exo.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE ex.') + ylab('') + xlab(''),
+#                               hbec.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('HBEC in.') + ylab('') + xlab(''), 
+#                               p4,
+#                               guides = 'collect', heights = c(0.05, 1, 0.005), design = plt_4C_patch)) -> plt_4C.plt
 
 plt_4D_patch <- "
 AAA
@@ -3154,7 +3019,7 @@ BCD
 EEE
 "
 
-p4 <- ggplot(data.frame(l = 'TE [target of ZNF] RNA log2FoldChange', x = 1, y = 1)) +
+p4 <- ggplot(data.frame(l = 'putatively bound TE RNA log2FoldChange', x = 1, y = 1)) +
       geom_text(aes(x, y, label = l), angle = 0, size = txt.mm_to_pts(0.8)) + 
       theme_void() +
       coord_cartesian(clip = "off")
@@ -3169,16 +3034,15 @@ wrap_elements(full = wrap_plots(guide_area(),
 
 fig_4_patch <- "
 AB
-CC
-DD
+CD
+EE
 "
 
 wrap_plots(plt_4A.plt,
            plt_4B.plt,
-           plt_4C.plt,
+           intra.aale.te_ranges_list$znf_plts$target_plt + theme(legend.position = c(0.3,0.3)) + ggtitle('ZNF motif binding'),
+           intra.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = c(0.99,0.99)) + ggtitle('ZNF binding score rank'),
            plt_4D.plt,
-           plot_spacer(),
-           plot_spacer(),
            design = fig_4_patch) + 
   plot_annotation(tag_levels = 'A')  -> figure_4_patchwork.fig
 
@@ -3263,7 +3127,6 @@ ggsave(plot = figure_S4_patchwork.fig,
 
 # Figure 5
 ```{r}
-
 a549_de$de_682 %>% 
   mutate(oe = 'A549 ZNF682 Overexpression') %>% 
   rbind(a549_de$de_257 %>% 
@@ -3299,15 +3162,14 @@ a549_te_de$de_682 %>%
   theme(legend.position = c(0.3, 0.99)) -> plt_5D.plt
 
 fig_5_patch <- "
-AB
 CD
 CD
+EE
 "
 
-wrap_plots(intra.aale.te_ranges_list$znf_plts$target_plt + theme(legend.position = c(0.3,0.3)) + ggtitle('ZNF motif binding'),
-           intra.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = c(0.99,0.99)) + ggtitle('ZNF binding score rank'),
-           plt_5C.plt,
+wrap_plots(plt_5C.plt,
            plt_5D.plt,
+           plot_spacer(),
            design = fig_5_patch) + 
   plot_annotation(tag_levels = 'A')  -> figure_5_patchwork.fig
 
