@@ -3583,7 +3583,6 @@ ggsurvplot(surv.fit,
 surv.plt
 
 model.plt <- magick::image_read_pdf(path = '/home/rreggiar/figures/aale_model_cropped.pdf')
-magick::image_ggplot(model.plt)
 
 fig_7_patch <- "
 AA
