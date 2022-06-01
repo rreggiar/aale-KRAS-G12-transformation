@@ -40,7 +40,7 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
   library(rjson)
   library(HDF5Array)
-  # library(DESeq2)
+  library(DESeq2)
   library(survival)
   library(survminer)
 })
@@ -425,13 +425,13 @@ colData(salmon.quant$gxi) %>%
 rowRanges(salmon.quant$gxi) %>% 
   as.data.frame() %>% 
   dplyr::rename('chr' = seqnames) %>% 
-  merge(gencode.35.tx.to.gene %>% select(ensg, gene) %>% distinct(), by.x = 'gene_id', by.y = 'ensg') -> 
+  merge(meta.data$gencode.35.tx.to.gene %>% select(ensg, gene) %>% distinct(), by.x = 'gene_id', by.y = 'ensg') -> 
   salmon.quant$gxi.bed
 
 rowRanges(salmon.quant$txi) %>% 
   as.data.frame() %>% 
   dplyr::rename('chr' = seqnames) %>% 
-  merge(gencode.35.tx.to.gene %>% select(enst, gene) %>% distinct(), by.x = 'tx_name', by.y = 'enst') -> 
+  merge(meta.data$gencode.35.tx.to.gene %>% select(enst, gene) %>% distinct(), by.x = 'tx_name', by.y = 'enst') -> 
   salmon.quant$txi.bed
 
 # ------------------------------------------------------------------------------
@@ -778,12 +778,15 @@ salmon.quant$aale$exo$deseq <- run.de.seq(salmon.quant$aale$exo, base_level = 'c
 salmon.quant$aale$kras_compare$deseq <- run.de.seq(salmon.quant$aale$kras_compare, base_level = 'kras')
 salmon.quant$aale$ctrl_compare$deseq <- run.de.seq(salmon.quant$aale$ctrl_compare, base_level = 'ctrl')
 salmon.quant$aale$platform_compare$deseq <- run.de.seq(salmon.quant$aale$platform_compare, base_level = 'ctrl')
-salmon.quant$hbec$hbec_wt$deseq <- run.de.seq(salmon.quant$hbec$hbec_wt, base_level = 'wt2_kras_wt')
-salmon.quant$hbec$hbec_v12$deseq <- run.de.seq(salmon.quant$hbec$hbec_v12, base_level = 'wt2_kras_v12')
-salmon.quant$hbec$lacz_v_wt$deseq <- run.de.seq(salmon.quant$hbec$lacz_v_wt, base_level = 'wt2_lacz')
+# salmon.quant$hbec$hbec_wt$deseq <- run.de.seq(salmon.quant$hbec$hbec_wt, base_level = 'wt2_kras_wt')
+# salmon.quant$hbec$hbec_v12$deseq <- run.de.seq(salmon.quant$hbec$hbec_v12, base_level = 'wt2_kras_v12')
+# salmon.quant$hbec$lacz_v_wt$deseq <- run.de.seq(salmon.quant$hbec$lacz_v_wt, base_level = 'wt2_lacz')
 salmon.quant$hbec$lacz_v_v12$deseq <- run.de.seq(salmon.quant$hbec$lacz_v_v12, base_level = 'wt2_lacz')
 salmon.quant$a549$deseq <- run.de.seq(salmon.quant$a549, base_level = 'Empty')
 salmon.quant$all_intra$deseq <- run.de.seq(salmon.quant$all_intra)
+
+# saveRDS(ucsc.rmsk.salmon.quant, file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
+
 
 a549_de <- run.de.seq.contrast(salmon.quant$a549, base_level = 'Empty')
 
@@ -791,15 +794,15 @@ a549_te_de <- run.de.seq.contrast(ucsc.rmsk.salmon.quant$a549, base_level = 'Emp
 
 # tmp <- run.de.seq.contrast(salmon.quant$aale$kras_compare$)
 
-View(tmp %>% filter(padj < 0.01))
-
-tmp %>% filter(gene %in% salmon.quant$aale$intra$deseq$de$gene) %>% View()
-
-salmon.quant$aale$exo$deseq$de %>% 
-  merge(tmp, by = 'gene') %>% 
-  ggplot(aes(log2FoldChange.x, log2FoldChange.y, label = gene)) + 
-  geom_point()+
-  geom_text_repel(aes(label = ifelse(abs(log2FoldChange.x) > 2, gene, '')))
+# View(tmp %>% filter(padj < 0.01))
+# 
+# tmp %>% filter(gene %in% salmon.quant$aale$intra$deseq$de$gene) %>% View()
+# 
+# salmon.quant$aale$exo$deseq$de %>% 
+#   merge(tmp, by = 'gene') %>% 
+#   ggplot(aes(log2FoldChange.x, log2FoldChange.y, label = gene)) + 
+#   geom_point()+
+#   geom_text_repel(aes(label = ifelse(abs(log2FoldChange.x) > 2, gene, '')))
 
 
 # ------------------------------------------------------------------------------
@@ -819,7 +822,7 @@ ucsc.rmsk.salmon.quant$hbec$lacz_v_v12$deseq <- run.de.seq(ucsc.rmsk.salmon.quan
 ucsc.rmsk.salmon.quant$hbec$a549$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$a549, base_case = 'Empty')
 ucsc.rmsk.salmon.quant$all_intra$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$all_intra)
 
-saveRDS(ucsc.rmsk.salmon.quant, file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
+# saveRDS(ucsc.rmsk.salmon.quant, file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
 
 
 
@@ -976,6 +979,7 @@ salmon.quant$aale$exo$deseq$de %>%
 
 salmon.quant <- readRDS(file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
 ucsc.rmsk.salmon.quant <- readRDS(file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
+
 msig.df <- 
   msigdbr(species = 'Homo sapiens', category = 'H') %>% 
   dplyr::select(gene_symbol, gs_name) %>% 
@@ -1003,7 +1007,7 @@ lapply(c(1,2), function(i) {
   ggplot(aes(context)) + 
   geom_bar() + 
   ggupset::scale_x_upset() +
-  geom_text(stat='count', aes(label=after_stat(count)), size = base_size*0.6*txt.mm_to_pts)
+  geom_text(stat='count', aes(label=after_stat(count)), size = txt.mm_to_pts(0.6))
 
 msig.df[grepl('INTERFERON|INFLAMMATORY', names(msig.df))] %>% 
   lapply(function(x) as.data.frame(x)) %>% 
@@ -1055,6 +1059,7 @@ availableOntologies(job)
 library(GenomicRanges)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(BSgenome)
+BiocManager::install("MotifDb")
 
 ifn_g <- msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE
 ifn_a <- msig.df$HALLMARK_INTERFERON_GAMMA_RESPONSE
