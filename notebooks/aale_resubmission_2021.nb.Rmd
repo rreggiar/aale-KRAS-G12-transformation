@@ -63,8 +63,8 @@ suppressPackageStartupMessages({
 })
 suppressMessages(loadfonts())
 ```
-# theming:
-## setting ggplot theme
+## theming:
+### setting ggplot theme
 ```{r setting ggplot theme}
 
 base_size = 10
@@ -158,7 +158,7 @@ theme_set_fun <- function() {
 
 txt.mm_to_pts <- function(ratio){ base_size * ratio * (25.4 / 72.27) } # for reverse can use .pt
 ```
-## figure dirs, and other globally relevant constants
+### figure dirs, and other globally relevant constants
 ```{r system I/O constants}
 figure.dir <-  here('figures')
 data.dir <-  here('data')
@@ -185,7 +185,7 @@ te_alone_color_pal <- viridis(5, direction = -1)
 names(te_alone_color_pal) <- te_alone_annotation_levels
 
 ```
-## saving panels
+### saving panels
 ```{r panel dimensions}
 panel.figure.width = 85
 panel.figure.width.medium = 114
@@ -259,7 +259,7 @@ patch_fig_height = unit(279.4 * 0.9 , 'mm')
 #     c(w, h)
 # }
 ```
-## gene sets for filtering, identification
+### gene sets for filtering, identification
 ```{r gene set I/O}
 
 if (! file.exists(file.path(output.data.dir, 'meta_data_df.rds'))) {
@@ -336,6 +336,37 @@ if (! file.exists(file.path(output.data.dir, 'meta_data_df.rds'))) {
 
 ```
 
+# processed dataset check:
+```{r}
+if (file.exists(file.path(output.data.dir, 'salmon.quant_analysis_set.rds')) { 
+  
+  salmon.quant <- readRDS(file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
+  
+  build_salmon.quant <- FALSE
+
+}) else {
+  
+  message('Warning: salmon published dataset not found, will generate equivalent')
+  
+  build_salmon.quant <- TRUE
+  
+}
+
+if (file.exists(file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds')) { 
+  
+  ucsc.rmsk.salmon.quant <- readRDS(file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
+  
+  build_ucsc.rmsk.salmon <- FALSE
+
+}) else {
+  
+  message('Warning: ucsc rmsk salmon published dataset not found, will generate equivalent')
+  
+  build_ucsc.rmsk.salmon <- TRUE
+  
+}
+```
+
 # feature engineering:
 ## FUN: construct.quant.object
 ```{r}
@@ -383,66 +414,73 @@ subset.tximeta.object <- function(tximeta.list, grep.string){
 ```
 ### CALL: construct.quant.object
 ```{r}
-salmon.quant <- load.tximeta.object('salmon')
 
-salmon.quant$aale$intra <- subset.tximeta.object(salmon.quant, 'intra.aale')
-salmon.quant$hbec$hbec_wt <- subset.tximeta.object(salmon.quant, 'wt2_kras')
-salmon.quant$hbec$hbec_v12 <- subset.tximeta.object(salmon.quant, '_v12')
-salmon.quant$hbec$lacz_v_wt <- subset.tximeta.object(salmon.quant, '_v12|mut2|aale|ZNF|Empty')
-salmon.quant$hbec$lacz_v_v12 <- subset.tximeta.object(salmon.quant, '_wt|mut2|aale|ZNF|Empty')
-salmon.quant$a549 <- subset.tximeta.object(salmon.quant, 'intra.a549')
-salmon.quant$all_intra <- subset.tximeta.object(salmon.quant, 'rnaEASY|hold')
-salmon.quant$aale$exo <- subset.tximeta.object(salmon.quant, 'rnaEASY.aale')
-salmon.quant$aale$kras_compare <- subset.tximeta.object(salmon.quant, 'aale.*.kras')
-salmon.quant$aale$ctrl_compare <- subset.tximeta.object(salmon.quant, 'aale.*.ctrl')
-salmon.quant$aale$platform_compare <- subset.tximeta.object(salmon.quant, 'aale')
+if (build_salmon.quant == T) { 
+  
+  salmon.quant <- load.tximeta.object('salmon')
+  salmon.quant$aale$intra <- subset.tximeta.object(salmon.quant, 'intra.aale')
+  salmon.quant$hbec$hbec_wt <- subset.tximeta.object(salmon.quant, 'wt2_kras')
+  salmon.quant$hbec$hbec_v12 <- subset.tximeta.object(salmon.quant, '_v12')
+  salmon.quant$hbec$lacz_v_wt <- subset.tximeta.object(salmon.quant, '_v12|mut2|aale|ZNF|Empty')
+  salmon.quant$hbec$lacz_v_v12 <- subset.tximeta.object(salmon.quant, '_wt|mut2|aale|ZNF|Empty')
+  salmon.quant$a549 <- subset.tximeta.object(salmon.quant, 'intra.a549')
+  salmon.quant$all_intra <- subset.tximeta.object(salmon.quant, 'rnaEASY|hold')
+  salmon.quant$aale$exo <- subset.tximeta.object(salmon.quant, 'rnaEASY.aale')
+  salmon.quant$aale$kras_compare <- subset.tximeta.object(salmon.quant, 'aale.*.kras')
+  salmon.quant$aale$ctrl_compare <- subset.tximeta.object(salmon.quant, 'aale.*.ctrl')
+  salmon.quant$aale$platform_compare <- subset.tximeta.object(salmon.quant, 'aale')
+  
+  colData(salmon.quant$gxi) %>% 
+    as.data.frame() %>% 
+    remove_rownames() -> salmon.quant$meta.data.df
+  
+  rowRanges(salmon.quant$gxi) %>% 
+    as.data.frame() %>% 
+    dplyr::rename('chr' = seqnames) %>% 
+    merge(meta.data$gencode.35.tx.to.gene %>% select(ensg, gene) %>% distinct(), by.x = 'gene_id', by.y = 'ensg') -> 
+    salmon.quant$gxi.bed
+  
+  rowRanges(salmon.quant$txi) %>% 
+    as.data.frame() %>% 
+    dplyr::rename('chr' = seqnames) %>% 
+    merge(meta.data$gencode.35.tx.to.gene %>% select(enst, gene) %>% distinct(), by.x = 'tx_name', by.y = 'enst') -> 
+    salmon.quant$txi.bed
+}
 
-colData(salmon.quant$gxi) %>% 
-  as.data.frame() %>% 
-  remove_rownames() -> salmon.quant$meta.data.df
-
-rowRanges(salmon.quant$gxi) %>% 
-  as.data.frame() %>% 
-  dplyr::rename('chr' = seqnames) %>% 
-  merge(meta.data$gencode.35.tx.to.gene %>% select(ensg, gene) %>% distinct(), by.x = 'gene_id', by.y = 'ensg') -> 
-  salmon.quant$gxi.bed
-
-rowRanges(salmon.quant$txi) %>% 
-  as.data.frame() %>% 
-  dplyr::rename('chr' = seqnames) %>% 
-  merge(meta.data$gencode.35.tx.to.gene %>% select(enst, gene) %>% distinct(), by.x = 'tx_name', by.y = 'enst') -> 
-  salmon.quant$txi.bed
 
 # ------------------------------------------------------------------------------
 
-ucsc.rmsk.salmon.quant <- load.tximeta.object('ucsc.rmsk.salmon')
+if (build_ucsc.rmsk.salmon.quant == T) { 
 
-ucsc.rmsk.salmon.quant$aale$intra <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, 'intra.aale')
-ucsc.rmsk.salmon.quant$hbec$hbec_wt <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, 'wt2_kras')
-ucsc.rmsk.salmon.quant$hbec$hbec_v12 <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, '_v12')
-ucsc.rmsk.salmon.quant$hbec$lacz_v_wt <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, '_v12|mut2|aale|ZNF|Empty')
-ucsc.rmsk.salmon.quant$hbec$lacz_v_v12 <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, '_wt|mut2|aale|ZNF|Empty')
-ucsc.rmsk.salmon.quant$a549 <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, 'intra.a549')
-ucsc.rmsk.salmon.quant$all_intra <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, 'rnaEASY|hold')
-ucsc.rmsk.salmon.quant$aale$exo <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, 'rnaEASY.aale')
-ucsc.rmsk.salmon.quant$aale$kras_compare <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, 'aale.*.kras')
-ucsc.rmsk.salmon.quant$aale$ctrl_compare <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, 'aale.*.ctrl')
-ucsc.rmsk.salmon.quant$aale$platform_compare <- 
-  subset.tximeta.object(ucsc.rmsk.salmon.quant, 'aale')
-
-colData(ucsc.rmsk.salmon.quant$gxi) %>% 
-  as.data.frame() %>% 
-  remove_rownames() -> ucsc.rmsk.salmon.quant$meta.data.df
+  ucsc.rmsk.salmon.quant <- load.tximeta.object('ucsc.rmsk.salmon')
+  
+  ucsc.rmsk.salmon.quant$aale$intra <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, 'intra.aale')
+  ucsc.rmsk.salmon.quant$hbec$hbec_wt <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, 'wt2_kras')
+  ucsc.rmsk.salmon.quant$hbec$hbec_v12 <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, '_v12')
+  ucsc.rmsk.salmon.quant$hbec$lacz_v_wt <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, '_v12|mut2|aale|ZNF|Empty')
+  ucsc.rmsk.salmon.quant$hbec$lacz_v_v12 <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, '_wt|mut2|aale|ZNF|Empty')
+  ucsc.rmsk.salmon.quant$a549 <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, 'intra.a549')
+  ucsc.rmsk.salmon.quant$all_intra <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, 'rnaEASY|hold')
+  ucsc.rmsk.salmon.quant$aale$exo <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, 'rnaEASY.aale')
+  ucsc.rmsk.salmon.quant$aale$kras_compare <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, 'aale.*.kras')
+  ucsc.rmsk.salmon.quant$aale$ctrl_compare <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, 'aale.*.ctrl')
+  ucsc.rmsk.salmon.quant$aale$platform_compare <- 
+    subset.tximeta.object(ucsc.rmsk.salmon.quant, 'aale')
+  
+  colData(ucsc.rmsk.salmon.quant$gxi) %>% 
+    as.data.frame() %>% 
+    remove_rownames() -> ucsc.rmsk.salmon.quant$meta.data.df
+}
 
 ```
 
@@ -757,32 +795,15 @@ salmon.quant$aale$exo$deseq <- run.de.seq(salmon.quant$aale$exo, base_level = 'c
 salmon.quant$aale$kras_compare$deseq <- run.de.seq(salmon.quant$aale$kras_compare, base_level = 'kras')
 salmon.quant$aale$ctrl_compare$deseq <- run.de.seq(salmon.quant$aale$ctrl_compare, base_level = 'ctrl')
 salmon.quant$aale$platform_compare$deseq <- run.de.seq(salmon.quant$aale$platform_compare, base_level = 'ctrl')
-# salmon.quant$hbec$hbec_wt$deseq <- run.de.seq(salmon.quant$hbec$hbec_wt, base_level = 'wt2_kras_wt')
-# salmon.quant$hbec$hbec_v12$deseq <- run.de.seq(salmon.quant$hbec$hbec_v12, base_level = 'wt2_kras_v12')
-# salmon.quant$hbec$lacz_v_wt$deseq <- run.de.seq(salmon.quant$hbec$lacz_v_wt, base_level = 'wt2_lacz')
+
 salmon.quant$hbec$lacz_v_v12$deseq <- run.de.seq(salmon.quant$hbec$lacz_v_v12, base_level = 'wt2_lacz')
 salmon.quant$a549$deseq <- run.de.seq(salmon.quant$a549, base_level = 'Empty')
 salmon.quant$all_intra$deseq <- run.de.seq(salmon.quant$all_intra)
-
-# saveRDS(ucsc.rmsk.salmon.quant, file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
 
 
 a549_de <- run.de.seq.contrast(salmon.quant$a549, base_level = 'Empty')
 
 a549_te_de <- run.de.seq.contrast(ucsc.rmsk.salmon.quant$a549, base_level = 'Empty')
-
-# tmp <- run.de.seq.contrast(salmon.quant$aale$kras_compare$)
-
-# View(tmp %>% filter(padj < 0.01))
-# 
-# tmp %>% filter(gene %in% salmon.quant$aale$intra$deseq$de$gene) %>% View()
-# 
-# salmon.quant$aale$exo$deseq$de %>% 
-#   merge(tmp, by = 'gene') %>% 
-#   ggplot(aes(log2FoldChange.x, log2FoldChange.y, label = gene)) + 
-#   geom_point()+
-#   geom_text_repel(aes(label = ifelse(abs(log2FoldChange.x) > 2, gene, '')))
-
 
 # ------------------------------------------------------------------------------
 
@@ -794,14 +815,12 @@ ucsc.rmsk.salmon.quant$aale$ctrl_compare$deseq <-
   run.de.seq(ucsc.rmsk.salmon.quant$aale$ctrl_compare, base_level = 'ctrl')
 ucsc.rmsk.salmon.quant$aale$platform_compare$deseq <- 
   run.de.seq(ucsc.rmsk.salmon.quant$aale$platform_compare, base_level = 'ctrl')
-# ucsc.rmsk.salmon.quant$hbec$hbec_wt$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$hbec_wt, base_level = 'wt2_kras_wt')
-# ucsc.rmsk.salmon.quant$hbec$hbec_v12$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$hbec_v12, base_level = 'wt2_kras_v12')
-# ucsc.rmsk.salmon.quant$hbec$lacz_v_wt$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$lacz_v_wt, base_level = 'wt2_lacz')
+
 ucsc.rmsk.salmon.quant$hbec$lacz_v_v12$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$lacz_v_v12, base_level = 'wt2_lacz')
 ucsc.rmsk.salmon.quant$hbec$a549$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$a549, base_case = 'Empty')
 ucsc.rmsk.salmon.quant$all_intra$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$all_intra)
 
-# saveRDS(ucsc.rmsk.salmon.quant, file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
+saveRDS(ucsc.rmsk.salmon.quant, file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
 
 
 
@@ -863,7 +882,6 @@ salmon.quant$aale$exo$deseq$pca <- plot_pca(salmon.quant$aale$exo$deseq$gxi.vst.
 
 ```
 
-
 ## FUN: make.fgsea.ranks
 ```{r}
 make.fgsea.ranks <- function(de.seq){
@@ -924,8 +942,6 @@ salmon.quant$hbec$hbec_v12$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$hbec$h
 salmon.quant$hbec$lacz_v_wt$deseq$H.fgsea <-make.fgsea.ranks(salmon.quant$hbec$lacz_v_wt$deseq$de)
 salmon.quant$hbec$lacz_v_v12$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$hbec$lacz_v_v12$deseq$de)
 
-# saveRDS(salmon.quant, file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
-
 msig.df <- 
   msigdbr(species = 'Homo sapiens') %>% 
   dplyr::select(gene_symbol, gs_name) %>% 
@@ -944,20 +960,12 @@ salmon.quant$hbec$lacz_v_v12$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec
 
 saveRDS(salmon.quant, file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
 
-
-salmon.quant$aale$exo$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange > 0.5) %>% nrow()
-
-salmon.quant$aale$exo$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange < -0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% nrow()
-
 ```
 
 # START HERE FOR ANALYSIS
 ```{r}
 
-salmon.quant <- readRDS(file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
-ucsc.rmsk.salmon.quant <- readRDS(file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
+
 
 msig.df <- 
   msigdbr(species = 'Homo sapiens', category = 'H') %>% 
