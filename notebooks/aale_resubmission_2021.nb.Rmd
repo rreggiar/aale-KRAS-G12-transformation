@@ -790,15 +790,19 @@ run.de.seq.contrast <- function(tximeta.object, base_level = 'ctrl'){
 ```
 ## CALL: run.de.seq
 ```{r}
-salmon.quant$aale$intra$deseq <- run.de.seq(salmon.quant$aale$intra, base_level = 'ctrl')
-salmon.quant$aale$exo$deseq <- run.de.seq(salmon.quant$aale$exo, base_level = 'ctrl')
-salmon.quant$aale$kras_compare$deseq <- run.de.seq(salmon.quant$aale$kras_compare, base_level = 'kras')
-salmon.quant$aale$ctrl_compare$deseq <- run.de.seq(salmon.quant$aale$ctrl_compare, base_level = 'ctrl')
-salmon.quant$aale$platform_compare$deseq <- run.de.seq(salmon.quant$aale$platform_compare, base_level = 'ctrl')
+if (build_salmon.quant == T) { 
 
-salmon.quant$hbec$lacz_v_v12$deseq <- run.de.seq(salmon.quant$hbec$lacz_v_v12, base_level = 'wt2_lacz')
-salmon.quant$a549$deseq <- run.de.seq(salmon.quant$a549, base_level = 'Empty')
-salmon.quant$all_intra$deseq <- run.de.seq(salmon.quant$all_intra)
+  salmon.quant$aale$intra$deseq <- run.de.seq(salmon.quant$aale$intra, base_level = 'ctrl')
+  salmon.quant$aale$exo$deseq <- run.de.seq(salmon.quant$aale$exo, base_level = 'ctrl')
+  salmon.quant$aale$kras_compare$deseq <- run.de.seq(salmon.quant$aale$kras_compare, base_level = 'kras')
+  salmon.quant$aale$ctrl_compare$deseq <- run.de.seq(salmon.quant$aale$ctrl_compare, base_level = 'ctrl')
+  salmon.quant$aale$platform_compare$deseq <- run.de.seq(salmon.quant$aale$platform_compare, base_level = 'ctrl')
+  
+  salmon.quant$hbec$lacz_v_v12$deseq <- run.de.seq(salmon.quant$hbec$lacz_v_v12, base_level = 'wt2_lacz')
+  salmon.quant$a549$deseq <- run.de.seq(salmon.quant$a549, base_level = 'Empty')
+  salmon.quant$all_intra$deseq <- run.de.seq(salmon.quant$all_intra)
+  
+}
 
 
 a549_de <- run.de.seq.contrast(salmon.quant$a549, base_level = 'Empty')
@@ -806,23 +810,24 @@ a549_de <- run.de.seq.contrast(salmon.quant$a549, base_level = 'Empty')
 a549_te_de <- run.de.seq.contrast(ucsc.rmsk.salmon.quant$a549, base_level = 'Empty')
 
 # ------------------------------------------------------------------------------
+if (build_ucsc.rmsk.salmon.quant == T) { 
 
-ucsc.rmsk.salmon.quant$aale$intra$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$aale$intra, base_level = 'ctrl')
-ucsc.rmsk.salmon.quant$aale$exo$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$aale$exo, base_level = 'ctrl')
-ucsc.rmsk.salmon.quant$aale$kras_compare$deseq <- 
-  run.de.seq(ucsc.rmsk.salmon.quant$aale$kras_compare, base_level = 'kras')
-ucsc.rmsk.salmon.quant$aale$ctrl_compare$deseq <- 
-  run.de.seq(ucsc.rmsk.salmon.quant$aale$ctrl_compare, base_level = 'ctrl')
-ucsc.rmsk.salmon.quant$aale$platform_compare$deseq <- 
-  run.de.seq(ucsc.rmsk.salmon.quant$aale$platform_compare, base_level = 'ctrl')
+  ucsc.rmsk.salmon.quant$aale$intra$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$aale$intra, base_level = 'ctrl')
+  ucsc.rmsk.salmon.quant$aale$exo$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$aale$exo, base_level = 'ctrl')
+  ucsc.rmsk.salmon.quant$aale$kras_compare$deseq <- 
+    run.de.seq(ucsc.rmsk.salmon.quant$aale$kras_compare, base_level = 'kras')
+  ucsc.rmsk.salmon.quant$aale$ctrl_compare$deseq <- 
+    run.de.seq(ucsc.rmsk.salmon.quant$aale$ctrl_compare, base_level = 'ctrl')
+  ucsc.rmsk.salmon.quant$aale$platform_compare$deseq <- 
+    run.de.seq(ucsc.rmsk.salmon.quant$aale$platform_compare, base_level = 'ctrl')
+  
+  ucsc.rmsk.salmon.quant$hbec$lacz_v_v12$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$lacz_v_v12, base_level = 'wt2_lacz')
+  ucsc.rmsk.salmon.quant$hbec$a549$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$a549, base_case = 'Empty')
+  ucsc.rmsk.salmon.quant$all_intra$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$all_intra)
+  
+  saveRDS(ucsc.rmsk.salmon.quant, file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
 
-ucsc.rmsk.salmon.quant$hbec$lacz_v_v12$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$hbec$lacz_v_v12, base_level = 'wt2_lacz')
-ucsc.rmsk.salmon.quant$hbec$a549$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$a549, base_case = 'Empty')
-ucsc.rmsk.salmon.quant$all_intra$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$all_intra)
-
-saveRDS(ucsc.rmsk.salmon.quant, file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
-
-
+}
 
 ```
 
@@ -872,13 +877,15 @@ plot_pca <- function(counts, col.data) {
 ```
 ### CALL: plot_pca
 ```{r}
+if (build_salmon.quant == T) { 
 
-salmon.quant$aale$intra$deseq$pca <- plot_pca(salmon.quant$aale$intra$deseq$gxi.vst.counts,
-                                              salmon.quant$aale$intra$deseq$col.data)
-
-
-salmon.quant$aale$exo$deseq$pca <- plot_pca(salmon.quant$aale$exo$deseq$gxi.vst.counts,
-                                              salmon.quant$aale$exo$deseq$col.data)
+  salmon.quant$aale$intra$deseq$pca <- plot_pca(salmon.quant$aale$intra$deseq$gxi.vst.counts,
+                                                salmon.quant$aale$intra$deseq$col.data)
+  
+  
+  salmon.quant$aale$exo$deseq$pca <- plot_pca(salmon.quant$aale$exo$deseq$gxi.vst.counts,
+                                                salmon.quant$aale$exo$deseq$col.data)
+}
 
 ```
 
@@ -922,47 +929,48 @@ make.fgsea.ranks <- function(de.seq){
 ```
 ### CALL: make.fgsea.ranks
 ```{r}
-msig.df <- 
-  msigdbr(species = 'Homo sapiens', category = 'H') %>% 
-  dplyr::select(gene_symbol, gs_name) %>% 
-  split(x = .$gene_symbol, f = .$gs_name)
-
-msig.df$HALLMARK_KRAS_G12D_ZNF_DN <- salmon.quant$aale$intra$deseq$de %>% 
-  filter(gene %in% filter(meta.data$trono.krab.znfs, ZNF == 'KRAB-ZNFs')$gene,
-         log2FoldChange <= -1) %>% 
-  dplyr::select(gene) %>% unlist() %>% unname()
-
-salmon.quant$aale$intra$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$intra$deseq$de)
-salmon.quant$aale$exo$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$exo$deseq$de)
-salmon.quant$aale$kras_compare$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$kras_compare$deseq$de)
-salmon.quant$aale$ctrl_compare$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$ctrl_compare$deseq$de)
-salmon.quant$aale$platform_compare$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$platform_compare$deseq$de)
-salmon.quant$hbec$hbec_wt$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$hbec$hbec_wt$deseq$de)
-salmon.quant$hbec$hbec_v12$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$hbec$hbec_v12$deseq$de)
-salmon.quant$hbec$lacz_v_wt$deseq$H.fgsea <-make.fgsea.ranks(salmon.quant$hbec$lacz_v_wt$deseq$de)
-salmon.quant$hbec$lacz_v_v12$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$hbec$lacz_v_v12$deseq$de)
-
-msig.df <- 
-  msigdbr(species = 'Homo sapiens') %>% 
-  dplyr::select(gene_symbol, gs_name) %>% 
-  filter(!grepl('HALLMARK', gs_name)) %>% 
-  split(x = .$gene_symbol, f = .$gs_name)
-
-salmon.quant$aale$intra$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$intra$deseq$de)
-salmon.quant$aale$exo$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$exo$deseq$de)
-salmon.quant$aale$kras_compare$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$kras_compare$deseq$de)
-salmon.quant$aale$ctrl_compare$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$ctrl_compare$deseq$de)
-salmon.quant$aale$platform_compare$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$platform_compare$deseq$de)
-salmon.quant$hbec$hbec_wt$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$hbec_wt$deseq$de)
-salmon.quant$hbec$hbec_v12$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$hbec_v12$deseq$de)
-salmon.quant$hbec$lacz_v_wt$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$lacz_v_wt$deseq$de)
-salmon.quant$hbec$lacz_v_v12$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$lacz_v_v12$deseq$de)
-
-saveRDS(salmon.quant, file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
-
+if (build_salmon.quant == T) { 
+  
+  msig.df <- 
+    msigdbr(species = 'Homo sapiens', category = 'H') %>% 
+    dplyr::select(gene_symbol, gs_name) %>% 
+    split(x = .$gene_symbol, f = .$gs_name)
+  
+  msig.df$HALLMARK_KRAS_G12D_ZNF_DN <- salmon.quant$aale$intra$deseq$de %>% 
+    filter(gene %in% filter(meta.data$trono.krab.znfs, ZNF == 'KRAB-ZNFs')$gene,
+           log2FoldChange <= -1) %>% 
+    dplyr::select(gene) %>% unlist() %>% unname()
+  
+  salmon.quant$aale$intra$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$intra$deseq$de)
+  salmon.quant$aale$exo$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$exo$deseq$de)
+  salmon.quant$aale$kras_compare$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$kras_compare$deseq$de)
+  salmon.quant$aale$ctrl_compare$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$ctrl_compare$deseq$de)
+  salmon.quant$aale$platform_compare$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$platform_compare$deseq$de)
+  salmon.quant$hbec$hbec_wt$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$hbec$hbec_wt$deseq$de)
+  salmon.quant$hbec$hbec_v12$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$hbec$hbec_v12$deseq$de)
+  salmon.quant$hbec$lacz_v_wt$deseq$H.fgsea <-make.fgsea.ranks(salmon.quant$hbec$lacz_v_wt$deseq$de)
+  salmon.quant$hbec$lacz_v_v12$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$hbec$lacz_v_v12$deseq$de)
+  
+  msig.df <- 
+    msigdbr(species = 'Homo sapiens') %>% 
+    dplyr::select(gene_symbol, gs_name) %>% 
+    filter(!grepl('HALLMARK', gs_name)) %>% 
+    split(x = .$gene_symbol, f = .$gs_name)
+  
+  salmon.quant$aale$intra$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$intra$deseq$de)
+  salmon.quant$aale$exo$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$exo$deseq$de)
+  salmon.quant$aale$kras_compare$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$kras_compare$deseq$de)
+  salmon.quant$aale$ctrl_compare$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$ctrl_compare$deseq$de)
+  salmon.quant$aale$platform_compare$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$aale$platform_compare$deseq$de)
+  salmon.quant$hbec$hbec_wt$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$hbec_wt$deseq$de)
+  salmon.quant$hbec$hbec_v12$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$hbec_v12$deseq$de)
+  salmon.quant$hbec$lacz_v_wt$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$lacz_v_wt$deseq$de)
+  salmon.quant$hbec$lacz_v_v12$deseq$A.fgsea <- make.fgsea.ranks(salmon.quant$hbec$lacz_v_v12$deseq$de)
+  
+  saveRDS(salmon.quant, file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
+}
 ```
 
-# START HERE FOR ANALYSIS
 ```{r}
 
 
