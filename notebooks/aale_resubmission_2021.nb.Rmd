@@ -1,7 +1,10 @@
 ---
-title: "Resubmission of AALE manuscript to Cell Reports"
-author: 'Roman E. Reggiardo'
-date: '9/22/2021'
+title: "Mutant KRAS regulates transposable element RNA and innate immunity via KRAB zinc-finger genes"
+author: 'Roman E. Reggiardo <rreggiar@ucsc.edu>'
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+institution: "UC Santa Cruz"
+journal: "Cell Reports"
+toc: true
 output: html_notebook
 editor_options: 
   chunk_output_type: console
@@ -1171,7 +1174,7 @@ irf9_fimo_results <- memes::runFimo(promoter_seqs, irf9_motif, thresh = 1e-3) %>
 
 ```{r}
 salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange > 0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% View()
+  filter(padj < 0.05, log2FoldChange > 0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% 
   select(gene_id) %>% unlist() %>% unname() -> de_list
 
 salmon.quant$aale$intra$deseq$de %>% 
@@ -1222,7 +1225,8 @@ consensus_atac_boolean_anno <-
 ```
 ## parsed_datasets & GREAT
 ```{r}
-irf9_fimo_results %>% 
+# BiocManager::install("rGREAT")
+irf9_fimo_results %>%
   mutate(start.x = start.y + start.x,
          end.x = start.y + end.x) %>% 
   select(chr, start = start.x, end = end.x, strand = strand.x, gene, motif_id) %>% 
@@ -1322,6 +1326,7 @@ names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>%
 ```
 ## bam count promoters NOT WORKING
 ```{r}
+# BiocManager::install("bamsignals")
 getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_uniq_peak_ranges) -> ifn_uniq_seqs
 getSeq(BSgenome.Hsapiens.UCSC.hg38, other_uniq_peak_ranges) -> other_uniq_seqs
 memes::runAme(input = ifn_uniq_seqs, control = other_uniq_seqs) -> ifn_uniq_motifs
