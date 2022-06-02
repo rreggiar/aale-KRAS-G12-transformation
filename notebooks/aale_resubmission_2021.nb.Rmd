@@ -18,8 +18,22 @@ print(here())
 ```
 
 # setup:
+## installing
+```{r dependency install}
+
+system('sudo apt-get update -y && sudo apt-get install -y libxt-dev')
+# https://stackoverflow.com/questions/23642353/error-message-installing-cairo-package-in-r
+# Enables `Cairo` installation, ComplexHeatmap dependency
+
+```
 ## loading
-```{r loading}
+```{r package install & load + fonts}
+BiocManager::install(c("DESeq2",
+                       "bamsignals",
+                       "rGREAT",
+                       "MotifDb",
+                       "ComplexHeatmap"), update = FALSE, ask = FALSE)
+
 suppressPackageStartupMessages({
   library(tidyverse)
   library(here)
@@ -49,6 +63,7 @@ suppressPackageStartupMessages({
 })
 suppressMessages(loadfonts())
 ```
+# theming:
 ## setting ggplot theme
 ```{r setting ggplot theme}
 
@@ -165,12 +180,13 @@ te_alone_annotation_levels <- c('DNA',
                                 'LTR',
                                 'Satellite',
                                 'SINE')
+
 te_alone_color_pal <- viridis(5, direction = -1)
 names(te_alone_color_pal) <- te_alone_annotation_levels
 
 ```
 ## saving panels
-```{r saving panel}
+```{r panel dimensions}
 panel.figure.width = 85
 panel.figure.width.medium = 114
 panel.figure.width.double = 17
@@ -179,69 +195,69 @@ panel.figure.height = 279.4
 patch_fig_width = unit(172, 'mm')
 patch_fig_height = unit(279.4 * 0.9 , 'mm')
 
-panel.save <- function(figure, name, width = 'single', height = 'single', plot.in = last_plot()){
-  
-  if (width == 'single'){
-    panel.width = panel.figure.width
-  } else if (width == 'medium'){
-    panel.width = panel.figure.width.medium
-  } else{
-    panel.width = panel.figure.width.double
-  }
-  
-  if (height == 'single'){
-    panel.height = panel.figure.height/3
-  } else if (height == 'double'){
-    panel.height = (panel.figure.height/3)*1.5
-  } else if (height == 'medium'){
-    panel.height = (panel.figure.height/3)*2
-  } else{
-    panel.height = panel.figure.height
-  }
-  
-  if(!dir.exists(paste0(figure.dir, '/','fig.',figure))){
-    
-    dir.create(paste0(figure.dir, '/','fig.',figure))
-    
-  }
-  
-  ggsave(paste0(figure.dir,
-                '/',
-                'fig.',
-                figure,
-                '/', 
-                name, 
-                '.',
-                panel.width, 
-                'x', 
-                panel.height, 
-                '.pdf'),
-       width = panel.width, 
-       height = panel.height, 
-       units = 'mm', plot = plot.in, device = cairo_pdf)
-}
-
-save_pheatmap_pdf <- function(x, filename, width=panel.figure.width, height=3) {
-   stopifnot(!missing(x))
-   stopifnot(!missing(filename))
-   pdf(filename, width=unit(width, 'mm'), height=unit(height, 'mm'), family = 'Helvetica')
-   grid::grid.newpage()
-   grid::grid.draw(x$gtable)
-   dev.off()
-}
-
-## https://jokergoo.github.io/2020/05/11/set-cell-width/height-in-the-heatmap/
-calc_ht_size = function(ht, unit = "mm") {
-    pdf(NULL)
-    ht = ComplexHeatmap::draw(ht)
-    w = ComplexHeatmap:::width(ht)
-    w = grid::convertX(w, unit, valueOnly = TRUE)
-    h = ComplexHeatmap:::height(ht)
-    h = grid::convertY(h, unit, valueOnly = TRUE)
-    dev.off()
-
-    c(w, h)
-}
+# RERWIP
+# panel.save <- function(figure, name, width = 'single', height = 'single', plot.in = last_plot()){
+#   
+#   if (width == 'single'){
+#     panel.width = panel.figure.width
+#   } else if (width == 'medium'){
+#     panel.width = panel.figure.width.medium
+#   } else{
+#     panel.width = panel.figure.width.double
+#   }
+#   
+#   if (height == 'single'){
+#     panel.height = panel.figure.height/3
+#   } else if (height == 'double'){
+#     panel.height = (panel.figure.height/3)*1.5
+#   } else if (height == 'medium'){
+#     panel.height = (panel.figure.height/3)*2
+#   } else{
+#     panel.height = panel.figure.height
+#   }
+#   
+#   if(!dir.exists(paste0(figure.dir, '/','fig.',figure))){
+#     
+#     dir.create(paste0(figure.dir, '/','fig.',figure))
+#     
+#   }
+#   
+#   ggsave(paste0(figure.dir,
+#                 '/',
+#                 'fig.',
+#                 figure,
+#                 '/', 
+#                 name, 
+#                 '.',
+#                 panel.width, 
+#                 'x', 
+#                 panel.height, 
+#                 '.pdf'),
+#        width = panel.width, 
+#        height = panel.height, 
+#        units = 'mm', plot = plot.in, device = cairo_pdf)
+# }
+# 
+# save_pheatmap_pdf <- function(x, filename, width=panel.figure.width, height=3) {
+#    stopifnot(!missing(x))
+#    stopifnot(!missing(filename))
+#    pdf(filename, width=unit(width, 'mm'), height=unit(height, 'mm'), family = 'Helvetica')
+#    grid::grid.newpage()
+#    grid::grid.draw(x$gtable)
+#    dev.off()
+# }
+# 
+# calc_ht_size = function(ht, unit = "mm") {
+#     pdf(NULL)
+#     ht = ComplexHeatmap::draw(ht)
+#     w = ComplexHeatmap:::width(ht)
+#     w = grid::convertX(w, unit, valueOnly = TRUE)
+#     h = ComplexHeatmap:::height(ht)
+#     h = grid::convertY(h, unit, valueOnly = TRUE)
+#     dev.off()
+# 
+#     c(w, h)
+# }
 ```
 ## gene sets for filtering, identification
 ```{r gene set I/O}
@@ -318,46 +334,6 @@ if (! file.exists(file.path(output.data.dir, 'meta_data_df.rds'))) {
 }
 
 
-```
-
-```{r ip tables}
-# te.locus.count <- 
-#   read_csv(file.path(output.data.dir, 'pancreas.plasma.ev.long.RNA.normalized.deseq.tx.counts.csv')) %>%
-#   rename('X1' = 'tx')
-# 
-# read_csv(file.path(output.data.dir, 
-#                    'pancreas.plasma.ev.long.RNA.normalized.deseq.gene.diseaseState_PDAC_vs_healthy.lfcShrink.csv')) %>% 
-#   drop_na() %>% 
-#   rename('X1' = 'gene') %>% 
-#   filter(!grepl('^MT', gene),
-#          abs(lfcShrinkResults.log2FoldChange) >= 0.5) %>% 
-#   merge(te.families.clades, by = 'gene') %>% 
-#   mutate(family = ifelse(is.na(family), clade, family), 
-#          clade = factor(clade, levels = c('coding-gencode', 'lncRNA', 'DNA', 'LINE', 'LTR', 'SINE'))) %>% 
-#   filter(!grepl('\\(', gene)) %>% 
-#   mutate(genome = 'hg38') -> panc_v_ctrl_te.ip.parse
-# 
-# 
-# te.locus.count %>% 
-#   filter(!grepl('^ENST', tx)) %>% 
-#   filter_at(vars(contains('SRR')), any_vars(. > 5)) %>% 
-#   separate(tx, '=', into = c('name', 'position')) %>% 
-#   separate(name, '_', into = c(NA,NA,'name',NA)) %>%
-#   merge(te.families.clades, by.x = 'name', by.y = 'gene') %>% 
-#   separate(position, ':', into = c('chr', 'position')) %>% 
-#   separate(position, '_', into = c('position', NA)) %>% 
-#   separate(position, '-', into = c('start', 'end')) %>% 
-#   dplyr::select(gene='name', chr, start, end, clade, contains('SRR')) %>% 
-#   filter(gene %in% panc_v_ctrl_te.ip.parse$gene) %>% 
-#   gather(patient, count, -chr, -start, -end, -gene, -clade) %>% 
-#   group_by(chr, start, end, gene, clade) %>% 
-#   summarize(avg_count = mean(count)) %>% 
-#   mutate(start = as.numeric(start),
-#            chr = factor(chr, levels = chr.order)) %>% 
-#   merge(panc_v_ctrl_te.ip.parse %>% dplyr::select(-clade), by = 'gene') -> panc_v_ctrl_te.ip.table
-# 
-# write_csv(x = panc_v_ctrl_te.ip.table, 
-#           file.path(output.data.dir, 'panc_v_healthy.gut.paper.te.ip.table.RENAME.COLUMNS.csv'))
 ```
 
 # feature engineering:
@@ -1062,7 +1038,6 @@ availableOntologies(job)
 library(GenomicRanges)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(BSgenome)
-BiocManager::install("MotifDb")
 
 ifn_g <- msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE
 ifn_a <- msig.df$HALLMARK_INTERFERON_GAMMA_RESPONSE
@@ -1225,7 +1200,6 @@ consensus_atac_boolean_anno <-
 ```
 ## parsed_datasets & GREAT
 ```{r}
-# BiocManager::install("rGREAT")
 irf9_fimo_results %>%
   mutate(start.x = start.y + start.x,
          end.x = start.y + end.x) %>% 
@@ -1326,7 +1300,6 @@ names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>%
 ```
 ## bam count promoters NOT WORKING
 ```{r}
-# BiocManager::install("bamsignals")
 getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_uniq_peak_ranges) -> ifn_uniq_seqs
 getSeq(BSgenome.Hsapiens.UCSC.hg38, other_uniq_peak_ranges) -> other_uniq_seqs
 memes::runAme(input = ifn_uniq_seqs, control = other_uniq_seqs) -> ifn_uniq_motifs
