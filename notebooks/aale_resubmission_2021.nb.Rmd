@@ -822,7 +822,7 @@ a549_de <- run.de.seq.A549.contrast(salmon.quant$a549, base_level = 'Empty')
 a549_te_de <- run.de.seq.A549.contrast(ucsc.rmsk.salmon.quant$a549, base_level = 'Empty')
 
 # ------------------------------------------------------------------------------
-if (build_ucsc.rmsk.salmon.quant == T) { 
+if (build_ucsc.rmsk.salmon == T) { 
 
   ucsc.rmsk.salmon.quant$aale$intra$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$aale$intra, base_level = 'ctrl')
   ucsc.rmsk.salmon.quant$aale$exo$deseq <- run.de.seq(ucsc.rmsk.salmon.quant$aale$exo, base_level = 'ctrl')
@@ -984,9 +984,7 @@ if (build_salmon.quant == T) {
 ```
 
 ```{r}
-
-
-
+## RERWIP_start
 msig.df <- 
   msigdbr(species = 'Homo sapiens', category = 'H') %>% 
   dplyr::select(gene_symbol, gs_name) %>% 
