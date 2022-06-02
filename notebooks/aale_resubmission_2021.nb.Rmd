@@ -34,6 +34,8 @@ BiocManager::install(c("DESeq2",
                        "MotifDb",
                        "ComplexHeatmap"), update = FALSE, ask = FALSE)
 
+install.packages('magick')
+
 suppressPackageStartupMessages({
   library(tidyverse)
   library(here)
@@ -338,13 +340,16 @@ if (! file.exists(file.path(output.data.dir, 'meta_data_df.rds'))) {
 
 # processed dataset check:
 ```{r}
-if (file.exists(file.path(output.data.dir, 'salmon.quant_analysis_set.rds')) { 
+
+build_salmon.quant <- FALSE
+
+if (file.exists(file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))) { 
   
   salmon.quant <- readRDS(file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
   
   build_salmon.quant <- FALSE
 
-}) else {
+} else {
   
   message('Warning: salmon published dataset not found, will generate equivalent')
   
@@ -352,13 +357,15 @@ if (file.exists(file.path(output.data.dir, 'salmon.quant_analysis_set.rds')) {
   
 }
 
-if (file.exists(file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds')) { 
+build_ucsc.rmsk.salmon <- FALSE
+
+if (file.exists(file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))) { 
   
   ucsc.rmsk.salmon.quant <- readRDS(file = file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.rds'))
   
   build_ucsc.rmsk.salmon <- FALSE
 
-}) else {
+} else {
   
   message('Warning: ucsc rmsk salmon published dataset not found, will generate equivalent')
   
@@ -371,6 +378,8 @@ if (file.exists(file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.
 ## FUN: construct.quant.object
 ```{r}
 load.tximeta.object <- function(reference){
+  
+  ## RERCOMM
   
   print(file.path(output.data.dir, paste0(reference, '_h5_se')))
   
@@ -391,6 +400,9 @@ load.tximeta.object <- function(reference){
 }
 
 subset.tximeta.object <- function(tximeta.list, grep.string){
+  
+    ## RERCOMM
+
   
   if (grepl('\\|', grep.string)){
       
@@ -450,7 +462,7 @@ if (build_salmon.quant == T) {
 
 # ------------------------------------------------------------------------------
 
-if (build_ucsc.rmsk.salmon.quant == T) { 
+if (build_ucsc.rmsk.salmon == T) { 
 
   ucsc.rmsk.salmon.quant <- load.tximeta.object('ucsc.rmsk.salmon')
   
@@ -643,7 +655,7 @@ return(list('de' = dds.gxi.lfc,
   
 }
 
-run.de.seq.contrast <- function(tximeta.object, base_level = 'Empty'){
+run.de.seq.A549.contrast <- function(tximeta.object, base_level = 'Empty'){
   
   tximeta.name <- deparse(substitute(tximeta.object))
   
@@ -805,9 +817,9 @@ if (build_salmon.quant == T) {
 }
 
 
-a549_de <- run.de.seq.contrast(salmon.quant$a549, base_level = 'Empty')
+a549_de <- run.de.seq.A549.contrast(salmon.quant$a549, base_level = 'Empty')
 
-a549_te_de <- run.de.seq.contrast(ucsc.rmsk.salmon.quant$a549, base_level = 'Empty')
+a549_te_de <- run.de.seq.A549.contrast(ucsc.rmsk.salmon.quant$a549, base_level = 'Empty')
 
 # ------------------------------------------------------------------------------
 if (build_ucsc.rmsk.salmon.quant == T) { 
