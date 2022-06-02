@@ -800,7 +800,7 @@ run.de.seq.contrast <- function(tximeta.object, base_level = 'ctrl'){
 }
 
 ```
-## CALL: run.de.seq
+### CALL: run.de.seq
 ```{r}
 if (build_salmon.quant == T) { 
 
@@ -995,57 +995,59 @@ msig.df$HALLMARK_KRAS_G12D_ZNF_DN <- salmon.quant$aale$intra$deseq$de %>%
          log2FoldChange <= -1) %>% 
   dplyr::select(gene) %>% unlist() %>% unname()
 
-lapply(c(1,2), function(i) { 
-  
-  imap(salmon.quant[names(salmon.quant) %in% c('aale', 'hbec')][[i]], function(x, x_name) {
-    
-    x$deseq$de %>%
-      filter(abs(log2FoldChange) > 1, padj < 0.05, gene %in% msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE) %>% 
-      mutate(id = x_name)
-    
-  })
-}) %>% purrr::flatten() %>% 
-  bind_rows() %>% 
-  filter(!grepl('compare|hbec_|v_wt', id)) %>% 
-  group_by(gene) %>% 
-  summarize(context = list(id)) %>% 
-  ggplot(aes(context)) + 
-  geom_bar() + 
-  ggupset::scale_x_upset() +
-  geom_text(stat='count', aes(label=after_stat(count)), size = txt.mm_to_pts(0.6))
-
-msig.df[grepl('INTERFERON|INFLAMMATORY', names(msig.df))] %>% 
-  lapply(function(x) as.data.frame(x)) %>% 
-  bind_rows(.id = 'pathway') %>% 
-  rbind(salmon.quant$aale$intra$deseq$de %>% 
-          filter(log2FoldChange > 1, padj < 0.05) %>% 
-          mutate(pathway = 'kras.intra') %>% select(pathway, 'x' = gene)) %>% 
-  group_by(x) %>% 
-  summarize(pathways = list(pathway)) %>% 
-  ggplot(aes(pathways)) + 
-  geom_bar() + 
-  ggupset::scale_x_upset() +
-  geom_text(stat='count', aes(label=after_stat(count)), vjust = -0.5)
-
-salmon.quant$aale$intra$deseq$de %>% 
-          filter(padj < 0.05) %>%
-  mutate(pathway = ifelse(gene %in% msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE, 'IFNA', 'other')) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), color = pathway)) + 
-  geom_point(alpha = 0.3)
-
-salmon.quant$aale$intra$deseq$de %>% filter(padj< 0.05) %>% 
-  merge(salmon.quant$aale$exo$deseq$de %>% filter(padj < 0.05), by = 'gene') %>% 
-  mutate(pathway = ifelse(gene %in% msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE, 'IFNA', 'other')) %>%
-  ggplot(aes(log2FoldChange.x, log2FoldChange.y, color = pathway)) + 
-  geom_point(alpha = 0.3)
-
+# lapply(c(1,2), function(i) { 
+#   
+#   imap(salmon.quant[names(salmon.quant) %in% c('aale', 'hbec')][[i]], function(x, x_name) {
+#     
+#     x$deseq$de %>%
+#       filter(abs(log2FoldChange) > 1, padj < 0.05, gene %in% msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE) %>% 
+#       mutate(id = x_name)
+#     
+#   })
+# }) %>% purrr::flatten() %>% 
+#   bind_rows() %>% 
+#   filter(!grepl('compare|hbec_|v_wt', id)) %>% 
+#   group_by(gene) %>% 
+#   summarize(context = list(id)) %>% 
+#   ggplot(aes(context)) + 
+#   geom_bar() + 
+#   ggupset::scale_x_upset() +
+#   geom_text(stat='count', aes(label=after_stat(count)), size = txt.mm_to_pts(0.6))
+# 
+# msig.df[grepl('INTERFERON|INFLAMMATORY', names(msig.df))] %>% 
+#   lapply(function(x) as.data.frame(x)) %>% 
+#   bind_rows(.id = 'pathway') %>% 
+#   rbind(salmon.quant$aale$intra$deseq$de %>% 
+#           filter(log2FoldChange > 1, padj < 0.05) %>% 
+#           mutate(pathway = 'kras.intra') %>% select(pathway, 'x' = gene)) %>% 
+#   group_by(x) %>% 
+#   summarize(pathways = list(pathway)) %>% 
+#   ggplot(aes(pathways)) + 
+#   geom_bar() + 
+#   ggupset::scale_x_upset() +
+#   geom_text(stat='count', aes(label=after_stat(count)), vjust = -0.5)
+# 
+# salmon.quant$aale$intra$deseq$de %>% 
+#           filter(padj < 0.05) %>%
+#   mutate(pathway = ifelse(gene %in% msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE, 'IFNA', 'other')) %>% 
+#   ggplot(aes(log2FoldChange, -log10(padj), color = pathway)) + 
+#   geom_point(alpha = 0.3)
+# 
+# salmon.quant$aale$intra$deseq$de %>% filter(padj< 0.05) %>% 
+#   merge(salmon.quant$aale$exo$deseq$de %>% filter(padj < 0.05), by = 'gene') %>% 
+#   mutate(pathway = ifelse(gene %in% msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE, 'IFNA', 'other')) %>%
+#   ggplot(aes(log2FoldChange.x, log2FoldChange.y, color = pathway)) + 
+#   geom_point(alpha = 0.3)
+```
+#
+```{r building GREAT}
 library(rGREAT)
 
 salmon.quant$gxi.bed %>% 
   filter(gene %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.01, log2FoldChange > 1)$gene) %>% 
   select(chr, start, end, gene, strand) -> input_bed
 
-consensus_atac_boolean_anno
+# consensus_atac_boolean_anno
 
 job <- rGREAT::submitGreatJob(input_bed, species = 'hg38')
 
@@ -1200,6 +1202,7 @@ promoter_seqs_hbec <-
 # 
 tomTom_res <- memes::runAme(control = 'shuffle',
                             input = promoter_seqs)
+
 
 ```
 
