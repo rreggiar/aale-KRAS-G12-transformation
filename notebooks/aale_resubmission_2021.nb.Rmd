@@ -39,7 +39,7 @@ BiocManager::install(c("DESeq2",
 
 remotes::install_github(repo = "poisonalien/trackplot", upgrade = F)
 
-install.packages('magick')
+install.packages(c('magick', 'cowplot'))
 
 suppressPackageStartupMessages({
   library(tidyverse)
@@ -51,6 +51,7 @@ suppressPackageStartupMessages({
   library(ggrepel)
   library(ggforce)
   library(ggpmisc)
+  library(cowplot)
   library(patchwork)
   library(extrafont)
   library(ggrepel)
@@ -920,8 +921,7 @@ if (build_salmon.quant == T) {
   saveRDS(salmon.quant, file = file.path(output.data.dir, 'salmon.quant_analysis_set.rds'))
 }
 ```
-
-# building GREAT
+## building GREAT
 ```{r building GREAT}
 library(rGREAT)
 
@@ -1050,37 +1050,6 @@ irf9_fimo_results <- memes::runFimo(promoter_seqs, irf9_motif, thresh = 1e-3) %>
 
 ```
 
-```{r}
-# salmon.quant$aale$intra$deseq$de %>% 
-#   filter(padj < 0.05, log2FoldChange > 0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% 
-#   select(gene_id) %>% unlist() %>% unname() -> de_list
-# 
-# salmon.quant$aale$intra$deseq$de %>% 
-#   filter(padj < 0.05, log2FoldChange < -0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% 
-#   select(gene_id) %>% unlist() %>% unname() -> de_list_w_hbec
-# 
-# gr <- rowRanges(salmon.quant$gxi)
-# 
-# ifn_de_gr <- gr[names(gr) %in% de_list]
-# ifn_de_gr_hbec <- gr[names(gr) %in% de_list_w_hbec]
-# 
-# promoter_seqs <- 
-#   GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
-#                                   query = ifn_de_gr, upstream = 1000, downstream = 500)
-# 
-# promoter_seqs_hbec <- 
-#   GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
-#                                    query = ifn_de_gr_hbec, upstream = 1000, downstream = 500)
-
-
-# dreme_results <- memes::runDreme(promoter_seqs, control = "shuffle")
-# 
-# tomTom_res <- memes::runAme(control = 'shuffle',
-#                             input = promoter_seqs)
-
-
-```
-
 # ATAC
 ## datasets
 ```{r}
@@ -1202,7 +1171,6 @@ names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>%
   filter(annotation == "promoter-TSS ") %>% 
   select(`Gene Name`) %>% unlist() %>% unname()
 ```
-
 ## DE promoters
 ```{r}
 salmon.quant$aale$intra$deseq$de %>% 
@@ -1229,7 +1197,6 @@ dn_promoter_regions <- promoters(dn_gr, upstream = 1000, downstream = 200)
 
 getSeq(BSgenome.Hsapiens.UCSC.hg38, dn_promoter_regions) -> dnreg_gencode_seqs
 ```
-
 ## TE ranges
 ```{r}
 meta.data$ucsc.rmsk.tx.to.gene.fmt %>% 
@@ -1986,6 +1953,7 @@ wrap_plots(znf90_atac.plt,
 
 
 ```
+
 # Figure 1
 ## toil data load and transform
 ```{r}
