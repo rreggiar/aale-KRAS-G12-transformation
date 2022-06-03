@@ -1,7 +1,7 @@
 ---
 title: "Mutant KRAS regulates transposable element RNA and innate immunity via KRAB zinc-finger genes"
 author: 'Roman E. Reggiardo <rreggiar@ucsc.edu>'
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+build_date: "`r format(Sys.time(), '%d %B, %Y')`"
 institution: "UC Santa Cruz"
 journal: "Cell Reports"
 toc: true
@@ -200,70 +200,6 @@ panel.figure.height = 279.4
 
 patch_fig_width = unit(172, 'mm')
 patch_fig_height = unit(279.4 * 0.9 , 'mm')
-
-# RERWIP
-# panel.save <- function(figure, name, width = 'single', height = 'single', plot.in = last_plot()){
-#   
-#   if (width == 'single'){
-#     panel.width = panel.figure.width
-#   } else if (width == 'medium'){
-#     panel.width = panel.figure.width.medium
-#   } else{
-#     panel.width = panel.figure.width.double
-#   }
-#   
-#   if (height == 'single'){
-#     panel.height = panel.figure.height/3
-#   } else if (height == 'double'){
-#     panel.height = (panel.figure.height/3)*1.5
-#   } else if (height == 'medium'){
-#     panel.height = (panel.figure.height/3)*2
-#   } else{
-#     panel.height = panel.figure.height
-#   }
-#   
-#   if(!dir.exists(paste0(figure.dir, '/','fig.',figure))){
-#     
-#     dir.create(paste0(figure.dir, '/','fig.',figure))
-#     
-#   }
-#   
-#   ggsave(paste0(figure.dir,
-#                 '/',
-#                 'fig.',
-#                 figure,
-#                 '/', 
-#                 name, 
-#                 '.',
-#                 panel.width, 
-#                 'x', 
-#                 panel.height, 
-#                 '.pdf'),
-#        width = panel.width, 
-#        height = panel.height, 
-#        units = 'mm', plot = plot.in, device = cairo_pdf)
-# }
-# 
-# save_pheatmap_pdf <- function(x, filename, width=panel.figure.width, height=3) {
-#    stopifnot(!missing(x))
-#    stopifnot(!missing(filename))
-#    pdf(filename, width=unit(width, 'mm'), height=unit(height, 'mm'), family = 'Helvetica')
-#    grid::grid.newpage()
-#    grid::grid.draw(x$gtable)
-#    dev.off()
-# }
-# 
-# calc_ht_size = function(ht, unit = "mm") {
-#     pdf(NULL)
-#     ht = ComplexHeatmap::draw(ht)
-#     w = ComplexHeatmap:::width(ht)
-#     w = grid::convertX(w, unit, valueOnly = TRUE)
-#     h = ComplexHeatmap:::height(ht)
-#     h = grid::convertY(h, unit, valueOnly = TRUE)
-#     dev.off()
-# 
-#     c(w, h)
-# }
 ```
 ### gene sets for filtering, identification
 ```{r gene set I/O}
@@ -499,7 +435,6 @@ if (build_ucsc.rmsk.salmon == T) {
 }
 
 ```
-
 ## FUN: run.de.seq
 ```{r}
 run.de.seq <- function(tximeta.object, base_level = 'ctrl'){
@@ -846,7 +781,6 @@ if (build_ucsc.rmsk.salmon == T) {
 }
 
 ```
-
 ## FUN: plot_pca
 ```{r}
 plot_pca <- function(counts, col.data) { 
@@ -904,7 +838,6 @@ if (build_salmon.quant == T) {
 }
 
 ```
-
 ## FUN: make.fgsea.ranks
 ```{r}
 make.fgsea.ranks <- function(de.seq){
@@ -945,8 +878,6 @@ make.fgsea.ranks <- function(de.seq){
 ```
 ### CALL: make.fgsea.ranks
 ```{r}
-if (build_salmon.quant == T) { 
-  
   msig.df <- 
     msigdbr(species = 'Homo sapiens', category = 'H') %>% 
     dplyr::select(gene_symbol, gs_name) %>% 
@@ -957,6 +888,8 @@ if (build_salmon.quant == T) {
            log2FoldChange <= -1) %>% 
     dplyr::select(gene) %>% unlist() %>% unname()
   
+if (build_salmon.quant == T) { 
+
   salmon.quant$aale$intra$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$intra$deseq$de)
   salmon.quant$aale$exo$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$exo$deseq$de)
   salmon.quant$aale$kras_compare$deseq$H.fgsea <- make.fgsea.ranks(salmon.quant$aale$kras_compare$deseq$de)
@@ -987,63 +920,7 @@ if (build_salmon.quant == T) {
 }
 ```
 
-```{r}
-## RERWIP_start
-msig.df <- 
-  msigdbr(species = 'Homo sapiens', category = 'H') %>% 
-  dplyr::select(gene_symbol, gs_name) %>% 
-  split(x = .$gene_symbol, f = .$gs_name)
-
-msig.df$HALLMARK_KRAS_G12D_ZNF_DN <- salmon.quant$aale$intra$deseq$de %>% 
-  filter(gene %in% filter(meta.data$trono.krab.znfs, ZNF == 'KRAB-ZNFs')$gene,
-         log2FoldChange <= -1) %>% 
-  dplyr::select(gene) %>% unlist() %>% unname()
-
-# lapply(c(1,2), function(i) { 
-#   
-#   imap(salmon.quant[names(salmon.quant) %in% c('aale', 'hbec')][[i]], function(x, x_name) {
-#     
-#     x$deseq$de %>%
-#       filter(abs(log2FoldChange) > 1, padj < 0.05, gene %in% msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE) %>% 
-#       mutate(id = x_name)
-#     
-#   })
-# }) %>% purrr::flatten() %>% 
-#   bind_rows() %>% 
-#   filter(!grepl('compare|hbec_|v_wt', id)) %>% 
-#   group_by(gene) %>% 
-#   summarize(context = list(id)) %>% 
-#   ggplot(aes(context)) + 
-#   geom_bar() + 
-#   ggupset::scale_x_upset() +
-#   geom_text(stat='count', aes(label=after_stat(count)), size = txt.mm_to_pts(0.6))
-# 
-# msig.df[grepl('INTERFERON|INFLAMMATORY', names(msig.df))] %>% 
-#   lapply(function(x) as.data.frame(x)) %>% 
-#   bind_rows(.id = 'pathway') %>% 
-#   rbind(salmon.quant$aale$intra$deseq$de %>% 
-#           filter(log2FoldChange > 1, padj < 0.05) %>% 
-#           mutate(pathway = 'kras.intra') %>% select(pathway, 'x' = gene)) %>% 
-#   group_by(x) %>% 
-#   summarize(pathways = list(pathway)) %>% 
-#   ggplot(aes(pathways)) + 
-#   geom_bar() + 
-#   ggupset::scale_x_upset() +
-#   geom_text(stat='count', aes(label=after_stat(count)), vjust = -0.5)
-# 
-# salmon.quant$aale$intra$deseq$de %>% 
-#           filter(padj < 0.05) %>%
-#   mutate(pathway = ifelse(gene %in% msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE, 'IFNA', 'other')) %>% 
-#   ggplot(aes(log2FoldChange, -log10(padj), color = pathway)) + 
-#   geom_point(alpha = 0.3)
-# 
-# salmon.quant$aale$intra$deseq$de %>% filter(padj< 0.05) %>% 
-#   merge(salmon.quant$aale$exo$deseq$de %>% filter(padj < 0.05), by = 'gene') %>% 
-#   mutate(pathway = ifelse(gene %in% msig.df$HALLMARK_INTERFERON_ALPHA_RESPONSE, 'IFNA', 'other')) %>%
-#   ggplot(aes(log2FoldChange.x, log2FoldChange.y, color = pathway)) + 
-#   geom_point(alpha = 0.3)
-```
-#
+# building GREAT
 ```{r building GREAT}
 library(rGREAT)
 
@@ -1052,20 +929,13 @@ salmon.quant$gxi.bed %>%
   select(chr, start, end, gene, strand) -> input_bed
 
 # consensus_atac_boolean_anno
-
-job <- rGREAT::submitGreatJob(input_bed, species = 'hg38')
-
-tb <- rGREAT::getEnrichmentTables(job)
-
-rGREAT::plotRegionGeneAssociationGraphs(job)
-
-
-availableOntologies(job)
-
-
+# 
+# job <- rGREAT::submitGreatJob(input_bed, species = 'hg38')
+# 
+# tb <- rGREAT::getEnrichmentTables(job)
 
 ```
-
+## generate FIMO output
 ```{r}
 library(GenomicRanges)
 library(BSgenome.Hsapiens.UCSC.hg38)
@@ -1180,32 +1050,32 @@ irf9_fimo_results <- memes::runFimo(promoter_seqs, irf9_motif, thresh = 1e-3) %>
 ```
 
 ```{r}
-salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange > 0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% 
-  select(gene_id) %>% unlist() %>% unname() -> de_list
-
-salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange < -0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% 
-  select(gene_id) %>% unlist() %>% unname() -> de_list_w_hbec
-
-gr <- rowRanges(salmon.quant$gxi)
-
-ifn_de_gr <- gr[names(gr) %in% de_list]
-ifn_de_gr_hbec <- gr[names(gr) %in% de_list_w_hbec]
-
-promoter_seqs <- 
-  GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
-                                  query = ifn_de_gr, upstream = 1000, downstream = 500)
-
-promoter_seqs_hbec <- 
-  GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
-                                   query = ifn_de_gr_hbec, upstream = 1000, downstream = 500)
+# salmon.quant$aale$intra$deseq$de %>% 
+#   filter(padj < 0.05, log2FoldChange > 0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% 
+#   select(gene_id) %>% unlist() %>% unname() -> de_list
+# 
+# salmon.quant$aale$intra$deseq$de %>% 
+#   filter(padj < 0.05, log2FoldChange < -0.5, gene %in% meta.data$gencode.35.lnc.gene.names$gene) %>% 
+#   select(gene_id) %>% unlist() %>% unname() -> de_list_w_hbec
+# 
+# gr <- rowRanges(salmon.quant$gxi)
+# 
+# ifn_de_gr <- gr[names(gr) %in% de_list]
+# ifn_de_gr_hbec <- gr[names(gr) %in% de_list_w_hbec]
+# 
+# promoter_seqs <- 
+#   GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
+#                                   query = ifn_de_gr, upstream = 1000, downstream = 500)
+# 
+# promoter_seqs_hbec <- 
+#   GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
+#                                    query = ifn_de_gr_hbec, upstream = 1000, downstream = 500)
 
 
 # dreme_results <- memes::runDreme(promoter_seqs, control = "shuffle")
 # 
-tomTom_res <- memes::runAme(control = 'shuffle',
-                            input = promoter_seqs)
+# tomTom_res <- memes::runAme(control = 'shuffle',
+#                             input = promoter_seqs)
 
 
 ```
@@ -1331,47 +1201,7 @@ names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>%
   filter(annotation == "promoter-TSS ") %>% 
   select(`Gene Name`) %>% unlist() %>% unname()
 ```
-## bam count promoters NOT WORKING
-```{r}
-# getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_uniq_peak_ranges) -> ifn_uniq_seqs
-# getSeq(BSgenome.Hsapiens.UCSC.hg38, other_uniq_peak_ranges) -> other_uniq_seqs
-# memes::runAme(input = ifn_uniq_seqs, control = other_uniq_seqs) -> ifn_uniq_motifs
-# 
-# salmon.quant$aale$intra$deseq$de %>% 
-#   filter(padj < 0.05, abs(log2FoldChange) > 1) %>%
-#   select(gene_id) %>% unlist() %>% unname() -> de_list
-# 
-# de_list_ranges <- gr[names(gr) %in% de_list]
-# 
-# names(de_list_ranges) <- paste0(seqnames(de_list_ranges)) #, '_', names(de_list_ranges))
-# 
-# de_list_promoter_seqs <-
-#   GenomicFeatures::getPromoterSeq(subject = BSgenome.Hsapiens.UCSC.hg38, 
-#                                   query = de_list_ranges, upstream = 1000, downstream = 500)
-# 
-# lapply(ifn_uniq_motifs$motif_id, function(motif) {
-#   
-#   print(motif)
-#   
-#   this_motif <- MotifDb::query(MotifDb::MotifDb, motif) %>% 
-#                   universalmotif::convert_motifs()
-#   
-#   memes::runFimo(de_list_promoter_seqs, motifs = this_motif) -> de_list_promoter_regions
-#   
-#   bamsignals::bamCount(kras_bam_path,
-#                           de_list_promoter_regions) -> kras_de_prom_profile
-# 
-#   bamsignals::bamCount(ctrl_bam_path,
-#                           de_list_promoter_regions) -> ctrl_de_prom_profile
-# 
-#   lst('kras' = kras_de_prom_profile,
-#       'ctrl' = ctrl_de_prom_profile)
-#   
-# 
-# }) -> de_list_fimo_out
-# 
-# de_list_fimo_out
-```
+
 ## DE promoters
 ```{r}
 salmon.quant$aale$intra$deseq$de %>% 
