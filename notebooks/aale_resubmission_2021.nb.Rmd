@@ -1318,7 +1318,7 @@ tf_list_generator <- function(upreg_te_list,
   
   lapply(unique(filter_te_list$gene), function(te) { 
 
-    filter_rmsk_parsed_bed %>% 
+    filter_te_list %>% 
       filter(gene %in% upreg_te_list$gene,
              gene == te) %>% 
       GenomicRanges::makeGRangesFromDataFrame() -> te_ranges
@@ -1329,7 +1329,7 @@ tf_list_generator <- function(upreg_te_list,
     
   }) -> filtered_te_ranges_list
   
-  lapply(unique(filter_rmsk_parsed_bed$biotype), function(bt) {
+  lapply(unique(filter_te_list$biotype), function(bt) {
 
     rmsk_parsed_bed %>% 
       filter(gene %in% upreg_te_list$gene,
