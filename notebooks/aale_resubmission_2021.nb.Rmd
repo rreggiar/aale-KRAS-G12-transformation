@@ -25,7 +25,8 @@ system('sudo apt-get update -y && sudo apt-get install -y libxt-dev')
 # https://stackoverflow.com/questions/23642353/error-message-installing-cairo-package-in-r
 # Enables `Cairo` installation, ComplexHeatmap dependency
 
-system('sudo cp install_bin/bwtool /usr/local/bin/ && sudo apt install mysql-server')
+system('sudo cp install_bin/bwtool /usr/local/bin/')
+system('sudo apt -y install mysql-server')
 
 ```
 ## loading
