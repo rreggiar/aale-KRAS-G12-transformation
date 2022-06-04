@@ -5,12 +5,14 @@ build_date: "`r format(Sys.time(), '%d %B, %Y')`"
 institution: "UC Santa Cruz"
 journal: "Cell Reports"
 toc: true
-output: html_notebook
+output: 
+  html_notebook:
+    code_folding: hide
 editor_options: 
   chunk_output_type: console
 ---
 
-```{r, setup, include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.width = 8, collapse = T)
 knitr::opts_chunk$set(message = F)
 library(here)
@@ -1054,8 +1056,8 @@ irf9_fimo_results <- memes::runFimo(promoter_seqs, irf9_motif, thresh = 1e-3) %>
 
 ```
 
-# ATAC
-## datasets
+## ATAC
+### datasets
 ```{r}
 kras_atac_anno_peaks <- 
   read_tsv(file.path(output.data.dir, 
@@ -1075,7 +1077,7 @@ consensus_atac_boolean_anno <-
                      'narrow_output.data/bwa/mergedLibrary/macs/narrowPeak/consensus/consensus_peaks.mLb.clN.boolean.annotatePeaks.txt'
                      ))
 ```
-## parsed_datasets & GREAT
+### parsed_datasets & GREAT
 ```{r}
 irf9_fimo_results %>%
   mutate(start.x = start.y + start.x,
@@ -1143,7 +1145,7 @@ uniq_ctrl_job <- rGREAT::submitGreatJob(uniq_ctrl_peak_input_bed, species = 'hg3
 
 uniq_ctrl_tb <- rGREAT::getEnrichmentTables(uniq_ctrl_job, download_by = 'tsv')
 ```
-## peak ranges
+### peak ranges
 ```{r}
 consensus_atac_boolean_anno %>% 
   filter(ctrl_R1.mLb.clN.bool == F) %>% 
@@ -1175,7 +1177,7 @@ names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>%
   filter(annotation == "promoter-TSS ") %>% 
   select(`Gene Name`) %>% unlist() %>% unname()
 ```
-## DE promoters
+### DE promoters
 ```{r}
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, log2FoldChange > 1.5) %>% 
@@ -1201,7 +1203,7 @@ dn_promoter_regions <- promoters(dn_gr, upstream = 1000, downstream = 200)
 
 getSeq(BSgenome.Hsapiens.UCSC.hg38, dn_promoter_regions) -> dnreg_gencode_seqs
 ```
-## TE ranges
+### TE ranges
 ```{r}
 meta.data$ucsc.rmsk.tx.to.gene.fmt %>% 
   select(enst, gene, biotype) %>% 
@@ -1618,7 +1620,7 @@ hbec.aale.te_ranges_list$znf_plts$znf_score <- znf_score_plt(salmon.quant$hbec$l
 
   
 ```
-## ATAC Coverage
+### ATAC Coverage
 ```{r}
 library(bamsignals)
 ctrl_norm_factor <- 43576060
@@ -1740,7 +1742,7 @@ salmon.quant$aale$intra$deseq$de %>%
 # 
 # bamsignals::alignSignals(bamsignals::bamCoverage(kras_bam_path, promoter_regions, paired.end = 'extend')) %>% dim()
 ```
-## ATAC BW signal
+### ATAC BW signal
 ```{r}
 library(trackplot)
 library(scales)
@@ -1957,7 +1959,7 @@ wrap_plots(znf90_atac.plt,
 
 
 ```
-## znf
+### znf
 ```{r}
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, log2FoldChange < -1, gene %in% meta.data$trono.krab.znfs$gene | grepl('^ZNF', gene)) %>% 
@@ -2291,6 +2293,8 @@ ggsave2(plot = figure_1_patchwork.fig,
        filename = file.path(figure.dir, 'fig.1', 'figure_1_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
+figure_1_patchwork.fig
+
 ```
 ## Figure S1
 ```{r}
@@ -2372,7 +2376,7 @@ ggsave(plot = figure_S1_patchwork.fig,
        filename = file.path(figure.dir, 'fig.1', 'figure_S1_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
-
+figure_S1_patchwork.fig
 ```
 # Figure 2
 ```{r}
@@ -2440,7 +2444,7 @@ ggsave(plot = figure_2_patchwork.fig,
        filename = file.path(figure.dir, 'fig.2', 'figure_2_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
-
+figure_2_patchwork.fig
 ```
 # Figure 3
 ```{r}
@@ -2594,7 +2598,7 @@ wrap_plots(plt_3A.plt,
 ggsave(plot = figure_3_patchwork.fig,
        filename = file.path(figure.dir, 'fig.3', 'figure_3_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
-
+figure_3_patchwork.fig
 ```
 ## Figure S2
 ```{r}
@@ -2724,7 +2728,7 @@ ggsave(plot = figure_S3_patchwork.fig,
        filename = file.path(figure.dir, 'fig.2', 'figure_S2_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
-
+figure_S3_patchwork.fig
 ```
 # Figure S3
 ```{r}
@@ -2807,6 +2811,8 @@ wrap_plots(plt_4A.plt,
 ggsave(plot = figure_4_patchwork.fig,
        filename = file.path(figure.dir, 'fig.3', 'figure_S3_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+figure_4_patchwork.fig
 ```
 ## Figure S4
 ```{r}
@@ -2880,6 +2886,8 @@ ggsave(plot = figure_S4_patchwork.fig,
        filename = file.path(figure.dir, 'fig.4', 'figure_S4_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
+figure_S4_patchwork.fig
+
 ```
 # Figure S5
 ```{r}
@@ -2934,6 +2942,8 @@ wrap_plots(plt_5C.plt,
 ggsave(plot = figure_5_patchwork.fig,
        filename = file.path(figure.dir, 'fig.5', 'figure_S5_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+figure_5_patchwork.fig
 ```
 ## Figure S6
 ```{r}
@@ -2951,6 +2961,8 @@ wrap_plots(exo.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = 
 ggsave(plot = figure_S5_patchwork.fig,
        filename = file.path(figure.dir, 'fig.6', 'figure_S6_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+figure_S5_patchwork.fig
 ```
 # Figure 4
 ```{r}
@@ -3013,8 +3025,7 @@ ggsave(plot = figure_6_patchwork.fig,
        filename = file.path(figure.dir, 'fig.4', 'figure_4_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
-
-
+figure_6_patchwork.fig
 ```
 # Figure 5
 ### complex plotting
@@ -3204,5 +3215,7 @@ wrap_plots(patchwork::wrap_elements(full =
 ggsave(plot = figure_7_patchwork.fig,
        filename = file.path(figure.dir, 'fig.5', 'figure_5_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
+
+figure_7_patchwork.fig
 
 ```
