@@ -23,12 +23,15 @@ print(here())
 # setup:
 ## installing
 ```{r dependency install}
+here::i_am("notebooks/aale_resubmission_2021.nb.Rmd")
 
 system('sudo apt-get update -y && sudo apt-get install -y libxt-dev')
 # https://stackoverflow.com/questions/23642353/error-message-installing-cairo-package-in-r
 # Enables `Cairo` installation, ComplexHeatmap dependency
 
-system('sudo cp install_bin/bwtool /usr/local/bin/')
+system(paste0('sudo cp ', 
+              here::here('install_bin/bwtool'),
+              ' /usr/local/bin/'))
 system('sudo apt install -y mysql-server')
 system('sudo apt-get install -y libmagick++-6.q16-dev')
 system('sudo apt-get install -y libpoppler-cpp-dev')
@@ -177,14 +180,11 @@ txt.mm_to_pts <- function(ratio){ base_size * ratio * (25.4 / 72.27) } # for rev
 ```{r system I/O constants}
 
 
-
 figure.dir <-  here('figures')
 data.dir <-  here('data')
 output.data.dir <- here('output.data')
 reference.dir <- here('reference')
 job.scripts.dir <- here('R/job.scripts')
-
-here::i_am("notebooks/aale_resubmission_2021.nb.Rmd")
 
 chr.order <- c('chr1', 'chr2', 'chr3', 
                'chr4', 'chr5', 'chr6', 
