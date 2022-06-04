@@ -39,7 +39,7 @@ BiocManager::install(c("DESeq2",
 
 remotes::install_github(repo = "poisonalien/trackplot", upgrade = F)
 
-install.packages(c('magick', 'cowplot'))
+install.packages(c('magick', 'cowplot', 'Hmisc'))
 
 suppressPackageStartupMessages({
   library(tidyverse)
@@ -1094,7 +1094,7 @@ consensus_atac_boolean_anno %>%
   separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
   filter(annotation == "promoter-TSS ") %>%
   group_by(`Gene Name`) %>%
-  tally() -> uniq_ifn_kras_peak_genes
+  tally() -> uniq_kras_peak_genes
 
 consensus_atac_boolean_anno %>% 
   filter(ctrl_R1.mLb.clN.bool == F) %>% 
@@ -2305,7 +2305,6 @@ ggsave(plot = figure_S1_patchwork.fig,
 
 
 ```
-
 # Figure 2
 ```{r}
 rbind(kras_de_prom_df, ctrl_de_prom_df) %>% 
@@ -2374,113 +2373,6 @@ ggsave(plot = figure_2_patchwork.fig,
 
 
 ```
-## Figure S2
-```{r}
-
-salmon.quant$aale$intra$deseq$counts %>%
-  filter(grepl('^IFN', gene),
-         !grepl('P', gene)) %>% 
-  select(gene, contains('.')) %>% 
-  gather(sample, count, -gene) %>% 
-  mutate(count = scale(log1p(count), center = T)) %>%
-  select(sample, gene, count) %>%
-  pivot_wider(names_from = gene, values_from = count) %>%
-  distinct() %>% 
-  column_to_rownames('sample') %>% 
-  t() -> IFN_hm_counts
-
-IFN_hm_counts %>% 
-  colnames() %>% 
-  as.data.frame() %>% 
-  rename('.' = 'sample') %>% 
-  mutate(condition = ifelse(grepl('ctrl', sample), 'ctrl', 'kras')) %>% 
-  column_to_rownames('sample') %>% 
-  ComplexHeatmap::columnAnnotation(df = . , 
-                                   col = list(condition = c('ctrl' = viridis(3)[1], 
-                                                            'kras' = viridis(3)[2])),
-                                    show_legend = T,
-                                    annotation_legend_param = list(condition = 
-                                                                     list(nrow = 1, title_position = 'lefttop',
-                                                                          title_gp = grid::gpar(fontsize = 7, face = 'bold'))),
-                                    annotation_name_gp = grid::gpar(fontsize = 8),
-                                    simple_anno_size = unit(4.5, "mm")) -> IFN_sample_anno
-
-IFN_hm_counts %>% 
-  rownames() %>% 
-  as.data.frame() %>% 
-  rename('.' = 'gene') %>% 
-  merge(salmon.quant$aale$intra$deseq$de %>% select(gene, log2FoldChange), by = 'gene', all.x = T) %>% 
-  column_to_rownames('gene') -> IFN_de
-  
-IFN_de[order(match(rownames(IFN_de), rownames(IFN_hm_counts))), , drop =F] -> IFN_de
-  
-toil_de_list <- setNames(IFN_de$log2FoldChange, rownames(IFN_de))
-  
-ComplexHeatmap::rowAnnotation(
-  `AALE log2FC` = ComplexHeatmap::anno_barplot(x = toil_de_list,
-      bar_width = 1, 
-      which = 'row',
-      gp = grid::gpar(col = "black", fill = viridis(3)[2]), 
-      border = FALSE,
-      annotation_name_gp = grid::gpar(fontsize = 8),
-      width = unit(1.25, "cm"),
-      height = unit(0.75, "cm")), 
-  show_annotation_name = TRUE,
-  annotation_name_gp = grid::gpar(fontsize = 8)) -> log2fc_ha
-
-ComplexHeatmap::Heatmap(IFN_hm_counts, 
-                      name = 'z-score', 
-                      show_row_names = T,
-                      row_dend_side = 'left',
-                      show_column_names = F,
-                      row_split = NULL,
-                      row_title = NULL,
-                      row_title_gp = grid::gpar(fontsize = 7, face = 'bold'),
-                      row_names_side = 'right',
-                      row_dend_width = unit(3, 'mm'),
-                      top_annotation = IFN_sample_anno,
-                      right_annotation = log2fc_ha,
-                      # top_annotation = toil_sample_anno,
-                      heatmap_legend_param = 
-                        list(labels_gp = grid::gpar(fontsize = 7),
-                             legend_gp = grid::gpar(fontsize = 7),
-                             legend_direction = 'vertical',
-                             legend_height = unit(3.5, "cm"),
-                             title_gp = grid::gpar(fontsize = 7, face = 'bold')),
-                      row_names_gp = grid::gpar(fontsize = 7),
-                      heatmap_width = patch_fig_width*0.375) -> IFN_expression_hm.plt
-
-plot_big_wig_coverage(loci = 'chr19:39,294,877-39,297,773', 
-                      gene_name = 'IFNL1', y_lab = 'scaled read depth') -> plt_S2A.plt
-
-fig_S2_patch <- "
-AB
-CB
-DD
-"
-
-
-
-wrap_plots(wrap_elements(full = plt_S2A.plt),
-           patchwork::wrap_elements(full = grid::grid.grabExpr(ComplexHeatmap::draw(IFN_expression_hm.plt,
-                                                                         heatmap_legend_side = 'right',
-                                                                         annotation_legend_side = 'top'), 
-                                                                         width = patch_fig_width*0.375)),
-           patchwork::plot_spacer(),
-           patchwork::plot_spacer(),
-           widths = c(1, 1),
-           design = fig_S2_patch) +
-  plot_annotation(tag_levels = 'A') &
-  theme(plot.tag = element_text(size = rel(0.95), face = 'bold'),
-        plot.tag.position = c(0.01, 0.99)) -> figure_S2_patchwork.fig
-
-
-ggsave(plot = figure_S2_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.2', 'figure_S2_patchwork.pdf'),
-       width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
-
-```
-
 # Figure 3
 ```{r}
 
@@ -2760,7 +2652,7 @@ wrap_plots(plt_S3A.plt,
 
 
 ggsave(plot = figure_S3_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.3', 'figure_S3_patchwork.pdf'),
+       filename = file.path(figure.dir, 'fig.2', 'figure_S2_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
 
