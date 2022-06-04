@@ -2527,7 +2527,7 @@ ggsave(plot = figure_3_patchwork.fig,
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
 ```
-## Figure S3
+## Figure S2
 ```{r}
 salmon.quant$aale$exo$deseq$pca$pca.out %>% 
   rownames_to_column('sample') %>% 
@@ -2657,8 +2657,7 @@ ggsave(plot = figure_S3_patchwork.fig,
 
 
 ```
-
-# Figure 4
+# Figure S3
 ```{r}
 ucsc.rmsk.salmon.quant$aale$intra$deseq$de %>%
   filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
@@ -2755,7 +2754,7 @@ wrap_plots(plt_4A.plt,
 
 
 ggsave(plot = figure_4_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.4', 'figure_4_patchwork.pdf'),
+       filename = file.path(figure.dir, 'fig.4', 'figure_S3_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 ```
 ## Figure S4
