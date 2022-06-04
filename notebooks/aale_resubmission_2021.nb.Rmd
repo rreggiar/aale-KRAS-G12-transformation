@@ -1,14 +1,15 @@
 ---
-title: "Mutant KRAS regulates transposable element RNA and innate immunity via KRAB zinc-finger genes"
-author: 'Roman E. Reggiardo <rreggiar@ucsc.edu>'
-build_date: "`r format(Sys.time(), '%d %B, %Y')`"
-institution: "UC Santa Cruz"
-journal: "Cell Reports"
-toc: true
-output: 
+title: Mutant KRAS regulates transposable element RNA and innate immunity via KRAB zinc-finger genes
+author: Roman E. Reggiardo rreggiar@ucsc.edu
+build_date: "r format(Sys.time(), '%d %B, %Y')"
+output:
+  html_document:
+    df_print: paged
   html_notebook:
     code_folding: hide
-editor_options: 
+journal: Cell Reports
+institution: UC Santa Cruz
+editor_options:
   chunk_output_type: console
 ---
 
@@ -174,11 +175,16 @@ txt.mm_to_pts <- function(ratio){ base_size * ratio * (25.4 / 72.27) } # for rev
 ```
 ### figure dirs, and other globally relevant constants
 ```{r system I/O constants}
+
+
+
 figure.dir <-  here('figures')
 data.dir <-  here('data')
 output.data.dir <- here('output.data')
 reference.dir <- here('reference')
 job.scripts.dir <- here('R/job.scripts')
+
+here::i_am("notebooks/aale_resubmission_2021.nb.Rmd")
 
 chr.order <- c('chr1', 'chr2', 'chr3', 
                'chr4', 'chr5', 'chr6', 
@@ -217,7 +223,7 @@ if (! file.exists(file.path(output.data.dir, 'meta_data_df.rds'))) {
   meta_data <- lst()
   
   meta_data$te.clades <- 
-  read_csv(file.path(output.data.dir, 'reference.data','te.clades.csv'))
+  read_csv(file.path(output.data.dir, 'reference.data', 'te.clades.csv'))
 
   meta_data$te.families.clades <- 
     read_csv(file.path(output.data.dir, 'reference.data','te.family.clade.csv'),
