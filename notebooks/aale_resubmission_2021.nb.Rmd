@@ -26,11 +26,9 @@ system('sudo apt-get update -y && sudo apt-get install -y libxt-dev')
 # Enables `Cairo` installation, ComplexHeatmap dependency
 
 system('sudo cp install_bin/bwtool /usr/local/bin/')
-system('sudo apt -y install mysql-server')
+system('sudo apt install -y mysql-server')
+system('sudo apt-get install -y libmagick++-6.q16-dev')
 
-```
-## loading
-```{r package install & load + fonts}
 BiocManager::install(c("DESeq2",
                        "bamsignals",
                        "rGREAT",
@@ -39,7 +37,12 @@ BiocManager::install(c("DESeq2",
 
 remotes::install_github(repo = "poisonalien/trackplot", upgrade = F)
 
-install.packages(c('magick', 'cowplot', 'Hmisc'))
+install.packages(c('magick', 'cowplot', 'Hmisc', 'pdftools'))
+
+```
+## loading
+```{r package install & load + fonts}
+
 
 suppressPackageStartupMessages({
   library(tidyverse)
@@ -1953,6 +1956,439 @@ wrap_plots(znf90_atac.plt,
 
 
 ```
+## znf
+```{r}
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange < -1, gene %in% meta.data$trono.krab.znfs$gene | grepl('^ZNF', gene)) %>% 
+  select(gene_id) %>% unlist() %>% unname() -> znf_de_list
+
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange > 1.5) %>% 
+  select(gene_id) %>% unlist() %>% unname() -> up_de_list
+
+gr <- rowRanges(salmon.quant$gxi)
+
+znf_de_gr <- gr[names(gr) %in% znf_de_list]
+up_de_gr <- gr[names(gr) %in% up_de_list]
+
+consensus_atac_boolean_anno %>% 
+  filter(ctrl_R1.mLb.clN.bool == T) %>%
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, 
+                                 log2FoldChange < -1.5)$gene) %>%
+  filter(`Gene Name` %in% meta.data$trono.krab.znfs$gene | grepl('^ZNF', `Gene Name`)) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>%
+  # filter(chr != 'chr19') %>% 
+  mutate(strand = '+') %>%
+  select(chr, start, end, strand, name = `Gene Name`) %>% 
+  GenomicRanges::makeGRangesFromDataFrame() -> ctrl_znf_uniq_peak_ranges
+
+consensus_atac_boolean_anno %>% 
+  filter(kras_R1.mLb.clN.bool == T) %>%
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, 
+                                 log2FoldChange > 1.5)$gene) %>%
+  filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>%
+  # filter(chr != 'chr19') %>% 
+  mutate(strand = '+') %>%
+  select(chr, start, end, strand, name = `Gene Name`) %>% 
+  GenomicRanges::makeGRangesFromDataFrame() -> kras_ifn_uniq_peak_ranges
+
+znf_promoter_seqs <-
+  GenomicRanges::promoters(znf_de_gr, upstream = 1000, downstream = 500) %>%
+  memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38)
+
+upDe_promoter_seqs <-
+  GenomicRanges::promoters(up_de_gr, upstream = 1000, downstream = 200) %>%
+  memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38)
+
+znf_uniq_peaks_seqs <- 
+  memes::get_sequence(regions = ctrl_znf_uniq_peak_ranges, genome = BSgenome.Hsapiens.UCSC.hg38)
+
+ifn_uniq_peaks_seqs <- 
+  memes::get_sequence(regions = kras_ifn_uniq_peak_ranges, genome = BSgenome.Hsapiens.UCSC.hg38)
+
+znf_ame_out <- memes::runAme(znf_promoter_seqs, 
+                             control = upDe_promoter_seqs)
+
+znf_ame_out %>% 
+  mutate(tmp = motif_id) %>% 
+  separate(tmp, sep = '_', into = c('TF', NA)) %>% 
+  mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) %>% 
+  filter(adj.pvalue < 0.05) -> znf_ame_out
+
+# znf_ame_out %>% 
+#   filter(adj.pvalue < 0.05) %>% 
+#   separate(motif_id, sep = '[.]', into = c('TF', NA, NA, NA)) -> znf_ame_out
+
+
+
+panel.save(figure = 6, name = 'tf_enrich_volcano', width = 'single', height = 'single')
+
+
+
+
+alx1_peak <- memes::get_sequence(regions = 'chr12:85280200-85280907', genome = BSgenome.Hsapiens.UCSC.hg38)
+
+
+etv1_motif <- MotifDb::query(MotifDb::MotifDb, c('NFYC_HUMAN')) %>% 
+  universalmotif::convert_motifs()
+
+
+etv1_fimo_results <- memes::runFimo(znf_uniq_peaks_seqs, etv1_motif) 
+etv1_fimo_results
+# %>%
+#   as.data.frame() %>%
+#   merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id')
+ 
+tomTom_res <- memes::runAme(control = 'shuffle', input = alx1_peak)
+
+
+ctrl_znf_uniq_peak_ranges %>% 
+  resize(661, 'center') %>% 
+  memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38) %>% 
+  memes::runDreme('shuffle') -> tmp
+
+tmp$sites_hits
+
+meme_res <- memes::runDreme(input = znf_uniq_peaks_seqs)
+meme_res %>% 
+  memes::runTomTom()
+
+
+
+znf_tomTom_res <- memes::runAme(control = 'shuffle',
+                            input = promoter_seqs, 
+                            database = 
+                              file.path(output.data.dir, 
+                                        'reference.data', 
+                                        'Hughes_ZNF_motifs.meme'))
+
+memes::runFimo(promoter_seqs, motifs = fos_motif) %>% as.data.frame() %>% View()
+
+tomTom_res %>% 
+  mutate(tmp = motif_id) %>% 
+  separate(tmp, sep = '_', into = c('TF', NA)) %>% 
+  mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) -> ame_tf
+
+salmon.quant$aale$intra$deseq$de %>% 
+  merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
+  # filter(gene %in% ame_tf) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
+  geom_point() + 
+  scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
+  geom_text_repel(color = 'black') + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(legend.position = c(0.35, 0.99)) 
+
+
+znf563_motif <- MotifDb::query(MotifDb::MotifDb, 'NFYC_HUMAN.H11MO.0.A') %>% 
+  universalmotif::convert_motifs()
+
+znf563_fimo_results <- memes::runFimo(promoter_seqs, znf563_motif, thresh = 1e-3) %>% 
+  as.data.frame() %>% 
+  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id')
+
+
+
+
+
+consensus_atac_boolean_anno %>% 
+  # filter(kras_R1.mLb.clN.bool == F) %>% 
+  filter(grepl('IRF9', `Gene Name`)) %>% 
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>% 
+  mutate(strand = '+') %>% 
+  select(chr, start, end, strand, name = `Gene Name`) %>% 
+  GenomicRanges::makeGRangesFromDataFrame() -> irf9_peak
+
+names(irf9_peak) <- 'IRF9'
+
+getSeq(BSgenome.Hsapiens.UCSC.hg38, irf9_peak) -> irf9_peak_seq
+
+memes::runAme(input = irf9_peak_seq, control = other_uniq_seqs) -> irf9_motifs
+memes::runDreme(input = ifn_uniq_seqs, control = 'shuffle')
+
+
+meme_in <- memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38, regions = ctrl_znf_uniq_peak_ranges)
+
+ctrl_meme_in <- memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38, regions = other_uniq_peak_ranges)
+names(meme_in) <- ctrl_znf_uniq_peak$name
+
+memes::runAme(input = meme_in, control = 'shuffle') -> ame_out
+
+
+ame_out %>% 
+  mutate(tmp = motif_id) %>% 
+  separate(tmp, sep = '_', into = c('TF', NA)) %>% 
+  mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
+         TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) -> ame_tf
+
+salmon.quant$aale$intra$deseq$de %>% 
+  merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
+  # filter(gene %in% ame_tf) %>% 
+  ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
+  geom_point() + 
+  scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
+  geom_text_repel(color = 'black') + 
+  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') #+ 
+  theme(legend.position = c(0.35, 0.99)) 
+
+names(ifn_uniq_peak_ranges) <- uniq_peak_genes$`Gene Name`
+
+consensus_atac_boolean_anno %>% 
+  filter(ctrl_R1.mLb.clN.bool == F) %>% 
+  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, log2FoldChange > 0)$gene) %>%
+  filter(`Gene Name` %in% meta.data$trono.krab.znfs$gene) %>% 
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>% 
+  mutate(strand = '+') %>% 
+  select(chr, start, end, strand, name = `Gene Name`) %>% 
+  GenomicRanges::makeGRangesFromDataFrame() -> other_uniq_peak_ranges
+
+names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>% 
+                                  filter(ctrl_R1.mLb.clN.bool == F) %>% 
+                                  filter(`Gene Name` %in%
+                                           filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
+                                  filter(!`Gene Name` %in% c(ifn_g, ifn_a), ! is.na(`Gene Name`)) %>% 
+  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
+  filter(annotation == "promoter-TSS ") %>% 
+  select(`Gene Name`) %>% unlist() %>% unname()
+
+getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_uniq_peak_ranges) -> ifn_uniq_seqs
+getSeq(BSgenome.Hsapiens.UCSC.hg38, other_uniq_peak_ranges) -> other_uniq_seqs
+
+memes::runAme(input = ifn_uniq_seqs, control = other_uniq_seqs) -> ifn_uniq_motifs
+
+gr <- rowRanges(salmon.quant$gxi)
+
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(gene %in% meta.data$trono.krab.znfs$gene,
+         padj < 0.05, log2FoldChange < -4.5) %>% 
+  select(gene_id) %>% unlist() %>% unname() -> znf_de_list
+
+# merge(ctrl_znf_uniq_peak, salmon.quant$aale$intra$deseq$de, ctrl_znf_uniq_peak, by.y = 'gene', by.x = 'name') %>% 
+#   filter(log2FoldChange < 0, padj < 0.05) -> ctrl_znf_uniq_peak
+
+znf_de_gr <- gr[names(gr) %in% znf_de_list]
+
+de_promoter_regions <- promoters(znf_de_gr, upstream = 300, downstream = 300)
+
+bamsignals::bamCoverage(kras_bam_path, de_promoter_regions, paired.end = 'extend') -> kras_de_prom_profile
+bamsignals::bamCoverage(ctrl_bam_path, de_promoter_regions, paired.end = 'extend') -> ctrl_de_prom_profile
+
+# memes::runFimo(sequences = ctrl_znf_uniq_peak, motifs = fos_motif)
+
+
+bamsignals::alignSignals(kras_de_prom_profile) %>% 
+  as.data.frame() %>% 
+  mutate(position = row_number()) %>% 
+  gather(prom, cov, -position) %>%
+  mutate(position = position - 300,
+         cov = (cov/kras_norm_factor) * 1e6,
+         condition = 'kras',
+         context = 'de') -> kras_de_prom_df
+
+bamsignals::alignSignals(ctrl_de_prom_profile) %>% 
+  as.data.frame() %>% 
+  mutate(position = row_number()) %>% 
+  gather(prom, cov, -position) %>%
+  mutate(position = position - 300,
+         cov = (cov/ctrl_norm_factor) * 1e6,
+         condition = 'ctrl',
+         context = 'de') -> ctrl_de_prom_df
+  
+rbind(kras_de_prom_df, ctrl_de_prom_df) %>%
+  ggplot(aes(position, cov, group = condition, color = condition)) +
+    stat_summary(geom="ribbon", fun.data=mean_cl_normal, width=0.1, conf.int=0.95, 
+                 fill='grey', alpha = 0.1, size = rel(0.05), show.legend = F)+
+    # stat_summary(geom="line", fun=mean, linetype="dashed", alpha = 0.15, size = rel(0.05)) +
+    stat_summary(geom="point", fun=mean, alpha = 0.25, size = rel(1)) +
+    scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
+    xlab('distance to TSS') +
+    ylab('mean CPM (95% CI)') + 
+    xlim(-300, 300) + 
+    theme(legend.position = c(0.99, 0.99))
+
+panel.save(figure = 6, name = 'atac_coverage_znf', width = 'single', height = 'single')
+
+
+
+ norm.counts.final %>% 
+  filter(sample != 'TCGA-44-3917-01') %>% 
+  filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
+
+salmon.quant$aale$intra$deseq$de %>% 
+  filter(padj < 0.05, log2FoldChange < -1, gene %in% meta.data$trono.krab.znfs$gene | grepl('ZNF', gene)) -> aale_znf
+
+working_toil_counts %>% 
+  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  # filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
+  filter(gene %in% aale_znf$gene) %>%
+  # filter(gene %in% c('ETV1', 'ALX1', 'ZNF90', 'ZNF736', 'ZNF682', 'MEF2B'), KRAS == 'p.G12D') %>% 
+  group_by(gene) %>%
+  mutate(count = scale(log1p(count), center = T)) %>%
+  select(sample, gene, count) %>%
+  pivot_wider(names_from = gene, values_from = count) %>%
+  distinct() %>% 
+  column_to_rownames('sample') %>% 
+  t() -> toil_hm_counts
+
+working_toil_counts %>% 
+  select(sample, 'G12D' = KRAS) %>%
+  distinct() %>% 
+  column_to_rownames('sample') %>% 
+  ComplexHeatmap::rowAnnotation(df = . , 
+                                 col = list(G12D = c('WT_normal' = 'white', 
+                                                     'p.G12D' = viridis(3)[2])),
+                                 show_legend = F,
+                                  annotation_name_side = 'bottom',
+                                  simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
+
+# working_toil_counts %>% 
+#   select(sample, 'G12' = KRAS) %>%
+#   distinct() %>% 
+#   column_to_rownames('sample') %>% 
+#   ComplexHeatmap::rowAnnotation(df = . , 
+#                                    col = list(G12D = c('WT_normal' = 'white', 
+#                                                        'p.G12' = viridis(3)[2])),
+#                                    show_legend = F,
+#                                 annotation_name_side = 'bottom',
+#                                 simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
+
+
+
+working_toil_counts %>% 
+  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  filter(gene %in% aale_znf$gene) %>%
+  # filter(gene %in% aale_ifn$gene) %>%
+  select(gene) %>% 
+  distinct() %>% 
+  mutate(unique = ifelse(gene %in% ctrl_znf_uniq_peak$name, T, F)) %>% 
+  column_to_rownames('gene') %>% 
+  ComplexHeatmap::columnAnnotation(df =.,
+                                col = list(unique = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
+                                show_legend = F,
+                                annotation_name_side = 'right',
+                                simple_anno_size = unit(2.5, "mm")) -> gene_motif_anno
+
+
+
+
+ComplexHeatmap::Heatmap(t(toil_hm_counts), 
+                        name = 'z-score', 
+                        show_row_names = F,
+                        # left_annotation = toil_sample_anno,
+                        # bottom_annotation = gene_motif_anno,
+                        # heatmap_width = unit(panel.figure.width, 'mm'),
+                        # heatmap_height = unit(panel.figure.height/2, 'mm'),
+                        # column_dend_height = unit(3, 'mm'),
+                        # row_dend_width = unit(4.5, 'mm'),
+                        height = unit((panel.figure.height/3)/2.18, 'mm'),
+                        width = unit((panel.figure.width*3)/1.81, 'mm')) -> toil_hm_plt
+
+size = calc_ht_size(toil_hm_plt)
+size
+
+pdf(file = file.path(figure.dir, 'fig.5', 'toil_znf_hm.pdf'),
+    width=unit(size[1], 'mm'), height=unit(size[2], 'mm'), family = 'Helvetica')
+
+toil_hm_plt
+
+dev.off()
+
+working_toil_counts %>% 
+  filter(KRAS %in% c('p.G12D', 'WT_normal')) %>% 
+  mutate(gene_set = ifelse(gene %in% aale_znf$gene, 'dn_ZNF', 
+                           ifelse(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 
+                                              'IFITM1', 'OAS1', 'MOV10', 'OAS3'), 'up_IFN', 'other'))) %>% 
+  filter(gene_set != 'other') -> toil_dist_counts
+
+
+
+toil_dist_counts %>% 
+  group_by(sample, KRAS, gene_set) %>% 
+  summarize(exp_mean = mean(count)) %>% 
+  pivot_wider(names_from = gene_set, values_from = exp_mean) %>% 
+  ggplot(aes(dn_ZNF, up_IFN, color = KRAS)) + 
+  geom_point()
+  ggplot(aes(KRAS, znf_mean)) + 
+  geom_jitter(width = 0.15) +
+  geom_boxplot(outlier.colour = NA, fill = NA) + 
+  stat_compare_means(method = 'wilcox.test', comparisons = list(c('p.G12D', 'WT_normal'))) +
+  ylab('mean(dn ZNF counts)') + xlab('')
+
+panel.save(figure = 7, name = 'avg_znf_wilcox', width = 'single', height = 'single')
+
+
+toil_dist_counts %>% 
+  ggplot(aes(KRAS, count)) + 
+  geom_jitter(alpha =0.4) +
+  geom_boxplot(outlier.colour = NA, fill = NA) + 
+  facet_row(~gene) + 
+  theme(axis.text.x = element_text(angle = 40, hjust = 1),
+        legend.position = c(0.99,0.99)) + 
+  stat_compare_means(method = 'wilcox.test', comparisons = list(c('p.G12D', 'WT_normal')), hide.ns = F, label = 'p.signif') + 
+  xlab('')
+
+
+
+
+myc.avg.counts.tidy.stratified <-
+  norm.counts.final %>%
+  filter(sample_type == 'Primary Tumor') %>%
+  # filter(gene %in% aale_znf$gene) %>%
+  filter(gene %in% ctrl_znf_uniq_peak$name) %>%
+  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  select(sample, count) %>% 
+  group_by(sample) %>%
+  summarize(avg.count = mean(count)) %>%
+  mutate(gene.set = 'toil_znf') %>%
+  group_by(gene.set) %>%
+  mutate(stratum = ifelse(avg.count >= quantile(avg.count, 0.66),
+                          'top-third', ifelse(avg.count <= quantile(avg.count, 0.33),
+                                              'bottom-third', 'middle'))) %>%
+  filter(stratum != 'middle') %>%
+  spread(gene.set, stratum)
+
+surv.obj <- Surv(time = filter(luad.phenotypes.merge %>% select(sample, OS.time, OS) %>% distinct() , 
+                               sample %in% myc.avg.counts.tidy.stratified$sample)$OS.time,
+                 event = filter(luad.phenotypes.merge %>% select(sample, OS.time, OS) %>% distinct(), 
+                                sample %in% myc.avg.counts.tidy.stratified$sample)$OS)
+
+surv.fit <- survfit(as.formula(surv.obj ~ myc.avg.counts.tidy.stratified$toil_znf), 
+                    data = myc.avg.counts.tidy.stratified)
+ggsurvplot(surv.fit,
+           pval = T, 
+           legend.title = "",
+           ggtheme = theme_set_fun() + theme(legend.position = c(0.45,0.95)),
+           pval.coord = c(0, 0.08),
+           palette = viridis(3)[c(2,1)]) -> surv.plt
+
+surv.plt
+
+panel.save(plot.in = surv.plt$plot, figure = 5, name = 'dn_znf_km', width = 'single', height = 'single')
+
+
+# save_pheatmap_pdf(x = toil_hm, filename = 'test_hm.pdf', height = panel.figure.height/2, width = panel.figure.width)
+
+
+working_toil_counts %>% 
+  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
+  ggplot(aes(KRAS, count)) + 
+  geom_boxplot(outlier.colour = NA, fill = NA) +
+  geom_point() + 
+  facet_wrap(~gene) + 
+  stat_compare_means(comparisons = list(c('p.G12D', 'WT_normal')), method = 'wilcox')
+
+
+```
 
 # Figure 1
 ## toil data load and transform
@@ -2700,24 +3136,6 @@ salmon.quant$aale$intra$deseq$de %>%
   geom_text_repel(aes(label = ifelse(AALE < -1 & HBEC < -0.35, gene, '')), show.legend = F, size = txt.mm_to_pts(0.8), color = 'black') + 
   theme(legend.position = c(0.99, 0.99)) -> plt_4B.plt
 
-# plt_4C_patch <- "
-# AAA
-# BCD
-# EEE
-# "
-# 
-# p4 <- ggplot(data.frame(l = 'DE TF RNA log2FoldChange', x = 1, y = 1)) +
-#       geom_text(aes(x, y, label = l), angle = 0, size = txt.mm_to_pts(0.8)) + 
-#       theme_void() +
-#       theme(plot.margin = margin(t = -6, unit = 'mm')) +
-#       coord_cartesian(clip = "off")
-# 
-# wrap_elements(full = wrap_plots(guide_area(),
-#                               intra.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE in.') + xlab(''),
-#                               exo.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('AALE ex.') + ylab('') + xlab(''),
-#                               hbec.aale.te_ranges_list$plts$volcano_plt + theme(legend.direction = 'horizontal') + ggtitle('HBEC in.') + ylab('') + xlab(''), 
-#                               p4,
-#                               guides = 'collect', heights = c(0.05, 1, 0.005), design = plt_4C_patch)) -> plt_4C.plt
 
 plt_4D_patch <- "
 AAA
@@ -2754,7 +3172,7 @@ wrap_plots(plt_4A.plt,
 
 
 ggsave(plot = figure_4_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.4', 'figure_S3_patchwork.pdf'),
+       filename = file.path(figure.dir, 'fig.3', 'figure_S3_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 ```
 ## Figure S4
@@ -2830,8 +3248,7 @@ ggsave(plot = figure_S4_patchwork.fig,
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
 ```
-
-# Figure 5
+# Figure S5
 ```{r}
 a549_de$de_682 %>% 
   mutate(oe = 'A549 ZNF682 Overexpression') %>% 
@@ -2842,7 +3259,8 @@ a549_de$de_682 %>%
          padj.x < 0.05) %>%
   ggplot(aes(log2FoldChange.x, log2FoldChange.y, label = gene)) + 
   geom_point(alpha = 0.6) + 
-  ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange.x < -0.1 & log2FoldChange.y > 0.1, gene, '')), max.overlaps = 5) +
+  ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange.x < -0.1 & log2FoldChange.y > 0.1, gene, '')), 
+                           max.overlaps = 5) +
   facet_col(~oe) +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
   geom_hline(yintercept = 0, alpha = 0.3, linetype = 'dashed') + 
@@ -2881,10 +3299,10 @@ wrap_plots(plt_5C.plt,
 
 
 ggsave(plot = figure_5_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.5', 'figure_5_patchwork.pdf'),
+       filename = file.path(figure.dir, 'fig.5', 'figure_S5_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 ```
-## Figure S5
+## Figure S6
 ```{r}
 fig_S5_patch <- "
 AA
@@ -2898,11 +3316,10 @@ wrap_plots(exo.aale.te_ranges_list$znf_plts$znf_score + theme(legend.position = 
 
 
 ggsave(plot = figure_S5_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.5', 'figure_S5_patchwork.pdf'),
+       filename = file.path(figure.dir, 'fig.6', 'figure_S6_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 ```
-
-# Figure 6
+# Figure 4
 ```{r}
 rbind(znf_kras_de_prom_df, znf_ctrl_de_prom_df) %>%
   ggplot(aes(position, cov, group = condition, color = condition)) +
@@ -2943,24 +3360,6 @@ salmon.quant$aale$intra$deseq$de %>%
   theme(legend.position = 'top') -> plt_6D.plt
 
 
-# base::do.call(rbind, uniq_ctrl_tb) %>%
-#   group_by(Ontology) %>%
-#   top_n(10, -HyperFdrQ) %>%
-#   filter(HyperFdrQ < 0.05,
-#          NumFgGenesHit > 1) %>%
-#   ggplot(aes(log2(RegionFoldEnrich), reorder(Desc, RegionFoldEnrich), label = Desc, color = -log10(HyperFdrQ))) +
-#   geom_point(aes(size = NumFgGenesHit)) +
-#   geom_text_repel(aes(label = Desc), 
-#                 size = txt.mm_to_pts(0.8), show.legend = F, point.padding = unit(2, 'mm'), color = 'black') + 
-#   theme(axis.text.y = element_blank(),
-#         axis.ticks.y = element_blank(),
-#         plot.title = element_text(size = rel(0.7), face = 'plain'),
-#         legend.position = 'top', legend.direction = 'horizontal') +
-#   scale_x_continuous() +
-#   ylab('GO Term') + xlab('log2(FoldEnrichment)') +
-#   scale_color_viridis_c() -> plt_6E.plt
-
-
 fig_6_patch <- "
 AB
 CC
@@ -2978,14 +3377,14 @@ wrap_plots(plt_6A.plt,
 
 
 ggsave(plot = figure_6_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.6', 'figure_6_patchwork.pdf'),
+       filename = file.path(figure.dir, 'fig.4', 'figure_4_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
 
 
 ```
 
-# Figure 7
+# Figure 5
 ### complex plotting
 ```{r}
 plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = NULL, split_title = NULL) {
@@ -3150,7 +3549,7 @@ ggsurvplot(surv.fit,
 
 surv.plt
 
-model.plt <- magick::image_read_pdf(path = '/home/rreggiar/figures/aale_model_cropped.pdf')
+model.plt <- magick::image_read_pdf(path = '/home/rreggiar/figures/fig.5/aale_model_cropped.pdf')
 
 fig_7_patch <- "
 AA
@@ -3171,7 +3570,7 @@ wrap_plots(patchwork::wrap_elements(full =
 
 
 ggsave(plot = figure_7_patchwork.fig,
-       filename = file.path(figure.dir, 'fig.7', 'figure_7_patchwork.pdf'),
+       filename = file.path(figure.dir, 'fig.5', 'figure_5_patchwork.pdf'),
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 
 ```
@@ -3714,446 +4113,7 @@ surv.plt
 
 ```
 
-## znf
-```{r}
-salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange < -1, gene %in% meta.data$trono.krab.znfs$gene | grepl('^ZNF', gene)) %>% 
-  select(gene_id) %>% unlist() %>% unname() -> znf_de_list
 
-salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange > 1.5) %>% 
-  select(gene_id) %>% unlist() %>% unname() -> up_de_list
-
-# salmon.quant$aale$intra$deseq$de %>% 
-#   filter(padj < 0.05, log2FoldChange < -0.5, grepl('^HOX|^KRT', gene) | gene %in% meta.data$trono.krab.znfs$gene) %>% 
-#   filter(gene %in% filter(salmon.quant$hbec$lacz_v_v12$deseq$de, padj < 0.05, log2FoldChange > 0)$gene) %>% 
-#   select(gene_id) %>% unlist() %>% unname() -> de_list
-
-
-gr <- rowRanges(salmon.quant$gxi)
-
-znf_de_gr <- gr[names(gr) %in% znf_de_list]
-up_de_gr <- gr[names(gr) %in% up_de_list]
-
-consensus_atac_boolean_anno %>% 
-  filter(ctrl_R1.mLb.clN.bool == T) %>%
-  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, 
-                                 log2FoldChange < -1.5)$gene) %>%
-  filter(`Gene Name` %in% meta.data$trono.krab.znfs$gene | grepl('^ZNF', `Gene Name`)) %>%
-  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
-  filter(annotation == "promoter-TSS ") %>%
-  # filter(chr != 'chr19') %>% 
-  mutate(strand = '+') %>%
-  select(chr, start, end, strand, name = `Gene Name`) %>% 
-  GenomicRanges::makeGRangesFromDataFrame() -> ctrl_znf_uniq_peak_ranges
-
-consensus_atac_boolean_anno %>% 
-  filter(kras_R1.mLb.clN.bool == T) %>%
-  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, 
-                                 log2FoldChange > 1.5)$gene) %>%
-  filter(`Gene Name` %in% c(ifn_g, ifn_a)) %>%
-  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
-  filter(annotation == "promoter-TSS ") %>%
-  # filter(chr != 'chr19') %>% 
-  mutate(strand = '+') %>%
-  select(chr, start, end, strand, name = `Gene Name`) %>% 
-  GenomicRanges::makeGRangesFromDataFrame() -> kras_ifn_uniq_peak_ranges
-
-znf_promoter_seqs <-
-  GenomicRanges::promoters(znf_de_gr, upstream = 1000, downstream = 500) %>%
-  memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38)
-
-upDe_promoter_seqs <-
-  GenomicRanges::promoters(up_de_gr, upstream = 1000, downstream = 200) %>%
-  memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38)
-
-znf_uniq_peaks_seqs <- 
-  memes::get_sequence(regions = ctrl_znf_uniq_peak_ranges, genome = BSgenome.Hsapiens.UCSC.hg38)
-
-ifn_uniq_peaks_seqs <- 
-  memes::get_sequence(regions = kras_ifn_uniq_peak_ranges, genome = BSgenome.Hsapiens.UCSC.hg38)
-
-znf_ame_out <- memes::runAme(znf_promoter_seqs, 
-                             control = upDe_promoter_seqs)
-
-znf_ame_out %>% 
-  mutate(tmp = motif_id) %>% 
-  separate(tmp, sep = '_', into = c('TF', NA)) %>% 
-  mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
-         TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
-         TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) %>% 
-  filter(adj.pvalue < 0.05) -> znf_ame_out
-
-# znf_ame_out %>% 
-#   filter(adj.pvalue < 0.05) %>% 
-#   separate(motif_id, sep = '[.]', into = c('TF', NA, NA, NA)) -> znf_ame_out
-
-
-
-panel.save(figure = 6, name = 'tf_enrich_volcano', width = 'single', height = 'single')
-
-
-
-
-alx1_peak <- memes::get_sequence(regions = 'chr12:85280200-85280907', genome = BSgenome.Hsapiens.UCSC.hg38)
-
-
-etv1_motif <- MotifDb::query(MotifDb::MotifDb, c('NFYC_HUMAN')) %>% 
-  universalmotif::convert_motifs()
-
-
-etv1_fimo_results <- memes::runFimo(znf_uniq_peaks_seqs, etv1_motif) 
-etv1_fimo_results
-# %>%
-#   as.data.frame() %>%
-#   merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id')
- 
-tomTom_res <- memes::runAme(control = 'shuffle', input = alx1_peak)
-
-
-ctrl_znf_uniq_peak_ranges %>% 
-  resize(661, 'center') %>% 
-  memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38) %>% 
-  memes::runDreme('shuffle') -> tmp
-
-tmp$sites_hits
-
-meme_res <- memes::runDreme(input = znf_uniq_peaks_seqs)
-meme_res %>% 
-  memes::runTomTom()
-
-
-create_motif('TACAAAAW', altname = 'test', type = 'PCM') %>% memes::runTomTom()
-
-znf_tomTom_res <- memes::runAme(control = 'shuffle',
-                            input = promoter_seqs, 
-                            database = 
-                              file.path(output.data.dir, 
-                                        'reference.data', 
-                                        'Hughes_ZNF_motifs.meme'))
-
-memes::runFimo(promoter_seqs, motifs = fos_motif) %>% as.data.frame() %>% View()
-
-tomTom_res %>% 
-  mutate(tmp = motif_id) %>% 
-  separate(tmp, sep = '_', into = c('TF', NA)) %>% 
-  mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
-         TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
-         TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) -> ame_tf
-
-salmon.quant$aale$intra$deseq$de %>% 
-  merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
-  # filter(gene %in% ame_tf) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
-  geom_point() + 
-  scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
-  geom_text_repel(color = 'black') + 
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
-  theme(legend.position = c(0.35, 0.99)) 
-
-
-znf563_motif <- MotifDb::query(MotifDb::MotifDb, 'NFYC_HUMAN.H11MO.0.A') %>% 
-  universalmotif::convert_motifs()
-
-znf563_fimo_results <- memes::runFimo(promoter_seqs, znf563_motif, thresh = 1e-3) %>% 
-  as.data.frame() %>% 
-  merge(salmon.quant$aale$intra$deseq$de, by.x = 'seqnames', by.y = 'gene_id')
-
-
-
-
-
-consensus_atac_boolean_anno %>% 
-  # filter(kras_R1.mLb.clN.bool == F) %>% 
-  filter(grepl('IRF9', `Gene Name`)) %>% 
-  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
-  filter(annotation == "promoter-TSS ") %>% 
-  mutate(strand = '+') %>% 
-  select(chr, start, end, strand, name = `Gene Name`) %>% 
-  GenomicRanges::makeGRangesFromDataFrame() -> irf9_peak
-
-names(irf9_peak) <- 'IRF9'
-
-getSeq(BSgenome.Hsapiens.UCSC.hg38, irf9_peak) -> irf9_peak_seq
-
-memes::runAme(input = irf9_peak_seq, control = other_uniq_seqs) -> irf9_motifs
-memes::runDreme(input = ifn_uniq_seqs, control = 'shuffle')
-
-
-meme_in <- memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38, regions = ctrl_znf_uniq_peak_ranges)
-
-ctrl_meme_in <- memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38, regions = other_uniq_peak_ranges)
-names(meme_in) <- ctrl_znf_uniq_peak$name
-
-memes::runAme(input = meme_in, control = 'shuffle') -> ame_out
-
-
-ame_out %>% 
-  mutate(tmp = motif_id) %>% 
-  separate(tmp, sep = '_', into = c('TF', NA)) %>% 
-  mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
-         TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
-         TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) -> ame_tf
-
-salmon.quant$aale$intra$deseq$de %>% 
-  merge(ame_tf, by.x = 'gene', by.y = 'TF') %>% 
-  # filter(gene %in% ame_tf) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
-  geom_point() + 
-  scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
-  geom_text_repel(color = 'black') + 
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') #+ 
-  theme(legend.position = c(0.35, 0.99)) 
-
-names(ifn_uniq_peak_ranges) <- uniq_peak_genes$`Gene Name`
-
-consensus_atac_boolean_anno %>% 
-  filter(ctrl_R1.mLb.clN.bool == F) %>% 
-  filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, log2FoldChange > 0)$gene) %>%
-  filter(`Gene Name` %in% meta.data$trono.krab.znfs$gene) %>% 
-  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
-  filter(annotation == "promoter-TSS ") %>% 
-  mutate(strand = '+') %>% 
-  select(chr, start, end, strand, name = `Gene Name`) %>% 
-  GenomicRanges::makeGRangesFromDataFrame() -> other_uniq_peak_ranges
-
-names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>% 
-                                  filter(ctrl_R1.mLb.clN.bool == F) %>% 
-                                  filter(`Gene Name` %in%
-                                           filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
-                                  filter(!`Gene Name` %in% c(ifn_g, ifn_a), ! is.na(`Gene Name`)) %>% 
-  separate(Annotation, sep = '\\(', into = c('annotation', NA)) %>% 
-  filter(annotation == "promoter-TSS ") %>% 
-  select(`Gene Name`) %>% unlist() %>% unname()
-
-getSeq(BSgenome.Hsapiens.UCSC.hg38, ifn_uniq_peak_ranges) -> ifn_uniq_seqs
-getSeq(BSgenome.Hsapiens.UCSC.hg38, other_uniq_peak_ranges) -> other_uniq_seqs
-
-memes::runAme(input = ifn_uniq_seqs, control = other_uniq_seqs) -> ifn_uniq_motifs
-
-gr <- rowRanges(salmon.quant$gxi)
-
-salmon.quant$aale$intra$deseq$de %>% 
-  filter(gene %in% meta.data$trono.krab.znfs$gene,
-         padj < 0.05, log2FoldChange < -4.5) %>% 
-  select(gene_id) %>% unlist() %>% unname() -> znf_de_list
-
-# merge(ctrl_znf_uniq_peak, salmon.quant$aale$intra$deseq$de, ctrl_znf_uniq_peak, by.y = 'gene', by.x = 'name') %>% 
-#   filter(log2FoldChange < 0, padj < 0.05) -> ctrl_znf_uniq_peak
-
-znf_de_gr <- gr[names(gr) %in% znf_de_list]
-
-de_promoter_regions <- promoters(znf_de_gr, upstream = 300, downstream = 300)
-
-bamsignals::bamCoverage(kras_bam_path, de_promoter_regions, paired.end = 'extend') -> kras_de_prom_profile
-bamsignals::bamCoverage(ctrl_bam_path, de_promoter_regions, paired.end = 'extend') -> ctrl_de_prom_profile
-
-# memes::runFimo(sequences = ctrl_znf_uniq_peak, motifs = fos_motif)
-
-
-bamsignals::alignSignals(kras_de_prom_profile) %>% 
-  as.data.frame() %>% 
-  mutate(position = row_number()) %>% 
-  gather(prom, cov, -position) %>%
-  mutate(position = position - 300,
-         cov = (cov/kras_norm_factor) * 1e6,
-         condition = 'kras',
-         context = 'de') -> kras_de_prom_df
-
-bamsignals::alignSignals(ctrl_de_prom_profile) %>% 
-  as.data.frame() %>% 
-  mutate(position = row_number()) %>% 
-  gather(prom, cov, -position) %>%
-  mutate(position = position - 300,
-         cov = (cov/ctrl_norm_factor) * 1e6,
-         condition = 'ctrl',
-         context = 'de') -> ctrl_de_prom_df
-  
-rbind(kras_de_prom_df, ctrl_de_prom_df) %>%
-  ggplot(aes(position, cov, group = condition, color = condition)) +
-    stat_summary(geom="ribbon", fun.data=mean_cl_normal, width=0.1, conf.int=0.95, 
-                 fill='grey', alpha = 0.1, size = rel(0.05), show.legend = F)+
-    # stat_summary(geom="line", fun=mean, linetype="dashed", alpha = 0.15, size = rel(0.05)) +
-    stat_summary(geom="point", fun=mean, alpha = 0.25, size = rel(1)) +
-    scale_color_manual(values = c(viridis(3)[1], viridis(3)[2])) +
-    xlab('distance to TSS') +
-    ylab('mean CPM (95% CI)') + 
-    xlim(-300, 300) + 
-    theme(legend.position = c(0.99, 0.99))
-
-panel.save(figure = 6, name = 'atac_coverage_znf', width = 'single', height = 'single')
-
-
-
- norm.counts.final %>% 
-  filter(sample != 'TCGA-44-3917-01') %>% 
-  filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
-
-salmon.quant$aale$intra$deseq$de %>% 
-  filter(padj < 0.05, log2FoldChange < -1, gene %in% meta.data$trono.krab.znfs$gene | grepl('ZNF', gene)) -> aale_znf
-
-working_toil_counts %>% 
-  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
-  # filter(gene %in% uniq_peak_genes$`Gene Name`) %>% 
-  filter(gene %in% aale_znf$gene) %>%
-  # filter(gene %in% c('ETV1', 'ALX1', 'ZNF90', 'ZNF736', 'ZNF682', 'MEF2B'), KRAS == 'p.G12D') %>% 
-  group_by(gene) %>%
-  mutate(count = scale(log1p(count), center = T)) %>%
-  select(sample, gene, count) %>%
-  pivot_wider(names_from = gene, values_from = count) %>%
-  distinct() %>% 
-  column_to_rownames('sample') %>% 
-  t() -> toil_hm_counts
-
-working_toil_counts %>% 
-  select(sample, 'G12D' = KRAS) %>%
-  distinct() %>% 
-  column_to_rownames('sample') %>% 
-  ComplexHeatmap::rowAnnotation(df = . , 
-                                 col = list(G12D = c('WT_normal' = 'white', 
-                                                     'p.G12D' = viridis(3)[2])),
-                                 show_legend = F,
-                                  annotation_name_side = 'bottom',
-                                  simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
-
-# working_toil_counts %>% 
-#   select(sample, 'G12' = KRAS) %>%
-#   distinct() %>% 
-#   column_to_rownames('sample') %>% 
-#   ComplexHeatmap::rowAnnotation(df = . , 
-#                                    col = list(G12D = c('WT_normal' = 'white', 
-#                                                        'p.G12' = viridis(3)[2])),
-#                                    show_legend = F,
-#                                 annotation_name_side = 'bottom',
-#                                 simple_anno_size = unit(2.5, "mm")) -> toil_sample_anno
-
-
-
-working_toil_counts %>% 
-  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
-  filter(gene %in% aale_znf$gene) %>%
-  # filter(gene %in% aale_ifn$gene) %>%
-  select(gene) %>% 
-  distinct() %>% 
-  mutate(unique = ifelse(gene %in% ctrl_znf_uniq_peak$name, T, F)) %>% 
-  column_to_rownames('gene') %>% 
-  ComplexHeatmap::columnAnnotation(df =.,
-                                col = list(unique = c('TRUE' = viridis(2)[1], 'FALSE' = 'white')),
-                                show_legend = F,
-                                annotation_name_side = 'right',
-                                simple_anno_size = unit(2.5, "mm")) -> gene_motif_anno
-
-
-
-
-ComplexHeatmap::Heatmap(t(toil_hm_counts), 
-                        name = 'z-score', 
-                        show_row_names = F,
-                        # left_annotation = toil_sample_anno,
-                        # bottom_annotation = gene_motif_anno,
-                        # heatmap_width = unit(panel.figure.width, 'mm'),
-                        # heatmap_height = unit(panel.figure.height/2, 'mm'),
-                        # column_dend_height = unit(3, 'mm'),
-                        # row_dend_width = unit(4.5, 'mm'),
-                        height = unit((panel.figure.height/3)/2.18, 'mm'),
-                        width = unit((panel.figure.width*3)/1.81, 'mm')) -> toil_hm_plt
-
-size = calc_ht_size(toil_hm_plt)
-size
-
-pdf(file = file.path(figure.dir, 'fig.5', 'toil_znf_hm.pdf'),
-    width=unit(size[1], 'mm'), height=unit(size[2], 'mm'), family = 'Helvetica')
-
-toil_hm_plt
-
-dev.off()
-
-working_toil_counts %>% 
-  filter(KRAS %in% c('p.G12D', 'WT_normal')) %>% 
-  mutate(gene_set = ifelse(gene %in% aale_znf$gene, 'dn_ZNF', 
-                           ifelse(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 
-                                              'IFITM1', 'OAS1', 'MOV10', 'OAS3'), 'up_IFN', 'other'))) %>% 
-  filter(gene_set != 'other') -> toil_dist_counts
-
-
-
-toil_dist_counts %>% 
-  group_by(sample, KRAS, gene_set) %>% 
-  summarize(exp_mean = mean(count)) %>% 
-  pivot_wider(names_from = gene_set, values_from = exp_mean) %>% 
-  ggplot(aes(dn_ZNF, up_IFN, color = KRAS)) + 
-  geom_point()
-  ggplot(aes(KRAS, znf_mean)) + 
-  geom_jitter(width = 0.15) +
-  geom_boxplot(outlier.colour = NA, fill = NA) + 
-  stat_compare_means(method = 'wilcox.test', comparisons = list(c('p.G12D', 'WT_normal'))) +
-  ylab('mean(dn ZNF counts)') + xlab('')
-
-panel.save(figure = 7, name = 'avg_znf_wilcox', width = 'single', height = 'single')
-
-
-toil_dist_counts %>% 
-  ggplot(aes(KRAS, count)) + 
-  geom_jitter(alpha =0.4) +
-  geom_boxplot(outlier.colour = NA, fill = NA) + 
-  facet_row(~gene) + 
-  theme(axis.text.x = element_text(angle = 40, hjust = 1),
-        legend.position = c(0.99,0.99)) + 
-  stat_compare_means(method = 'wilcox.test', comparisons = list(c('p.G12D', 'WT_normal')), hide.ns = F, label = 'p.signif') + 
-  xlab('')
-
-
-
-
-myc.avg.counts.tidy.stratified <-
-  norm.counts.final %>%
-  filter(sample_type == 'Primary Tumor') %>%
-  # filter(gene %in% aale_znf$gene) %>%
-  filter(gene %in% ctrl_znf_uniq_peak$name) %>%
-  # filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
-  select(sample, count) %>% 
-  group_by(sample) %>%
-  summarize(avg.count = mean(count)) %>%
-  mutate(gene.set = 'toil_znf') %>%
-  group_by(gene.set) %>%
-  mutate(stratum = ifelse(avg.count >= quantile(avg.count, 0.66),
-                          'top-third', ifelse(avg.count <= quantile(avg.count, 0.33),
-                                              'bottom-third', 'middle'))) %>%
-  filter(stratum != 'middle') %>%
-  spread(gene.set, stratum)
-
-surv.obj <- Surv(time = filter(luad.phenotypes.merge %>% select(sample, OS.time, OS) %>% distinct() , 
-                               sample %in% myc.avg.counts.tidy.stratified$sample)$OS.time,
-                 event = filter(luad.phenotypes.merge %>% select(sample, OS.time, OS) %>% distinct(), 
-                                sample %in% myc.avg.counts.tidy.stratified$sample)$OS)
-
-surv.fit <- survfit(as.formula(surv.obj ~ myc.avg.counts.tidy.stratified$toil_znf), 
-                    data = myc.avg.counts.tidy.stratified)
-ggsurvplot(surv.fit,
-           pval = T, 
-           legend.title = "",
-           ggtheme = theme_set_fun() + theme(legend.position = c(0.45,0.95)),
-           pval.coord = c(0, 0.08),
-           palette = viridis(3)[c(2,1)]) -> surv.plt
-
-surv.plt
-
-panel.save(plot.in = surv.plt$plot, figure = 5, name = 'dn_znf_km', width = 'single', height = 'single')
-
-
-# save_pheatmap_pdf(x = toil_hm, filename = 'test_hm.pdf', height = panel.figure.height/2, width = panel.figure.width)
-
-
-working_toil_counts %>% 
-  filter(gene %in% c('ISG20', 'ISG15', 'MX2', 'CFB', 'IFITM1', 'OAS1', 'MOV10', 'OAS3')) %>%
-  ggplot(aes(KRAS, count)) + 
-  geom_boxplot(outlier.colour = NA, fill = NA) +
-  geom_point() + 
-  facet_wrap(~gene) + 
-  stat_compare_means(comparisons = list(c('p.G12D', 'WT_normal')), method = 'wilcox')
-
-
-```
 
 ###A549
 ```{r}
