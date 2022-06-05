@@ -1225,6 +1225,10 @@ if (file.exists(file.path(output.data.dir, 'intra.aale.te_ranges_list.rds')) &
     file.exists(file.path(output.data.dir, 'hbec.aale.te_ranges_list.rds'))) {
   
   build_ranges_lists = FALSE
+  
+  intra.aale.te_ranges_list <- readRDS(file.path(output.data.dir, 'intra.aale.te_ranges_list.rds'))
+  exo.aale.te_ranges_list <- readRDS(file.path(output.data.dir, 'exo.aale.te_ranges_list.rds'))
+  hbec.aale.te_ranges_list <- readRDS(file.path(output.data.dir, 'hbec.aale.te_ranges_list.rds'))
 
 }
 
