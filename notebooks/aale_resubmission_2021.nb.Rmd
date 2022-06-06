@@ -15,6 +15,12 @@ editor_options:
   chunk_output_type: console
 ---
 
+<style type="text/css">
+  body{
+  font-family: Helvetica;
+}
+</style>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   
@@ -2081,7 +2087,7 @@ norm.counts.final %>%
   filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
 ```
 ### complex plotting
-```{r Figure 1 heatmap, results=FALSE}
+```{r Figure 1 heatmap, fig.show='hide'}
 
 plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = NULL, split_title = NULL) {
   
