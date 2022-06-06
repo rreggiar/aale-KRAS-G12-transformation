@@ -16,9 +16,11 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   
-  dev = c('cairo_pdf'),
+  dev = c('svglite', 'cairo_pdf'),
   fig.width = 6.77165,
-  fig.height = 9.9
+  fig.height = 9.9, 
+  message = F, 
+  warning = F 
   
 )
 library(here)
@@ -49,7 +51,7 @@ BiocManager::install(c("DESeq2",
 
 remotes::install_github(repo = "poisonalien/trackplot", upgrade = F)
 
-install.packages(c('magick', 'cowplot', 'Hmisc', 'pdftools'))
+install.packages(c('magick', 'cowplot', 'Hmisc', 'pdftools', 'svglite'))
 
 ```
 ## loading
@@ -1243,17 +1245,28 @@ if (file.exists(file.path(output.data.dir, 'intra.aale.te_ranges_list.rds')) &
 
 ```
 #### TE filters
-```{r construct te db and filters, cache=TRUE}
-meta.data$ucsc.rmsk.tx.to.gene.fmt %>% 
+```{r construct te db and filters}
+
+if (file.exists(file.path(output.data.dir, 'rmsk_parsed_bed.rds'))) {
+  
+  rmsk_parsed_bed <- readRDS(file.path(output.data.dir, 'rmsk_parsed_bed.rds'))
+  
+} else {
+  
+  meta.data$ucsc.rmsk.tx.to.gene.fmt %>% 
   select(enst, gene, biotype) %>% 
   separate(enst, sep = '_', into = c(NA, NA, 'gene', 'position', NA, NA, 'strand', NA)) %>% 
   mutate(position = sub('range=', '', position),
          strand = sub('strand=', '', strand)) -> rmsk_bed
 
-rmsk_bed %>% 
-  filter(grepl(':', position)) %>% 
-  separate(position, sep = ':', into = c('chr', 'range')) %>% 
-  separate(range, sep = '-', into = c('start', 'end')) -> rmsk_parsed_bed
+  rmsk_bed %>% 
+    filter(grepl(':', position)) %>% 
+    separate(position, sep = ':', into = c('chr', 'range')) %>% 
+    separate(range, sep = '-', into = c('start', 'end')) -> rmsk_parsed_bed
+  
+  saveRDS(rmsk_parsed_bed, file.path(output.data.dir, 'rmsk_parsed_bed.rds'))
+  
+}
 
 
 
