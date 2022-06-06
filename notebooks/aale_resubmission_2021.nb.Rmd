@@ -1,17 +1,15 @@
 ---
 title: "Mutant KRAS regulates transposable element RNA and innate immunity via KRAB zinc-finger genes"
 author: "Roman E. Reggiardo <rreggiar@ucsc.edu>"
-date: "r format(Sys.time(), '%d %B, %Y')"
+date: "6/8/2022"
 output:
   html_document:
     code_folding: hide
     self_contained: yes
     mode: selfcontained
     toc: true
-    toc_float: true
     toc_collapsed: true
     toc_depth: 5
-    number_sections: true
     theme: lumen
 editor_options:
   chunk_output_type: console
