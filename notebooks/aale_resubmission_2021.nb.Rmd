@@ -298,7 +298,7 @@ if (! file.exists(file.path(output.data.dir, 'meta_data_df.rds'))) {
 ```
 
 # processed dataset check:
-```{r chec}
+```{r check procesed data}
 
 build_salmon.quant <- FALSE
 
@@ -331,11 +331,14 @@ if (file.exists(file.path(output.data.dir, 'ucsc.rmsk.salmon.quant_analysis_set.
   build_ucsc.rmsk.salmon <- TRUE
   
 }
+
+eval_build_datasets <- ifelse(build_ucsc.rmsk.salmon == F &
+                                build_salmon.quant == F, FALSE, TRUE)
 ```
 
 # feature engineering:
 ## FUN: construct.quant.object
-```{r}
+```{r quant obj fxn}
 load.tximeta.object <- function(reference){
   
   ## RERCOMM
@@ -384,7 +387,7 @@ subset.tximeta.object <- function(tximeta.list, grep.string){
 }
 ```
 ### CALL: construct.quant.object
-```{r}
+```{r building quant data eval=eval_build_datasets}
 
 if (build_salmon.quant == T) { 
   
@@ -455,7 +458,7 @@ if (build_ucsc.rmsk.salmon == T) {
 
 ```
 ## FUN: run.de.seq
-```{r}
+```{r deseq fxn}
 run.de.seq <- function(tximeta.object, base_level = 'ctrl'){
   
   tximeta.name <- deparse(substitute(tximeta.object))
@@ -759,7 +762,7 @@ run.de.seq.contrast <- function(tximeta.object, base_level = 'ctrl'){
 
 ```
 ### CALL: run.de.seq
-```{r}
+```{r running deseq eval=eval_build_datasets}
 if (build_salmon.quant == T) { 
 
   salmon.quant$aale$intra$deseq <- run.de.seq(salmon.quant$aale$intra, base_level = 'ctrl')
@@ -801,7 +804,7 @@ if (build_ucsc.rmsk.salmon == T) {
 
 ```
 ## FUN: plot_pca
-```{r}
+```{r pca fxn}
 plot_pca <- function(counts, col.data) { 
   set.seed(234)
   ### Gencode PCA
@@ -845,7 +848,7 @@ plot_pca <- function(counts, col.data) {
 }
 ```
 ### CALL: plot_pca
-```{r}
+```{r running and plotting pca eval=eval_build_datasets}
 if (build_salmon.quant == T) { 
 
   salmon.quant$aale$intra$deseq$pca <- plot_pca(salmon.quant$aale$intra$deseq$gxi.vst.counts,
@@ -858,7 +861,7 @@ if (build_salmon.quant == T) {
 
 ```
 ## FUN: make.fgsea.ranks
-```{r}
+```{r fgsea fxn}
 make.fgsea.ranks <- function(de.seq){
   
   # build a ranked gene list in the appropriate format (named list)
@@ -896,7 +899,7 @@ make.fgsea.ranks <- function(de.seq){
 
 ```
 ### CALL: make.fgsea.ranks
-```{r}
+```{r build msig and run fgsea}
   msig.df <- 
     msigdbr(species = 'Homo sapiens', category = 'H') %>% 
     dplyr::select(gene_symbol, gs_name) %>% 
@@ -954,7 +957,7 @@ salmon.quant$gxi.bed %>%
 
 ```
 ## generate FIMO output
-```{r}
+```{r build motif lists}
 library(GenomicRanges)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(BSgenome)
@@ -1069,7 +1072,7 @@ irf9_fimo_results <- memes::runFimo(promoter_seqs, irf9_motif, thresh = 1e-3) %>
 
 ## ATAC
 ### datasets
-```{r}
+```{r atac dataset load}
 kras_atac_anno_peaks <- 
   read_tsv(file.path(output.data.dir, 
                      'narrow_output.data/bwa/mergedLibrary/macs/narrowPeak/kras_R1.mLb.clN_peaks.annotatePeaks.txt'))
@@ -1089,7 +1092,7 @@ consensus_atac_boolean_anno <-
                      ))
 ```
 ### parsed_datasets & GREAT
-```{r}
+```{r extract useful data}
 irf9_fimo_results %>%
   mutate(start.x = start.y + start.x,
          end.x = start.y + end.x) %>% 
@@ -1157,7 +1160,7 @@ uniq_ctrl_job <- rGREAT::submitGreatJob(uniq_ctrl_peak_input_bed, species = 'hg3
 uniq_ctrl_tb <- rGREAT::getEnrichmentTables(uniq_ctrl_job, download_by = 'tsv')
 ```
 ### peak ranges
-```{r}
+```{r atac peak ranges}
 consensus_atac_boolean_anno %>% 
   filter(ctrl_R1.mLb.clN.bool == F) %>% 
   filter(`Gene Name` %in% filter(salmon.quant$aale$intra$deseq$de, padj < 0.05, log2FoldChange > 1.5)$gene) %>%
@@ -1189,7 +1192,7 @@ names(other_uniq_peak_ranges) <- consensus_atac_boolean_anno %>%
   select(`Gene Name`) %>% unlist() %>% unname()
 ```
 ### DE promoters
-```{r}
+```{r DE promotors and tfs}
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, log2FoldChange > 1.5) %>% 
   select(gene_id) %>% unlist() %>% unname() -> de_list
@@ -1215,9 +1218,9 @@ dn_promoter_regions <- promoters(dn_gr, upstream = 1000, downstream = 200)
 getSeq(BSgenome.Hsapiens.UCSC.hg38, dn_promoter_regions) -> dnreg_gencode_seqs
 ```
 ### TE ranges
-```{r}
+```{r te ranges build check}
 
-build_ranges_lists = FALSE
+build_ranges_lists = TRUE
 
 
 if (file.exists(file.path(output.data.dir, 'intra.aale.te_ranges_list.rds')) &
@@ -1226,15 +1229,18 @@ if (file.exists(file.path(output.data.dir, 'intra.aale.te_ranges_list.rds')) &
   
   build_ranges_lists = FALSE
   
-  intra.aale.te_ranges_list <- readRDS(file.path(output.data.dir, 'intra.aale.te_ranges_list.rds'))
-  exo.aale.te_ranges_list <- readRDS(file.path(output.data.dir, 'exo.aale.te_ranges_list.rds'))
-  hbec.aale.te_ranges_list <- readRDS(file.path(output.data.dir, 'hbec.aale.te_ranges_list.rds'))
+  intra.aale.te_ranges_list <- 
+    readRDS(file.path(output.data.dir, 'intra.aale.te_ranges_list.rds'))
+  exo.aale.te_ranges_list <- 
+    readRDS(file.path(output.data.dir, 'exo.aale.te_ranges_list.rds'))
+  hbec.aale.te_ranges_list <- 
+    readRDS(file.path(output.data.dir, 'hbec.aale.te_ranges_list.rds'))
 
 }
 
 ```
 #### TE filters
-```{r}
+```{r construct te db and filters}
 meta.data$ucsc.rmsk.tx.to.gene.fmt %>% 
   select(enst, gene, biotype) %>% 
   separate(enst, sep = '_', into = c(NA, NA, 'gene', 'position', NA, NA, 'strand', NA)) %>% 
@@ -1659,7 +1665,7 @@ if(build_ranges_lists == TRUE) {
 
 ```
 ### ATAC Coverage
-```{r}
+```{r bamsignals}
 library(bamsignals)
 ctrl_norm_factor <- 43576060
 kras_norm_factor <- 60276212
@@ -1781,7 +1787,7 @@ salmon.quant$aale$intra$deseq$de %>%
 # bamsignals::alignSignals(bamsignals::bamCoverage(kras_bam_path, promoter_regions, paired.end = 'extend')) %>% dim()
 ```
 ### ATAC BW signal
-```{r}
+```{r atac coverage plots}
 library(trackplot)
 library(scales)
 
@@ -1998,7 +2004,7 @@ wrap_plots(znf90_atac.plt,
 
 ```
 ### znf
-```{r}
+```{r znf data}
 salmon.quant$aale$intra$deseq$de %>% 
   filter(padj < 0.05, log2FoldChange < -1, gene %in% meta.data$trono.krab.znfs$gene | grepl('^ZNF', gene)) %>% 
   select(gene_id) %>% unlist() %>% unname() -> znf_de_list
@@ -2065,7 +2071,7 @@ znf_ame_out %>%
 
 # Figure 1
 ## toil data load and transform
-```{r}
+```{r Figure 1}
 toil.survival <- read_tsv(file.path(output.data.dir, 'tcga.data/TCGA-LUAD.survival.tsv.gz')) 
 
 luad.phenotypes <- 
@@ -2098,7 +2104,7 @@ norm.counts.final %>%
   filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
 ```
 ### complex plotting
-```{r}
+```{r Figure 1 heatmap}
 
 plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = NULL, split_title = NULL) {
   
@@ -2226,7 +2232,7 @@ ifn_high_hm_zoom <- aale_ifn_chm[split_rowOrder[[1]], ]
 
 ```
 ## patchwork
-```{r}
+```{r Figure 1 patchwork}
 msig.df[grepl('INTERFERON', names(msig.df))] %>% 
                              unlist() %>% unname() -> ifn_gene_list
 
@@ -2335,7 +2341,7 @@ figure_1_patchwork.fig
 
 ```
 ## Figure S1
-```{r}
+```{r Figure S1}
 salmon.quant$aale$intra$deseq$de %>% 
   mutate(padj = ifelse(padj == 0, 
                        min(filter(salmon.quant$aale$intra$deseq$de, padj != 0)$padj), padj)) %>% 
@@ -2417,7 +2423,7 @@ ggsave(plot = figure_S1_patchwork.fig,
 figure_S1_patchwork.fig
 ```
 # Figure 2
-```{r}
+```{r Figure 2}
 rbind(kras_de_prom_df, ctrl_de_prom_df) %>% 
   mutate(condition = toupper(condition)) %>% 
   ggplot(aes(position, cov, group = condition, color = condition)) +
@@ -2485,7 +2491,7 @@ ggsave(plot = figure_2_patchwork.fig,
 figure_2_patchwork.fig
 ```
 # Figure 3
-```{r}
+```{r Figure 3}
 
 kras.sight <- read_csv(file.path(output.data.dir, 'kras.nanosight.data.csv'), skip = 2,
                        col_names = c('size', 'r1', 'r2', 'r3', NA, NA, NA, NA)) %>% 
@@ -2639,7 +2645,7 @@ ggsave(plot = figure_3_patchwork.fig,
 figure_3_patchwork.fig
 ```
 ## Figure S2
-```{r}
+```{r Figure S2}
 salmon.quant$aale$exo$deseq$pca$pca.out %>% 
   rownames_to_column('sample') %>% 
   mutate(condition = toupper(condition)) %>% 
@@ -2769,7 +2775,7 @@ ggsave(plot = figure_S3_patchwork.fig,
 figure_S3_patchwork.fig
 ```
 # Figure S3
-```{r}
+```{r Figure S3}
 ucsc.rmsk.salmon.quant$aale$intra$deseq$de %>%
   filter(!gene %in% meta.data$gencode.35.tx.to.gene$gene,
          padj < 0.05) %>%
@@ -2853,7 +2859,7 @@ ggsave(plot = figure_4_patchwork.fig,
 figure_4_patchwork.fig
 ```
 ## Figure S4
-```{r}
+```{r Figure S4}
 intra.aale.te_ranges_list$znf_plts$de_list %>% 
   select(TF, log2FoldChange.x, padj.x, clade, context) %>% 
   distinct() %>% 
@@ -2928,7 +2934,7 @@ figure_S4_patchwork.fig
 
 ```
 # Figure S5
-```{r}
+```{r Figure S5}
 a549_de$de_682 %>% 
   mutate(oe = 'A549 ZNF682 Overexpression') %>% 
   rbind(a549_de$de_257 %>% 
@@ -2984,7 +2990,7 @@ ggsave(plot = figure_5_patchwork.fig,
 figure_5_patchwork.fig
 ```
 ## Figure S6
-```{r}
+```{r Figure S6}
 fig_S5_patch <- "
 AA
 BB
@@ -3003,7 +3009,7 @@ ggsave(plot = figure_S5_patchwork.fig,
 figure_S5_patchwork.fig
 ```
 # Figure 4
-```{r}
+```{r Figure 4}
 rbind(znf_kras_de_prom_df, znf_ctrl_de_prom_df) %>%
   ggplot(aes(position, cov, group = condition, color = condition)) +
     stat_summary(geom="ribbon", fun.data=mean_cl_boot, width=0.1, conf.int=0.95, 
@@ -3067,7 +3073,7 @@ figure_6_patchwork.fig
 ```
 # Figure 5
 ### complex plotting
-```{r}
+```{r Figure 5 heatmap}
 plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = NULL, split_title = NULL) {
   
    set.seed(123)
@@ -3184,7 +3190,7 @@ working_toil_counts %>%
 
 ```
 ##
-```{r}
+```{r Figure 5}
 
 working_toil_counts %>% 
   filter(gene %in% toil_sig_znf) %>%
