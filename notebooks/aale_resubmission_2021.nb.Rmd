@@ -387,7 +387,7 @@ subset.tximeta.object <- function(tximeta.list, grep.string){
 }
 ```
 ### CALL: construct.quant.object
-```{r building quant data eval=eval_build_datasets}
+```{r building quant data, eval=eval_build_datasets}
 
 if (build_salmon.quant == T) { 
   
@@ -762,7 +762,7 @@ run.de.seq.contrast <- function(tximeta.object, base_level = 'ctrl'){
 
 ```
 ### CALL: run.de.seq
-```{r running deseq eval=eval_build_datasets}
+```{r running deseq, eval=eval_build_datasets}
 if (build_salmon.quant == T) { 
 
   salmon.quant$aale$intra$deseq <- run.de.seq(salmon.quant$aale$intra, base_level = 'ctrl')
@@ -777,10 +777,6 @@ if (build_salmon.quant == T) {
   
 }
 
-
-a549_de <- run.de.seq.A549.contrast(salmon.quant$a549, base_level = 'Empty')
-
-a549_te_de <- run.de.seq.A549.contrast(ucsc.rmsk.salmon.quant$a549, base_level = 'Empty')
 
 # ------------------------------------------------------------------------------
 if (build_ucsc.rmsk.salmon == T) { 
@@ -803,6 +799,13 @@ if (build_ucsc.rmsk.salmon == T) {
 }
 
 ```
+### CALL: a549 de seq
+```{r a549 de seq, cache=TRUE}
+a549_de <- run.de.seq.A549.contrast(salmon.quant$a549, base_level = 'Empty')
+
+a549_te_de <- run.de.seq.A549.contrast(ucsc.rmsk.salmon.quant$a549, base_level = 'Empty')
+```
+
 ## FUN: plot_pca
 ```{r pca fxn}
 plot_pca <- function(counts, col.data) { 
@@ -848,7 +851,7 @@ plot_pca <- function(counts, col.data) {
 }
 ```
 ### CALL: plot_pca
-```{r running and plotting pca eval=eval_build_datasets}
+```{r running and plotting pca, eval=eval_build_datasets}
 if (build_salmon.quant == T) { 
 
   salmon.quant$aale$intra$deseq$pca <- plot_pca(salmon.quant$aale$intra$deseq$gxi.vst.counts,
@@ -1240,7 +1243,7 @@ if (file.exists(file.path(output.data.dir, 'intra.aale.te_ranges_list.rds')) &
 
 ```
 #### TE filters
-```{r construct te db and filters}
+```{r construct te db and filters, cache=TRUE}
 meta.data$ucsc.rmsk.tx.to.gene.fmt %>% 
   select(enst, gene, biotype) %>% 
   separate(enst, sep = '_', into = c(NA, NA, 'gene', 'position', NA, NA, 'strand', NA)) %>% 
@@ -1311,7 +1314,7 @@ exo.rmsk.txi_filter_parsed <- te_filter(exo.rmsk.txi)
 hbec.rmsk.txi_filter_parsed <- te_filter(hbec.rmsk.txi)
 
 ```
-### Ranges Lists
+#### Ranges Lists
 ```{r eval=build_ranges_lists}
 if(build_ranges_lists == TRUE) {
   tf_list_generator <- function(upreg_te_list,
@@ -3176,8 +3179,6 @@ salmon.quant$aale$intra$deseq$de %>%
 
 aale_znf_chm <- plot_complex_heatmap(aale_znf$gene, show_genes = T, split_vector = NULL, split_title = NULL)
 
-aale_znf_chm
-
 working_toil_counts %>% 
   filter(gene %in% c(aale_znf$gene)) %>%
   group_by(gene) %>% 
@@ -3190,7 +3191,7 @@ working_toil_counts %>%
 
 ```
 ##
-```{r Figure 5}
+```{r Figure 5, error=TRUE}
 
 working_toil_counts %>% 
   filter(gene %in% toil_sig_znf) %>%
@@ -3236,7 +3237,7 @@ ggsurvplot(surv.fit,
 
 surv.plt
 
-model.plt <- magick::image_read_pdf(path = '/home/rreggiar/figures/fig.5/aale_model_cropped.pdf')
+model.plt <- magick::image_read_pdf(path = file.path(figure.dir, 'fig.5','aale_model_cropped.pdf'))
 
 fig_7_patch <- "
 AA
