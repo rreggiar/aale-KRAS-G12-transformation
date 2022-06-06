@@ -1097,7 +1097,7 @@ consensus_atac_boolean_anno <-
                      ))
 ```
 ### parsed_datasets & GREAT
-```{r extract useful data}
+```{r extract useful data, results=FALSE}
 irf9_fimo_results %>%
   mutate(start.x = start.y + start.x,
          end.x = start.y + end.x) %>% 
@@ -1756,9 +1756,6 @@ bamsignals::alignSignals(ctrl_de_prom_profile) %>%
          context = 'de') -> znf_ctrl_de_prom_df
 
 
-# panel.save(figure = 2, name = 'isg_atac_enrichment', width = 'single', height = 'single')
-
-
 de_promoter_regions_for_meme <- promoters(ifn_de_gr, upstream = 300, downstream = 500) %>% 
   memes::get_sequence(genome = BSgenome.Hsapiens.UCSC.hg38)
 
@@ -1778,29 +1775,7 @@ ifn_ame_out %>%
   mutate(TF = str_replace(TF, pattern = '^ZN', replacement = 'ZNF'),
          TF = str_replace(TF, pattern = 'ZNFF', replacement = 'ZNF'),
          TF = str_replace(TF, pattern = '^NFAC', replacement = 'NFATC')) -> ifn_ame_out
-# %>% 
-  # select(TF) %>% unlist() %>% unname() -> ame_tf
 
-salmon.quant$aale$intra$deseq$de %>% 
-  merge(ifn_ame_out, by.x = 'gene', by.y = 'TF') %>% 
-  # filter(gene %in% ame_tf) %>% 
-  ggplot(aes(log2FoldChange, -log10(padj), color = adj.pvalue, label = gene)) + 
-  geom_point() + 
-  scale_color_viridis_c(direction = -1, name = 'ame adj.pval') +
-  geom_text_repel(color = 'black') + 
-  geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
-  theme(legend.position = c(0.35, 0.79)) 
-
-
-# avgBinnedSig <- rowMeans(bamsignals::alignSignals(kras_prom_profile))
-# 
-# avgBinnedSig %>% 
-#   as.data.frame() %>% 
-#   rownames_to_column('bin') %>% 
-#   ggplot(aes(bin, .)) + 
-#   geom_col()
-# 
-# bamsignals::alignSignals(bamsignals::bamCoverage(kras_bam_path, promoter_regions, paired.end = 'extend')) %>% dim()
 ```
 ### ATAC BW signal
 ```{r atac coverage plots}
@@ -2120,7 +2095,7 @@ norm.counts.final %>%
   filter(KRAS %in% c('p.G12D', 'WT_normal')) -> working_toil_counts
 ```
 ### complex plotting
-```{r Figure 1 heatmap}
+```{r Figure 1 heatmap, results=FALSE}
 
 plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = NULL, split_title = NULL) {
   
@@ -2228,9 +2203,8 @@ salmon.quant$aale$intra$deseq$de %>%
 
 unique_peak_aale_ifn_list <- unique(c(aale_uniq_up$`Gene Name`, aale_ifn$gene))
 
-aale_ifn_chm <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = T, split_vector = 2, split_title = "cluster_%s")
-
-# aale_ifn_chm
+aale_ifn_chm <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = T, 
+                                     split_vector = 2, split_title = "cluster_%s")
 
 aale_ifn_chm_no_rownames <- aale_ifn_chm
 aale_ifn_chm_no_rownames@row_names_param$show <- FALSE
@@ -2238,13 +2212,10 @@ aale_ifn_chm_no_rownames@row_names_param$show <- FALSE
 split_rowOrder <- ComplexHeatmap::row_order(ComplexHeatmap::draw(aale_ifn_chm_no_rownames))
 
 aale_ifn_chm <- plot_complex_heatmap(unique_peak_aale_ifn_list, show_genes = T)
-# aale_ifn_chm
 
 aale_ifn_chm_rowOrder <- ComplexHeatmap::row_order(ComplexHeatmap::draw(aale_ifn_chm))
 
 ifn_high_hm_zoom <- aale_ifn_chm[split_rowOrder[[1]], ]
-
-# ifn_high_hm_zoom
 
 ```
 ## patchwork
@@ -2356,7 +2327,7 @@ ggsave2(plot = figure_1_patchwork.fig,
 figure_1_patchwork.fig
 
 ```
-## Figure S1
+# Figure S1
 ```{r Figure S1}
 salmon.quant$aale$intra$deseq$de %>% 
   mutate(padj = ifelse(padj == 0, 
@@ -2660,7 +2631,7 @@ ggsave(plot = figure_3_patchwork.fig,
        width = patch_fig_width, height = patch_fig_height, device = cairo_pdf, units = 'mm')
 figure_3_patchwork.fig
 ```
-## Figure S2
+# Figure S2
 ```{r Figure S2}
 salmon.quant$aale$exo$deseq$pca$pca.out %>% 
   rownames_to_column('sample') %>% 
@@ -2874,7 +2845,7 @@ ggsave(plot = figure_4_patchwork.fig,
 
 figure_4_patchwork.fig
 ```
-## Figure S4
+# Figure S4
 ```{r Figure S4}
 intra.aale.te_ranges_list$znf_plts$de_list %>% 
   select(TF, log2FoldChange.x, padj.x, clade, context) %>% 
@@ -3005,7 +2976,7 @@ ggsave(plot = figure_5_patchwork.fig,
 
 figure_5_patchwork.fig
 ```
-## Figure S6
+# Figure S6
 ```{r Figure S6}
 fig_S5_patch <- "
 AA
@@ -3089,7 +3060,7 @@ figure_6_patchwork.fig
 ```
 # Figure 5
 ### complex plotting
-```{r Figure 5 heatmap}
+```{r Figure 5 heatmap, results=FALSE}
 plot_complex_heatmap <- function(filter_values, show_genes = F, split_vector = NULL, split_title = NULL) {
   
    set.seed(123)
@@ -3247,8 +3218,6 @@ ggsurvplot(surv.fit,
            ggtheme = theme_set_fun() + theme(legend.position = c(0.45,0.95)),
            pval.coord = c(0, 0.08),
            palette = viridis(3)[c(2,1)]) -> surv.plt
-
-surv.plt
 
 model.plt <- magick::image_read_pdf(path = file.path(figure.dir, 'fig.5','aale_model_cropped.pdf'))
 
