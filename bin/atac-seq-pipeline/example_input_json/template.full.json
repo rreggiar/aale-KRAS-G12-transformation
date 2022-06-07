@@ -1,0 +1,95 @@
+{
+    "atac.title" : "Example (paired end)",
+    "atac.description" : "This is a template input JSON for paired ended sample.",
+
+    "atac.pipeline_type" : "atac",
+    "atac.align_only" : false,
+    "atac.true_rep_only" : false,
+
+    "atac.genome_tsv" : "/path_to_genome_data/hg38/hg38.tsv",
+
+    "atac.paired_end" : true,
+    "atac.paired_ends" : [true, true],
+
+    "atac.fastqs_rep1_R1" : [ "rep1_R1_L1.fastq.gz", "rep1_R1_L2.fastq.gz", "rep1_R1_L3.fastq.gz" ],
+    "atac.fastqs_rep1_R2" : [ "rep1_R2_L1.fastq.gz", "rep1_R2_L2.fastq.gz", "rep1_R2_L3.fastq.gz" ],
+    "atac.fastqs_rep2_R1" : [ "rep2_R1_L1.fastq.gz", "rep2_R1_L2.fastq.gz" ],
+    "atac.fastqs_rep2_R2" : [ "rep2_R2_L1.fastq.gz", "rep2_R2_L2.fastq.gz" ],
+
+    "atac.read_len" : [],
+    "atac.pseudoreplication_random_seed" : 0,
+
+    "atac.auto_detect_adapter" : false,
+    "atac.adapter" : "AATTCCGG",
+    "atac.adapters_rep1_R1" : [ "AATTCCGG", "AATTCCGG", "AATTCCGG" ],
+    "atac.adapters_rep1_R2" : [ "AATTCCGG", "AATTCCGG" ],
+    "atac.adapters_rep2_R1" : [ "AATTCCGG", "AATTCCGG", "AATTCCGG" ],
+    "atac.adapters_rep2_R2" : [ "AATTCCGG", "AATTCCGG" ],
+    "atac.cutadapt_param" : "-e 0.1 -m 5",
+
+    "atac.multimapping" : 4,
+
+    "atac.mapq_thresh" : 30,
+    "atac.dup_marker" : "picard",
+    "atac.no_dup_removal" : false,
+
+    "atac.subsample_reads" : 0,
+    "atac.xcor_subsample_reads" : 25000000,
+
+    "atac.cap_num_peak" : 300000,
+    "atac.pval_thresh" : 0.01,
+    "atac.smooth_win" : 150,
+
+    "atac.enable_idr" : true,
+    "atac.idr_thresh" : 0.05,
+
+    "atac.enable_xcor" : false,
+    "atac.enable_count_signal_track" : false,
+
+    "atac.filter_chrs" : ["chrM", "MT"],
+
+    "atac.enable_preseq" : false,
+    "atac.enable_compare_to_roadmap" : false,
+    "atac.enable_tss_enrich" : true,
+    "atac.enable_gc_bias" : true,
+
+    "atac.align_cpu" : 6,
+    "atac.align_mem_factor" : 0.15,
+    "atac.align_time_hr" : 48,
+    "atac.align_disk_factor" : 8.0,
+
+    "atac.filter_cpu" : 4,
+    "atac.filter_mem_factor" : 0.4,
+    "atac.filter_time_hr" : 24,
+    "atac.filter_disk_factor" : 8.0,
+
+    "atac.bam2ta_cpu" : 2,
+    "atac.bam2ta_mem_factor" : 0.3,
+    "atac.bam2ta_time_hr" : 12,
+    "atac.bam2ta_disk_factor" : 4.0,
+
+    "atac.spr_mem_factor" : 13.5,
+    "atac.spr_disk_factor" : 18.0,
+
+    "atac.jsd_cpu" : 4,
+    "atac.jsd_mem_factor" : 0.1,
+    "atac.jsd_time_hr" : 12,
+    "atac.jsd_disk_factor" : 2.0,
+
+    "atac.xcor_cpu" : 2,
+    "atac.xcor_mem_factor" : 1.0,
+    "atac.xcor_time_hr" : 6,
+    "atac.xcor_disk_factor" : 4.5,
+
+    "atac.call_peak_cpu" : 2,
+    "atac.call_peak_mem_factor" : 2.0,
+    "atac.call_peak_time_hr" : 24,
+    "atac.call_peak_disk_factor" : 30.0,
+
+    "atac.macs2_signal_track_mem_factor" : 12.0,
+    "atac.macs2_signal_track_time_hr" : 24,
+    "atac.macs2_signal_track_disk_factor" : 80.0,
+
+    "atac.preseq_mem_factor" : 0.5,
+    "atac.preseq_disk_factor" : 5.0
+}
