@@ -1,2 +1,2 @@
 *.html -linguist-detectable
-bin/atac-seq-pipeline/* -linguist-detectable
+bin/atac-seq-pipeline/** -linguist-detectable
