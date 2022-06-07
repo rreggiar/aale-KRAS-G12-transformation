@@ -1,1138 +1,0 @@
-cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549/ intra /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/
-+ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty intra
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty
-trimmomatic: 0.39
-+ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662984_1.fastq.gz
-read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662984_1.fastq.gz
-+ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662984_2.fastq.gz
-read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662984_2.fastq.gz
-+ echo 'Trimming fastq'
-Trimming fastq
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty
-+ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662984_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662984_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-TrimmomaticPE: Started with arguments:
- -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662984_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662984_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
-ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Quality encoding detected as phred33
-Input Read Pairs: 30490279 Both Surviving: 30108736 (98.75%) Forward Only Surviving: 223507 (0.73%) Reverse Only Surviving: 123079 (0.40%) Dropped: 34957 (0.11%)
-TrimmomaticPE: Completed successfully
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-+ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-salmon version: salmon 1.3.0
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty
-output: intra.a549.1.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/*sel.align.gencode.v35.salmon.v1.3.0.sidx*
-++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/*sel.align.gencode.v35.salmon.v1.3.0.sidx*' -name quant.sf
-find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/*sel.align.gencode.v35.salmon.v1.3.0.sidx*’: No such file or directory
-+ [[ ! -f '' ]]
-+ mkdir /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty
-+ '[' -f /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_single_end.fq.gz ']'
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty
-+ trim_fwd=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_forward_paired.fq.gz
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty
-+ trim_rev=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_reverse_paired.fq.gz
-+ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ --libType A -1 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-Version Info: ### PLEASE UPGRADE SALMON ###
-### A newer version of salmon with important bug fixes and improvements is available. ####
-###
-The newest version, available at https://github.com/COMBINE-lab/salmon/releases
-contains new features, improvements, and bug fixes; please upgrade at your
-earliest convenience.
-###
-Sign up for the salmon mailing list to hear about new versions, features and updates at:
-https://oceangenomics.com/subscribe
-###
-### salmon (selective-alignment-based) v1.3.0
-### [ program ] => salmon 
-### [ command ] => quant 
-### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ }
-### [ libType ] => { A }
-### [ mates1 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_forward_paired.fq.gz }
-### [ mates2 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_output_reverse_paired.fq.gz }
-### [ threads ] => { 8 }
-### [ validateMappings ] => { }
-### [ gcBias ] => { }
-### [ seqBias ] => { }
-### [ recoverOrphans ] => { }
-### [ rangeFactorizationBins ] => { 4 }
-### [ output ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT }
-Logs will be written to /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty/intra.a549.1.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT/logs
-[2021-03-27 16:45:22.696] [jointLog] [info] setting maxHashResizeThreads to 8
-[2021-03-27 16:45:22.697] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
-[2021-03-27 16:45:22.697] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
-[2021-03-27 16:45:22.697] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
-[2021-03-27 16:45:22.697] [jointLog] [info] parsing read library format
-[2021-03-27 16:45:22.697] [jointLog] [info] There is 1 library.
-[2021-03-27 16:45:22.836] [jointLog] [info] Loading pufferfish index
-[2021-03-27 16:45:22.836] [jointLog] [info] Loading dense pufferfish index.
------------------------------------------
-| Loading contig table | Time = 56.467 s
------------------------------------------
-size = 37233365
------------------------------------------
-| Loading contig offsets | Time = 161.53 ms
------------------------------------------
------------------------------------------
-| Loading reference lengths | Time = 2.1487 ms
------------------------------------------
------------------------------------------
-| Loading mphf table | Time = 2.1043 s
------------------------------------------
-size = 3779420184
-Number of ones: 37233364
-Number of ones per inventory item: 512
-Inventory entries filled: 72722
------------------------------------------
-| Loading contig boundaries | Time = 15.423 s
------------------------------------------
-size = 3779420184
------------------------------------------
-| Loading sequence | Time = 1.3249 s
------------------------------------------
-size = 2662419264
------------------------------------------
-| Loading positions | Time = 15.36 s
------------------------------------------
-size = 3465171825
------------------------------------------
-| Loading reference sequence | Time = 1.2033 s
------------------------------------------
------------------------------------------
-| Loading reference accumulative lengths | Time = 3.5798 ms
------------------------------------------
-[2021-03-27 16:46:54.891] [jointLog] [info] done
-[2021-03-27 16:46:54.891] [jointLog] [info] Index contained 228,948 targets
-
-
-
-
-[2021-03-27 16:47:02.531] [jointLog] [info] Number of decoys : 194
-[2021-03-27 16:47:02.531] [jointLog] [info] First decoy index : 228,715 
-[2021-03-27 16:47:03.840] [jointLog] [info] Automatically detected most likely library type as IU
-[A[32mprocessed[31m 500,000 [32mfragments[0m
-hits: 1,658,588, hits per frag:  3.51093[A[32mprocessed[31m 1,000,000 [32mfragments[0m
-hits: 3,319,014, hits per frag:  3.36614[A[32mprocessed[31m 1,500,000 [32mfragments[0m
-hits: 4,968,751, hits per frag:  3.36448[A[32mprocessed[31m 2,000,001 [32mfragments[0m
-hits: 6,622,791, hits per frag:  3.33141[A[32mprocessed[31m 2,500,000 [32mfragments[0m
-hits: 8,275,478, hits per frag:  3.33363[A[32mprocessed[31m 3,000,000 [32mfragments[0m
-hits: 9,931,938, hits per frag:  3.35461[A[32mprocessed[31m 3,500,000 [32mfragments[0m
-hits: 11,580,691, hits per frag:  3.33988[A[32mprocessed[31m 4,000,000 [32mfragments[0m
-hits: 13,233,839, hits per frag:  3.32507[A[32mprocessed[31m 4,500,000 [32mfragments[0m
-hits: 14,883,049, hits per frag:  3.33735[A[32mprocessed[31m 5,000,000 [32mfragments[0m
-hits: 16,538,392, hits per frag:  3.31308[A[32mprocessed[31m 5,500,000 [32mfragments[0m
-hits: 18,192,691, hits per frag:  3.32077[A[32mprocessed[31m 6,000,000 [32mfragments[0m
-hits: 19,842,493, hits per frag:  3.32396[A[32mprocessed[31m 6,500,000 [32mfragments[0m
-hits: 21,497,049, hits per frag:  3.32039[A[32mprocessed[31m 7,000,000 [32mfragments[0m
-hits: 23,143,665, hits per frag:  3.31996[A[32mprocessed[31m 7,500,000 [32mfragments[0m
-hits: 24,791,362, hits per frag:  3.31812[A[32mprocessed[31m 8,000,000 [32mfragments[0m
-hits: 26,446,889, hits per frag:  3.32224[A[32mprocessed[31m 8,500,000 [32mfragments[0m
-hits: 28,102,696, hits per frag:  3.31801[A[32mprocessed[31m 9,000,000 [32mfragments[0m
-hits: 29,754,230, hits per frag:  3.31707[A[32mprocessed[31m 9,500,000 [32mfragments[0m
-hits: 31,403,281, hits per frag:  3.31448[A[32mprocessed[31m 10,000,000 [32mfragments[0m
-hits: 33,057,147, hits per frag:  3.30788[A[32mprocessed[31m 10,500,000 [32mfragments[0m
-hits: 34,709,493, hits per frag:  3.31424[A[32mprocessed[31m 11,000,000 [32mfragments[0m
-hits: 36,368,360, hits per frag:  3.31561[A[32mprocessed[31m 11,500,000 [32mfragments[0m
-hits: 38,020,393, hits per frag:  3.31079[A[32mprocessed[31m 12,000,000 [32mfragments[0m
-hits: 39,669,190, hits per frag:  3.31149[A[32mprocessed[31m 12,500,000 [32mfragments[0m
-hits: 41,321,134, hits per frag:  3.31353[A[32mprocessed[31m 13,000,000 [32mfragments[0m
-hits: 42,971,477, hits per frag:  3.31169[A[32mprocessed[31m 13,500,000 [32mfragments[0m
-hits: 44,623,320, hits per frag:  3.31421[A[32mprocessed[31m 14,000,000 [32mfragments[0m
-hits: 46,277,622, hits per frag:  3.30737[A[32mprocessed[31m 14,500,000 [32mfragments[0m
-hits: 47,929,125, hits per frag:  3.31429[A[32mprocessed[31m 15,000,000 [32mfragments[0m
-hits: 49,582,532, hits per frag:  3.30837[A[32mprocessed[31m 15,500,000 [32mfragments[0m
-hits: 51,224,823, hits per frag:  3.30998[A[32mprocessed[31m 16,000,000 [32mfragments[0m
-hits: 52,873,055, hits per frag:  3.3116[A[32mprocessed[31m 16,500,000 [32mfragments[0m
-hits: 54,517,762, hits per frag:  3.30657[A[32mprocessed[31m 17,000,000 [32mfragments[0m
-hits: 56,165,734, hits per frag:  3.30473[A[32mprocessed[31m 17,500,000 [32mfragments[0m
-hits: 57,818,381, hits per frag:  3.30816[A[32mprocessed[31m 18,000,000 [32mfragments[0m
-hits: 59,469,944, hits per frag:  3.31075[A[32mprocessed[31m 18,500,000 [32mfragments[0m
-hits: 61,120,520, hits per frag:  3.30651[A[32mprocessed[31m 19,000,000 [32mfragments[0m
-hits: 62,770,040, hits per frag:  3.3065[A[32mprocessed[31m 19,500,001 [32mfragments[0m
-hits: 64,415,758, hits per frag:  3.30452[A[32mprocessed[31m 20,000,000 [32mfragments[0m
-hits: 66,060,971, hits per frag:  3.30686[A[32mprocessed[31m 20,500,000 [32mfragments[0m
-hits: 67,702,199, hits per frag:  3.30465[A[32mprocessed[31m 21,000,000 [32mfragments[0m
-hits: 69,350,125, hits per frag:  3.30676[A[32mprocessed[31m 21,500,000 [32mfragments[0m
-hits: 70,998,083, hits per frag:  3.30318[A[32mprocessed[31m 22,000,000 [32mfragments[0m
-hits: 72,645,062, hits per frag:  3.30787[A[32mprocessed[31m 22,500,000 [32mfragments[0m
-hits: 74,295,943, hits per frag:  3.30286[A[32mprocessed[31m 23,000,000 [32mfragments[0m
-hits: 75,942,825, hits per frag:  3.30468[A[32mprocessed[31m 23,500,000 [32mfragments[0m
-hits: 77,588,315, hits per frag:  3.30313[A[32mprocessed[31m 24,000,000 [32mfragments[0m
-hits: 79,234,426, hits per frag:  3.30657[A[32mprocessed[31m 24,500,000 [32mfragments[0m
-hits: 80,883,915, hits per frag:  3.30211[A[32mprocessed[31m 25,000,000 [32mfragments[0m
-hits: 82,534,481, hits per frag:  3.30523[A[32mprocessed[31m 25,500,000 [32mfragments[0m
-hits: 84,181,676, hits per frag:  3.30511[A[32mprocessed[31m 26,000,000 [32mfragments[0m
-hits: 85,827,345, hits per frag:  3.30495[A[32mprocessed[31m 26,500,000 [32mfragments[0m
-hits: 87,472,110, hits per frag:  3.30223[A[32mprocessed[31m 27,000,000 [32mfragments[0m
-hits: 89,119,936, hits per frag:  3.30311[A[32mprocessed[31m 27,500,000 [32mfragments[0m
-hits: 90,764,877, hits per frag:  3.30485[A[32mprocessed[31m 28,000,000 [32mfragments[0m
-hits: 92,419,421, hits per frag:  3.3021[A[32mprocessed[31m 28,500,000 [32mfragments[0m
-hits: 94,068,745, hits per frag:  3.3036[A[32mprocessed[31m 29,000,000 [32mfragments[0m
-hits: 95,725,423, hits per frag:  3.30283[A[32mprocessed[31m 29,500,000 [32mfragments[0m
-hits: 97,375,019, hits per frag:  3.30461[A[32mprocessed[31m 30,000,000 [32mfragments[0m
-hits: 99,025,541, hits per frag:  3.30238
-
-
-
-
-
-
-
-[2021-03-27 16:56:27.783] [jointLog] [info] Computed 397,809 rich equivalence classes for further processing
-[2021-03-27 16:56:27.783] [jointLog] [info] Counted 27,065,037 total reads in the equivalence classes 
-[2021-03-27 16:56:27.796] [jointLog] [info] Number of orphans recovered using orphan rescue : 627,326
-[2021-03-27 16:56:27.796] [jointLog] [info] Number of mappings discarded because of alignment score : 15,458,038
-[2021-03-27 16:56:27.796] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,800,757
-[2021-03-27 16:56:27.796] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,248,445
-[2021-03-27 16:56:27.796] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 177,786
-[2021-03-27 16:56:27.796] [jointLog] [info] Mapping rate = 89.891%
-
-[2021-03-27 16:56:27.796] [jointLog] [info] finished quantifyLibrary()
-[2021-03-27 16:56:27.803] [jointLog] [info] Starting optimizer
-[2021-03-27 16:56:28.117] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
-[2021-03-27 16:56:28.150] [jointLog] [info] iteration = 0 | max rel diff. = 5395.61
-[2021-03-27 16:56:28.506] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
-[2021-03-27 16:58:37.788] [jointLog] [info] Computed expected counts (for bias correction)
-[2021-03-27 16:58:37.788] [jointLog] [info] processed bias for 0.0% of the transcripts
-[2021-03-27 16:58:47.288] [jointLog] [info] processed bias for 10.0% of the transcripts
-[2021-03-27 16:58:57.536] [jointLog] [info] processed bias for 20.0% of the transcripts
-[2021-03-27 16:59:07.107] [jointLog] [info] processed bias for 30.0% of the transcripts
-[2021-03-27 16:59:17.651] [jointLog] [info] processed bias for 40.0% of the transcripts
-[2021-03-27 16:59:27.304] [jointLog] [info] processed bias for 50.0% of the transcripts
-[2021-03-27 16:59:37.910] [jointLog] [info] processed bias for 60.0% of the transcripts
-[2021-03-27 16:59:47.493] [jointLog] [info] processed bias for 70.0% of the transcripts
-[2021-03-27 16:59:57.329] [jointLog] [info] processed bias for 80.0% of the transcripts
-[2021-03-27 17:00:07.208] [jointLog] [info] processed bias for 90.0% of the transcripts
-[2021-03-27 17:00:17.111] [jointLog] [info] processed bias for 100.0% of the transcripts
-[2021-03-27 17:00:17.132] [jointLog] [info] processed bias for 100.0% of the transcripts
-[2021-03-27 17:00:20.257] [jointLog] [info] iteration = 100 | max rel diff. = 16.8636
-[2021-03-27 17:00:23.754] [jointLog] [info] iteration = 200 | max rel diff. = 14.0119
-[2021-03-27 17:00:27.200] [jointLog] [info] iteration = 300 | max rel diff. = 6.16838
-[2021-03-27 17:00:30.608] [jointLog] [info] iteration = 400 | max rel diff. = 1.43722
-[2021-03-27 17:00:34.034] [jointLog] [info] iteration = 500 | max rel diff. = 0.299173
-[2021-03-27 17:00:37.512] [jointLog] [info] iteration = 600 | max rel diff. = 1.90558
-[2021-03-27 17:00:41.062] [jointLog] [info] iteration = 700 | max rel diff. = 0.355001
-[2021-03-27 17:00:44.618] [jointLog] [info] iteration = 800 | max rel diff. = 0.0510359
-[2021-03-27 17:00:48.129] [jointLog] [info] iteration = 900 | max rel diff. = 0.0315163
-[2021-03-27 17:00:51.650] [jointLog] [info] iteration = 1,000 | max rel diff. = 0.0563072
-[2021-03-27 17:00:55.166] [jointLog] [info] iteration = 1,100 | max rel diff. = 0.0780506
-[2021-03-27 17:00:58.170] [jointLog] [info] iteration = 1,187 | max rel diff. = 0.00883112
-[2021-03-27 17:00:58.264] [jointLog] [info] Finished optimizer
-[2021-03-27 17:00:58.264] [jointLog] [info] writing output 
-
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-SKIP salmon /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.Empty already run for /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-+ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257 intra
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257
-trimmomatic: 0.39
-+ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662960_1.fastq.gz
-read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662960_1.fastq.gz
-+ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662960_2.fastq.gz
-read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662960_2.fastq.gz
-+ echo 'Trimming fastq'
-Trimming fastq
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257
-+ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662960_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662960_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-TrimmomaticPE: Started with arguments:
- -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662960_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662960_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
-ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Quality encoding detected as phred33
-Input Read Pairs: 30216835 Both Surviving: 29787566 (98.58%) Forward Only Surviving: 269327 (0.89%) Reverse Only Surviving: 120672 (0.40%) Dropped: 39270 (0.13%)
-TrimmomaticPE: Completed successfully
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-+ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-salmon version: salmon 1.3.0
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257
-output: intra.a549.1.ZNF257_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/*sel.align.gencode.v35.salmon.v1.3.0.sidx*
-++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/*sel.align.gencode.v35.salmon.v1.3.0.sidx*' -name quant.sf
-find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/*sel.align.gencode.v35.salmon.v1.3.0.sidx*’: No such file or directory
-+ [[ ! -f '' ]]
-+ mkdir /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257
-+ '[' -f /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_single_end.fq.gz ']'
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257
-+ trim_fwd=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_forward_paired.fq.gz
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257
-+ trim_rev=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_reverse_paired.fq.gz
-+ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ --libType A -1 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-Version Info: ### PLEASE UPGRADE SALMON ###
-### A newer version of salmon with important bug fixes and improvements is available. ####
-###
-The newest version, available at https://github.com/COMBINE-lab/salmon/releases
-contains new features, improvements, and bug fixes; please upgrade at your
-earliest convenience.
-###
-Sign up for the salmon mailing list to hear about new versions, features and updates at:
-https://oceangenomics.com/subscribe
-###
-### salmon (selective-alignment-based) v1.3.0
-### [ program ] => salmon 
-### [ command ] => quant 
-### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ }
-### [ libType ] => { A }
-### [ mates1 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_forward_paired.fq.gz }
-### [ mates2 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_output_reverse_paired.fq.gz }
-### [ threads ] => { 8 }
-### [ validateMappings ] => { }
-### [ gcBias ] => { }
-### [ seqBias ] => { }
-### [ recoverOrphans ] => { }
-### [ rangeFactorizationBins ] => { 4 }
-### [ output ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT }
-Logs will be written to /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257/intra.a549.1.ZNF257_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT/logs
-[2021-03-27 17:29:37.898] [jointLog] [info] setting maxHashResizeThreads to 8
-[2021-03-27 17:29:37.898] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
-[2021-03-27 17:29:37.898] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
-[2021-03-27 17:29:37.898] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
-[2021-03-27 17:29:37.898] [jointLog] [info] parsing read library format
-[2021-03-27 17:29:37.898] [jointLog] [info] There is 1 library.
-[2021-03-27 17:29:38.040] [jointLog] [info] Loading pufferfish index
-[2021-03-27 17:29:38.041] [jointLog] [info] Loading dense pufferfish index.
------------------------------------------
-| Loading contig table | Time = 54.029 s
------------------------------------------
-size = 37233365
------------------------------------------
-| Loading contig offsets | Time = 166.37 ms
------------------------------------------
------------------------------------------
-| Loading reference lengths | Time = 2.1185 ms
------------------------------------------
------------------------------------------
-| Loading mphf table | Time = 2.0839 s
------------------------------------------
-size = 3779420184
-Number of ones: 37233364
-Number of ones per inventory item: 512
-Inventory entries filled: 72722
------------------------------------------
-| Loading contig boundaries | Time = 14.736 s
------------------------------------------
-size = 3779420184
------------------------------------------
-| Loading sequence | Time = 1.1253 s
------------------------------------------
-size = 2662419264
------------------------------------------
-| Loading positions | Time = 15.569 s
------------------------------------------
-size = 3465171825
------------------------------------------
-| Loading reference sequence | Time = 1.2372 s
------------------------------------------
------------------------------------------
-| Loading reference accumulative lengths | Time = 3.9618 ms
------------------------------------------
-[2021-03-27 17:31:06.998] [jointLog] [info] done
-[2021-03-27 17:31:06.998] [jointLog] [info] Index contained 228,948 targets
-
-
-
-
-[2021-03-27 17:31:14.678] [jointLog] [info] Number of decoys : 194
-[2021-03-27 17:31:14.678] [jointLog] [info] First decoy index : 228,715 
-[2021-03-27 17:31:15.713] [jointLog] [info] Automatically detected most likely library type as IU
-[A[32mprocessed[31m 500,000 [32mfragments[0m
-hits: 1,632,197, hits per frag:  3.36657[A[32mprocessed[31m 1,000,000 [32mfragments[0m
-hits: 3,265,916, hits per frag:  3.31706[A[32mprocessed[31m 1,500,000 [32mfragments[0m
-hits: 4,895,473, hits per frag:  3.33082[A[32mprocessed[31m 2,000,000 [32mfragments[0m
-hits: 6,525,007, hits per frag:  3.30975[A[32mprocessed[31m 2,500,000 [32mfragments[0m
-hits: 8,154,313, hits per frag:  3.30645[A[32mprocessed[31m 3,000,000 [32mfragments[0m
-hits: 9,784,931, hits per frag:  3.30051[A[32mprocessed[31m 3,500,000 [32mfragments[0m
-hits: 11,409,817, hits per frag:  3.27268[A[32mprocessed[31m 4,000,000 [32mfragments[0m
-hits: 13,036,768, hits per frag:  3.28145[A[32mprocessed[31m 4,500,000 [32mfragments[0m
-hits: 14,665,668, hits per frag:  3.26473[A[32mprocessed[31m 5,000,000 [32mfragments[0m
-hits: 16,294,035, hits per frag:  3.27409[A[32mprocessed[31m 5,500,000 [32mfragments[0m
-hits: 17,919,204, hits per frag:  3.27546[A[32mprocessed[31m 6,000,000 [32mfragments[0m
-hits: 19,546,940, hits per frag:  3.27422[A[32mprocessed[31m 6,500,000 [32mfragments[0m
-hits: 21,171,079, hits per frag:  3.26988[A[32mprocessed[31m 7,000,000 [32mfragments[0m
-hits: 22,801,897, hits per frag:  3.26353[A[32mprocessed[31m 7,500,000 [32mfragments[0m
-hits: 24,434,506, hits per frag:  3.27499[A[32mprocessed[31m 8,000,000 [32mfragments[0m
-hits: 26,064,340, hits per frag:  3.27086[A[32mprocessed[31m 8,500,000 [32mfragments[0m
-hits: 27,692,148, hits per frag:  3.2721[A[32mprocessed[31m 9,000,000 [32mfragments[0m
-hits: 29,319,250, hits per frag:  3.26009[A[32mprocessed[31m 9,500,001 [32mfragments[0m
-hits: 30,947,250, hits per frag:  3.26231[A[32mprocessed[31m 10,000,000 [32mfragments[0m
-hits: 32,574,238, hits per frag:  3.26203[A[32mprocessed[31m 10,500,001 [32mfragments[0m
-hits: 34,203,357, hits per frag:  3.26106[A[32mprocessed[31m 11,000,001 [32mfragments[0m
-hits: 35,833,532, hits per frag:  3.26295[A[32mprocessed[31m 11,500,001 [32mfragments[0m
-hits: 37,460,204, hits per frag:  3.26884[A[32mprocessed[31m 12,000,000 [32mfragments[0m
-hits: 39,090,814, hits per frag:  3.26209[A[32mprocessed[31m 12,500,000 [32mfragments[0m
-hits: 40,717,814, hits per frag:  3.26273[A[32mprocessed[31m 13,000,000 [32mfragments[0m
-hits: 42,350,820, hits per frag:  3.26035[A[32mprocessed[31m 13,500,000 [32mfragments[0m
-hits: 43,981,916, hits per frag:  3.26182[A[32mprocessed[31m 14,000,000 [32mfragments[0m
-hits: 45,616,452, hits per frag:  3.26025[A[32mprocessed[31m 14,500,000 [32mfragments[0m
-hits: 47,243,872, hits per frag:  3.26458[A[32mprocessed[31m 15,000,000 [32mfragments[0m
-hits: 48,872,435, hits per frag:  3.26674[A[32mprocessed[31m 15,500,000 [32mfragments[0m
-hits: 50,496,978, hits per frag:  3.26367[A[32mprocessed[31m 16,000,000 [32mfragments[0m
-hits: 52,128,188, hits per frag:  3.25969[A[32mprocessed[31m 16,500,001 [32mfragments[0m
-hits: 53,752,900, hits per frag:  3.26425[A[32mprocessed[31m 17,000,000 [32mfragments[0m
-hits: 55,380,022, hits per frag:  3.25968[A[32mprocessed[31m 17,500,000 [32mfragments[0m
-hits: 57,007,382, hits per frag:  3.26343[A[32mprocessed[31m 18,000,000 [32mfragments[0m
-hits: 58,631,022, hits per frag:  3.26466[A[32mprocessed[31m 18,500,000 [32mfragments[0m
-hits: 60,253,428, hits per frag:  3.26084[A[32mprocessed[31m 19,000,000 [32mfragments[0m
-hits: 61,873,951, hits per frag:  3.25746[A[32mprocessed[31m 19,500,000 [32mfragments[0m
-hits: 63,501,306, hits per frag:  3.26162[A[32mprocessed[31m 20,000,000 [32mfragments[0m
-hits: 65,126,031, hits per frag:  3.25834[A[32mprocessed[31m 20,500,000 [32mfragments[0m
-hits: 66,749,826, hits per frag:  3.26165[A[32mprocessed[31m 21,000,000 [32mfragments[0m
-hits: 68,376,040, hits per frag:  3.25666[A[32mprocessed[31m 21,500,000 [32mfragments[0m
-hits: 69,997,890, hits per frag:  3.26189[A[32mprocessed[31m 22,000,000 [32mfragments[0m
-hits: 71,622,786, hits per frag:  3.2583[A[32mprocessed[31m 22,500,000 [32mfragments[0m
-hits: 73,248,557, hits per frag:  3.2602[A[32mprocessed[31m 23,000,000 [32mfragments[0m
-hits: 74,873,648, hits per frag:  3.25899[A[32mprocessed[31m 23,500,000 [32mfragments[0m
-hits: 76,500,017, hits per frag:  3.25882[A[32mprocessed[31m 24,000,000 [32mfragments[0m
-hits: 78,124,014, hits per frag:  3.25631[A[32mprocessed[31m 24,500,000 [32mfragments[0m
-hits: 79,744,350, hits per frag:  3.25571[A[32mprocessed[31m 25,000,000 [32mfragments[0m
-hits: 81,370,124, hits per frag:  3.26026[A[32mprocessed[31m 25,500,000 [32mfragments[0m
-hits: 82,996,266, hits per frag:  3.25963[A[32mprocessed[31m 26,000,000 [32mfragments[0m
-hits: 84,619,982, hits per frag:  3.25896[A[32mprocessed[31m 26,500,000 [32mfragments[0m
-hits: 86,244,774, hits per frag:  3.25628[A[32mprocessed[31m 27,000,000 [32mfragments[0m
-hits: 87,868,464, hits per frag:  3.2577[A[32mprocessed[31m 27,500,000 [32mfragments[0m
-hits: 89,496,867, hits per frag:  3.25493[A[32mprocessed[31m 28,000,000 [32mfragments[0m
-hits: 91,127,547, hits per frag:  3.25825[A[32mprocessed[31m 28,500,000 [32mfragments[0m
-hits: 92,754,629, hits per frag:  3.2568[A[32mprocessed[31m 29,000,000 [32mfragments[0m
-hits: 94,380,681, hits per frag:  3.25735[A[32mprocessed[31m 29,500,000 [32mfragments[0m
-hits: 96,007,252, hits per frag:  3.25842
-
-
-
-
-
-
-
-[2021-03-27 17:40:28.866] [jointLog] [info] Computed 401,483 rich equivalence classes for further processing
-[2021-03-27 17:40:28.866] [jointLog] [info] Counted 26,842,138 total reads in the equivalence classes 
-[2021-03-27 17:40:28.878] [jointLog] [info] Number of orphans recovered using orphan rescue : 650,189
-[2021-03-27 17:40:28.878] [jointLog] [info] Number of mappings discarded because of alignment score : 15,036,874
-[2021-03-27 17:40:28.878] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,812,618
-[2021-03-27 17:40:28.878] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,253,181
-[2021-03-27 17:40:28.878] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 155,350
-[2021-03-27 17:40:28.878] [jointLog] [info] Mapping rate = 90.1119%
-
-[2021-03-27 17:40:28.878] [jointLog] [info] finished quantifyLibrary()
-[2021-03-27 17:40:28.886] [jointLog] [info] Starting optimizer
-[2021-03-27 17:40:29.201] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
-[2021-03-27 17:40:29.235] [jointLog] [info] iteration = 0 | max rel diff. = 5423.46
-[2021-03-27 17:40:29.564] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
-[2021-03-27 17:42:43.630] [jointLog] [info] Computed expected counts (for bias correction)
-[2021-03-27 17:42:43.631] [jointLog] [info] processed bias for 0.0% of the transcripts
-[2021-03-27 17:42:53.913] [jointLog] [info] processed bias for 10.0% of the transcripts
-[2021-03-27 17:43:04.440] [jointLog] [info] processed bias for 20.0% of the transcripts
-[2021-03-27 17:43:13.796] [jointLog] [info] processed bias for 30.0% of the transcripts
-[2021-03-27 17:43:24.331] [jointLog] [info] processed bias for 40.0% of the transcripts
-[2021-03-27 17:43:34.584] [jointLog] [info] processed bias for 50.0% of the transcripts
-[2021-03-27 17:43:44.538] [jointLog] [info] processed bias for 60.0% of the transcripts
-[2021-03-27 17:43:53.916] [jointLog] [info] processed bias for 70.0% of the transcripts
-[2021-03-27 17:44:03.484] [jointLog] [info] processed bias for 80.0% of the transcripts
-[2021-03-27 17:44:13.510] [jointLog] [info] processed bias for 90.0% of the transcripts
-[2021-03-27 17:44:24.461] [jointLog] [info] processed bias for 100.0% of the transcripts
-[2021-03-27 17:44:24.472] [jointLog] [info] processed bias for 100.0% of the transcripts
-[2021-03-27 17:44:27.777] [jointLog] [info] iteration = 100 | max rel diff. = 9.25454
-[2021-03-27 17:44:31.415] [jointLog] [info] iteration = 200 | max rel diff. = 7.62277
-[2021-03-27 17:44:34.927] [jointLog] [info] iteration = 300 | max rel diff. = 3.07801
-[2021-03-27 17:44:38.550] [jointLog] [info] iteration = 400 | max rel diff. = 2.2925
-[2021-03-27 17:44:42.137] [jointLog] [info] iteration = 500 | max rel diff. = 1.45767
-[2021-03-27 17:44:45.709] [jointLog] [info] iteration = 600 | max rel diff. = 2.22674
-[2021-03-27 17:44:49.238] [jointLog] [info] iteration = 700 | max rel diff. = 2.54775
-[2021-03-27 17:44:52.827] [jointLog] [info] iteration = 800 | max rel diff. = 0.253683
-[2021-03-27 17:44:56.397] [jointLog] [info] iteration = 900 | max rel diff. = 0.116752
-[2021-03-27 17:44:59.947] [jointLog] [info] iteration = 1,000 | max rel diff. = 0.876109
-[2021-03-27 17:45:03.444] [jointLog] [info] iteration = 1,100 | max rel diff. = 0.0461236
-[2021-03-27 17:45:04.010] [jointLog] [info] iteration = 1,117 | max rel diff. = 0.00889081
-[2021-03-27 17:45:04.129] [jointLog] [info] Finished optimizer
-[2021-03-27 17:45:04.129] [jointLog] [info] writing output 
-
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-SKIP salmon /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF257 already run for /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-+ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682 intra
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682
-trimmomatic: 0.39
-+ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662979_1.fastq.gz
-read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662979_1.fastq.gz
-+ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662979_2.fastq.gz
-read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662979_2.fastq.gz
-+ echo 'Trimming fastq'
-Trimming fastq
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682
-+ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662979_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662979_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-TrimmomaticPE: Started with arguments:
- -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662979_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662979_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
-ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Quality encoding detected as phred33
-Input Read Pairs: 27803740 Both Surviving: 27437276 (98.68%) Forward Only Surviving: 226877 (0.82%) Reverse Only Surviving: 107350 (0.39%) Dropped: 32237 (0.12%)
-TrimmomaticPE: Completed successfully
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-+ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682 /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-salmon version: salmon 1.3.0
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682
-output: intra.a549.1.ZNF682_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/*sel.align.gencode.v35.salmon.v1.3.0.sidx*
-++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/*sel.align.gencode.v35.salmon.v1.3.0.sidx*' -name quant.sf
-find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/*sel.align.gencode.v35.salmon.v1.3.0.sidx*’: No such file or directory
-+ [[ ! -f '' ]]
-+ mkdir /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682
-+ '[' -f /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_single_end.fq.gz ']'
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682
-+ trim_fwd=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_forward_paired.fq.gz
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682
-+ trim_rev=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_reverse_paired.fq.gz
-+ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ --libType A -1 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-Version Info: ### PLEASE UPGRADE SALMON ###
-### A newer version of salmon with important bug fixes and improvements is available. ####
-###
-The newest version, available at https://github.com/COMBINE-lab/salmon/releases
-contains new features, improvements, and bug fixes; please upgrade at your
-earliest convenience.
-###
-Sign up for the salmon mailing list to hear about new versions, features and updates at:
-https://oceangenomics.com/subscribe
-###
-### salmon (selective-alignment-based) v1.3.0
-### [ program ] => salmon 
-### [ command ] => quant 
-### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ }
-### [ libType ] => { A }
-### [ mates1 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_forward_paired.fq.gz }
-### [ mates2 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_output_reverse_paired.fq.gz }
-### [ threads ] => { 8 }
-### [ validateMappings ] => { }
-### [ gcBias ] => { }
-### [ seqBias ] => { }
-### [ recoverOrphans ] => { }
-### [ rangeFactorizationBins ] => { 4 }
-### [ output ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT }
-Logs will be written to /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682/intra.a549.1.ZNF682_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT/logs
-[2021-03-27 18:11:14.424] [jointLog] [info] setting maxHashResizeThreads to 8
-[2021-03-27 18:11:14.424] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
-[2021-03-27 18:11:14.424] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
-[2021-03-27 18:11:14.424] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
-[2021-03-27 18:11:14.424] [jointLog] [info] parsing read library format
-[2021-03-27 18:11:14.424] [jointLog] [info] There is 1 library.
-[2021-03-27 18:11:14.575] [jointLog] [info] Loading pufferfish index
-[2021-03-27 18:11:14.576] [jointLog] [info] Loading dense pufferfish index.
------------------------------------------
-| Loading contig table | Time = 48.478 s
------------------------------------------
-size = 37233365
------------------------------------------
-| Loading contig offsets | Time = 245.47 ms
------------------------------------------
------------------------------------------
-| Loading reference lengths | Time = 3.8056 ms
------------------------------------------
------------------------------------------
-| Loading mphf table | Time = 5.021 s
------------------------------------------
-size = 3779420184
-Number of ones: 37233364
-Number of ones per inventory item: 512
-Inventory entries filled: 72722
------------------------------------------
-| Loading contig boundaries | Time = 13.633 s
------------------------------------------
-size = 3779420184
------------------------------------------
-| Loading sequence | Time = 2.635 s
------------------------------------------
-size = 2662419264
------------------------------------------
-| Loading positions | Time = 13.224 s
------------------------------------------
-size = 3465171825
------------------------------------------
-| Loading reference sequence | Time = 1.0423 s
------------------------------------------
------------------------------------------
-| Loading reference accumulative lengths | Time = 3.5479 ms
------------------------------------------
-[2021-03-27 18:12:38.868] [jointLog] [info] done
-[2021-03-27 18:12:38.869] [jointLog] [info] Index contained 228,948 targets
-
-
-
-
-[2021-03-27 18:12:46.203] [jointLog] [info] Number of decoys : 194
-[2021-03-27 18:12:46.203] [jointLog] [info] First decoy index : 228,715 
-[2021-03-27 18:12:47.212] [jointLog] [info] Automatically detected most likely library type as IU
-[A[32mprocessed[31m 500,000 [32mfragments[0m
-hits: 1,677,697, hits per frag:  3.48686[A[32mprocessed[31m 1,000,000 [32mfragments[0m
-hits: 3,349,959, hits per frag:  3.38447[A[32mprocessed[31m 1,500,000 [32mfragments[0m
-hits: 5,026,331, hits per frag:  3.37398[A[32mprocessed[31m 2,000,000 [32mfragments[0m
-hits: 6,699,748, hits per frag:  3.37669[A[32mprocessed[31m 2,500,000 [32mfragments[0m
-hits: 8,377,535, hits per frag:  3.37214[A[32mprocessed[31m 3,000,000 [32mfragments[0m
-hits: 10,051,303, hits per frag:  3.38123[A[32mprocessed[31m 3,500,000 [32mfragments[0m
-hits: 11,722,069, hits per frag:  3.36205[A[32mprocessed[31m 4,000,000 [32mfragments[0m
-hits: 13,397,168, hits per frag:  3.38147[A[32mprocessed[31m 4,500,000 [32mfragments[0m
-hits: 15,067,002, hits per frag:  3.35761[A[32mprocessed[31m 5,000,000 [32mfragments[0m
-hits: 16,738,950, hits per frag:  3.35932[A[32mprocessed[31m 5,500,000 [32mfragments[0m
-hits: 18,407,288, hits per frag:  3.36511[A[32mprocessed[31m 6,000,000 [32mfragments[0m
-hits: 20,073,678, hits per frag:  3.36666[A[32mprocessed[31m 6,500,000 [32mfragments[0m
-hits: 21,745,716, hits per frag:  3.35457[A[32mprocessed[31m 7,000,001 [32mfragments[0m
-hits: 23,417,345, hits per frag:  3.3579[A[32mprocessed[31m 7,500,000 [32mfragments[0m
-hits: 25,089,703, hits per frag:  3.36339[A[32mprocessed[31m 8,000,000 [32mfragments[0m
-hits: 26,760,618, hits per frag:  3.35072[A[32mprocessed[31m 8,500,000 [32mfragments[0m
-hits: 28,434,891, hits per frag:  3.35564[A[32mprocessed[31m 9,000,000 [32mfragments[0m
-hits: 30,105,057, hits per frag:  3.34567[A[32mprocessed[31m 9,500,000 [32mfragments[0m
-hits: 31,778,956, hits per frag:  3.34845[A[32mprocessed[31m 10,000,000 [32mfragments[0m
-hits: 33,455,010, hits per frag:  3.35124[A[32mprocessed[31m 10,500,000 [32mfragments[0m
-hits: 35,130,342, hits per frag:  3.35538[A[32mprocessed[31m 11,000,000 [32mfragments[0m
-hits: 36,803,256, hits per frag:  3.35654[A[32mprocessed[31m 11,500,000 [32mfragments[0m
-hits: 38,475,458, hits per frag:  3.35734[A[32mprocessed[31m 12,000,000 [32mfragments[0m
-hits: 40,149,690, hits per frag:  3.35178[A[32mprocessed[31m 12,500,000 [32mfragments[0m
-hits: 41,824,047, hits per frag:  3.34746[A[32mprocessed[31m 13,000,000 [32mfragments[0m
-hits: 43,496,143, hits per frag:  3.35475[A[32mprocessed[31m 13,500,000 [32mfragments[0m
-hits: 45,170,431, hits per frag:  3.35037[A[32mprocessed[31m 14,000,000 [32mfragments[0m
-hits: 46,838,980, hits per frag:  3.35392[A[32mprocessed[31m 14,500,000 [32mfragments[0m
-hits: 48,515,853, hits per frag:  3.35[A[32mprocessed[31m 15,000,000 [32mfragments[0m
-hits: 50,185,215, hits per frag:  3.35502[A[32mprocessed[31m 15,500,000 [32mfragments[0m
-hits: 51,856,911, hits per frag:  3.35011[A[32mprocessed[31m 16,000,000 [32mfragments[0m
-hits: 53,524,469, hits per frag:  3.34769[A[32mprocessed[31m 16,500,001 [32mfragments[0m
-hits: 55,195,076, hits per frag:  3.35052[A[32mprocessed[31m 17,000,000 [32mfragments[0m
-hits: 56,867,621, hits per frag:  3.3476[A[32mprocessed[31m 17,500,000 [32mfragments[0m
-hits: 58,533,523, hits per frag:  3.34783[A[32mprocessed[31m 18,000,000 [32mfragments[0m
-hits: 60,201,614, hits per frag:  3.34692[A[32mprocessed[31m 18,500,000 [32mfragments[0m
-hits: 61,873,581, hits per frag:  3.34672[A[32mprocessed[31m 19,000,000 [32mfragments[0m
-hits: 63,538,962, hits per frag:  3.34652[A[32mprocessed[31m 19,500,000 [32mfragments[0m
-hits: 65,208,816, hits per frag:  3.34681[A[32mprocessed[31m 20,000,000 [32mfragments[0m
-hits: 66,874,346, hits per frag:  3.34525[A[32mprocessed[31m 20,500,000 [32mfragments[0m
-hits: 68,546,236, hits per frag:  3.34874[A[32mprocessed[31m 21,000,000 [32mfragments[0m
-hits: 70,211,491, hits per frag:  3.34801[A[32mprocessed[31m 21,500,000 [32mfragments[0m
-hits: 71,882,801, hits per frag:  3.34779[A[32mprocessed[31m 22,000,000 [32mfragments[0m
-hits: 73,551,497, hits per frag:  3.34577[A[32mprocessed[31m 22,500,000 [32mfragments[0m
-hits: 75,221,113, hits per frag:  3.34702[A[32mprocessed[31m 23,000,000 [32mfragments[0m
-hits: 76,888,832, hits per frag:  3.34504[A[32mprocessed[31m 23,500,000 [32mfragments[0m
-hits: 78,555,549, hits per frag:  3.34645[A[32mprocessed[31m 24,000,000 [32mfragments[0m
-hits: 80,222,152, hits per frag:  3.34403[A[32mprocessed[31m 24,500,000 [32mfragments[0m
-hits: 81,891,929, hits per frag:  3.34601[A[32mprocessed[31m 25,000,000 [32mfragments[0m
-hits: 83,562,201, hits per frag:  3.34343[A[32mprocessed[31m 25,500,000 [32mfragments[0m
-hits: 85,233,425, hits per frag:  3.34787[A[32mprocessed[31m 26,000,000 [32mfragments[0m
-hits: 86,900,401, hits per frag:  3.34609[A[32mprocessed[31m 26,500,000 [32mfragments[0m
-hits: 88,578,273, hits per frag:  3.34495[A[32mprocessed[31m 27,000,000 [32mfragments[0m
-hits: 90,248,503, hits per frag:  3.34631
-
-
-
-
-
-
-
-[2021-03-27 18:21:14.441] [jointLog] [info] Computed 382,230 rich equivalence classes for further processing
-[2021-03-27 18:21:14.441] [jointLog] [info] Counted 24,825,870 total reads in the equivalence classes 
-[2021-03-27 18:21:14.453] [jointLog] [info] Number of orphans recovered using orphan rescue : 546,900
-[2021-03-27 18:21:14.453] [jointLog] [info] Number of mappings discarded because of alignment score : 14,164,531
-[2021-03-27 18:21:14.453] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,578,982
-[2021-03-27 18:21:14.453] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,087,312
-[2021-03-27 18:21:14.453] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 153,613
-[2021-03-27 18:21:14.453] [jointLog] [info] Mapping rate = 90.4823%
-
-[2021-03-27 18:21:14.453] [jointLog] [info] finished quantifyLibrary()
-[2021-03-27 18:21:14.476] [jointLog] [info] Starting optimizer
-[2021-03-27 18:21:14.781] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
-[2021-03-27 18:21:14.814] [jointLog] [info] iteration = 0 | max rel diff. = 5441.48
-[2021-03-27 18:21:15.135] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
-[2021-03-27 18:23:22.324] [jointLog] [info] Computed expected counts (for bias correction)
-[2021-03-27 18:23:22.324] [jointLog] [info] processed bias for 0.0% of the transcripts
-[2021-03-27 18:23:32.038] [jointLog] [info] processed bias for 10.0% of the transcripts
-[2021-03-27 18:23:42.289] [jointLog] [info] processed bias for 20.0% of the transcripts
-[2021-03-27 18:23:51.429] [jointLog] [info] processed bias for 30.0% of the transcripts
-[2021-03-27 18:24:01.219] [jointLog] [info] processed bias for 40.0% of the transcripts
-[2021-03-27 18:24:10.636] [jointLog] [info] processed bias for 50.0% of the transcripts
-[2021-03-27 18:24:20.081] [jointLog] [info] processed bias for 60.0% of the transcripts
-[2021-03-27 18:24:29.660] [jointLog] [info] processed bias for 70.0% of the transcripts
-[2021-03-27 18:24:39.133] [jointLog] [info] processed bias for 80.0% of the transcripts
-[2021-03-27 18:24:48.260] [jointLog] [info] processed bias for 90.0% of the transcripts
-[2021-03-27 18:24:57.995] [jointLog] [info] processed bias for 100.0% of the transcripts
-[2021-03-27 18:24:57.997] [jointLog] [info] processed bias for 100.0% of the transcripts
-[2021-03-27 18:25:01.050] [jointLog] [info] iteration = 100 | max rel diff. = 18.3767
-[2021-03-27 18:25:04.419] [jointLog] [info] iteration = 200 | max rel diff. = 2.49505
-[2021-03-27 18:25:07.836] [jointLog] [info] iteration = 300 | max rel diff. = 0.862256
-[2021-03-27 18:25:11.304] [jointLog] [info] iteration = 400 | max rel diff. = 3.60662
-[2021-03-27 18:25:14.758] [jointLog] [info] iteration = 500 | max rel diff. = 1.91615
-[2021-03-27 18:25:18.249] [jointLog] [info] iteration = 600 | max rel diff. = 5.40993
-[2021-03-27 18:25:21.736] [jointLog] [info] iteration = 700 | max rel diff. = 0.537128
-[2021-03-27 18:25:25.221] [jointLog] [info] iteration = 800 | max rel diff. = 0.0955552
-[2021-03-27 18:25:28.784] [jointLog] [info] iteration = 900 | max rel diff. = 0.0480445
-[2021-03-27 18:25:32.267] [jointLog] [info] iteration = 1,000 | max rel diff. = 0.0712178
-[2021-03-27 18:25:35.750] [jointLog] [info] iteration = 1,100 | max rel diff. = 0.688566
-[2021-03-27 18:25:39.265] [jointLog] [info] iteration = 1,200 | max rel diff. = 0.0276065
-[2021-03-27 18:25:41.499] [jointLog] [info] iteration = 1,271 | max rel diff. = 0.00262227
-[2021-03-27 18:25:41.590] [jointLog] [info] Finished optimizer
-[2021-03-27 18:25:41.590] [jointLog] [info] writing output 
-
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-SKIP salmon /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.1.ZNF682 already run for /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-+ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty intra
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty
-trimmomatic: 0.39
-+ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662985_1.fastq.gz
-read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662985_1.fastq.gz
-+ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662985_2.fastq.gz
-read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662985_2.fastq.gz
-+ echo 'Trimming fastq'
-Trimming fastq
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty
-+ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662985_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662985_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-TrimmomaticPE: Started with arguments:
- -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662985_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662985_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
-ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Quality encoding detected as phred33
-Input Read Pairs: 24111046 Both Surviving: 23816035 (98.78%) Forward Only Surviving: 160146 (0.66%) Reverse Only Surviving: 108679 (0.45%) Dropped: 26186 (0.11%)
-TrimmomaticPE: Completed successfully
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-+ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-salmon version: salmon 1.3.0
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty
-output: intra.a549.2.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/*sel.align.gencode.v35.salmon.v1.3.0.sidx*
-++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/*sel.align.gencode.v35.salmon.v1.3.0.sidx*' -name quant.sf
-find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/*sel.align.gencode.v35.salmon.v1.3.0.sidx*’: No such file or directory
-+ [[ ! -f '' ]]
-+ mkdir /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty
-+ '[' -f /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_single_end.fq.gz ']'
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty
-+ trim_fwd=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_forward_paired.fq.gz
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty
-+ trim_rev=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_reverse_paired.fq.gz
-+ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ --libType A -1 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-Version Info: ### PLEASE UPGRADE SALMON ###
-### A newer version of salmon with important bug fixes and improvements is available. ####
-###
-The newest version, available at https://github.com/COMBINE-lab/salmon/releases
-contains new features, improvements, and bug fixes; please upgrade at your
-earliest convenience.
-###
-Sign up for the salmon mailing list to hear about new versions, features and updates at:
-https://oceangenomics.com/subscribe
-###
-### salmon (selective-alignment-based) v1.3.0
-### [ program ] => salmon 
-### [ command ] => quant 
-### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ }
-### [ libType ] => { A }
-### [ mates1 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_forward_paired.fq.gz }
-### [ mates2 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_output_reverse_paired.fq.gz }
-### [ threads ] => { 8 }
-### [ validateMappings ] => { }
-### [ gcBias ] => { }
-### [ seqBias ] => { }
-### [ recoverOrphans ] => { }
-### [ rangeFactorizationBins ] => { 4 }
-### [ output ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT }
-Logs will be written to /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty/intra.a549.2.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT/logs
-[2021-03-27 18:48:18.684] [jointLog] [info] setting maxHashResizeThreads to 8
-[2021-03-27 18:48:18.684] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
-[2021-03-27 18:48:18.684] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
-[2021-03-27 18:48:18.684] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
-[2021-03-27 18:48:18.684] [jointLog] [info] parsing read library format
-[2021-03-27 18:48:18.684] [jointLog] [info] There is 1 library.
-[2021-03-27 18:48:18.818] [jointLog] [info] Loading pufferfish index
-[2021-03-27 18:48:18.819] [jointLog] [info] Loading dense pufferfish index.
------------------------------------------
-| Loading contig table | Time = 55.075 s
------------------------------------------
-size = 37233365
------------------------------------------
-| Loading contig offsets | Time = 180.08 ms
------------------------------------------
------------------------------------------
-| Loading reference lengths | Time = 2.2462 ms
------------------------------------------
------------------------------------------
-| Loading mphf table | Time = 2.3449 s
------------------------------------------
-size = 3779420184
-Number of ones: 37233364
-Number of ones per inventory item: 512
-Inventory entries filled: 72722
------------------------------------------
-| Loading contig boundaries | Time = 15.534 s
------------------------------------------
-size = 3779420184
------------------------------------------
-| Loading sequence | Time = 1.3377 s
------------------------------------------
-size = 2662419264
------------------------------------------
-| Loading positions | Time = 15.146 s
------------------------------------------
-size = 3465171825
------------------------------------------
-| Loading reference sequence | Time = 1.1868 s
------------------------------------------
------------------------------------------
-| Loading reference accumulative lengths | Time = 3.6444 ms
------------------------------------------
-[2021-03-27 18:49:49.636] [jointLog] [info] done
-[2021-03-27 18:49:49.636] [jointLog] [info] Index contained 228,948 targets
-
-
-
-
-[2021-03-27 18:49:57.429] [jointLog] [info] Number of decoys : 194
-[2021-03-27 18:49:57.429] [jointLog] [info] First decoy index : 228,715 
-[2021-03-27 18:49:58.766] [jointLog] [info] Automatically detected most likely library type as IU
-[A[32mprocessed[31m 500,000 [32mfragments[0m
-hits: 1,651,681, hits per frag:  3.41987[A[32mprocessed[31m 1,000,000 [32mfragments[0m
-hits: 3,292,869, hits per frag:  3.34822[A[32mprocessed[31m 1,500,000 [32mfragments[0m
-hits: 4,936,094, hits per frag:  3.38654[A[32mprocessed[31m 2,000,000 [32mfragments[0m
-hits: 6,579,321, hits per frag:  3.29791[A[32mprocessed[31m 2,500,000 [32mfragments[0m
-hits: 8,225,842, hits per frag:  3.34234[A[32mprocessed[31m 3,000,000 [32mfragments[0m
-hits: 9,870,448, hits per frag:  3.31888[A[32mprocessed[31m 3,500,000 [32mfragments[0m
-hits: 11,511,749, hits per frag:  3.32829[A[32mprocessed[31m 4,000,000 [32mfragments[0m
-hits: 13,152,352, hits per frag:  3.31216[A[32mprocessed[31m 4,500,000 [32mfragments[0m
-hits: 14,799,707, hits per frag:  3.29063[A[32mprocessed[31m 5,000,000 [32mfragments[0m
-hits: 16,441,095, hits per frag:  3.29623[A[32mprocessed[31m 5,500,000 [32mfragments[0m
-hits: 18,088,024, hits per frag:  3.31005[A[32mprocessed[31m 6,000,000 [32mfragments[0m
-hits: 19,726,436, hits per frag:  3.29061[A[32mprocessed[31m 6,500,000 [32mfragments[0m
-hits: 21,373,314, hits per frag:  3.29659[A[32mprocessed[31m 7,000,000 [32mfragments[0m
-hits: 23,019,200, hits per frag:  3.29063[A[32mprocessed[31m 7,500,000 [32mfragments[0m
-hits: 24,660,999, hits per frag:  3.29964[A[32mprocessed[31m 8,000,000 [32mfragments[0m
-hits: 26,299,483, hits per frag:  3.29516[A[32mprocessed[31m 8,500,000 [32mfragments[0m
-hits: 27,945,431, hits per frag:  3.29794[A[32mprocessed[31m 9,000,000 [32mfragments[0m
-hits: 29,588,364, hits per frag:  3.2888[A[32mprocessed[31m 9,500,000 [32mfragments[0m
-hits: 31,233,066, hits per frag:  3.29783[A[32mprocessed[31m 10,000,000 [32mfragments[0m
-hits: 32,877,471, hits per frag:  3.29219[A[32mprocessed[31m 10,500,000 [32mfragments[0m
-hits: 34,523,587, hits per frag:  3.29684[A[32mprocessed[31m 11,000,000 [32mfragments[0m
-hits: 36,165,709, hits per frag:  3.29031[A[32mprocessed[31m 11,500,000 [32mfragments[0m
-hits: 37,809,050, hits per frag:  3.29464[A[32mprocessed[31m 12,000,000 [32mfragments[0m
-hits: 39,453,640, hits per frag:  3.2903[A[32mprocessed[31m 12,500,000 [32mfragments[0m
-hits: 41,097,335, hits per frag:  3.29636[A[32mprocessed[31m 13,000,000 [32mfragments[0m
-hits: 42,739,732, hits per frag:  3.29394[A[32mprocessed[31m 13,500,000 [32mfragments[0m
-hits: 44,378,609, hits per frag:  3.28789[A[32mprocessed[31m 14,000,000 [32mfragments[0m
-hits: 46,019,904, hits per frag:  3.29121[A[32mprocessed[31m 14,500,000 [32mfragments[0m
-hits: 47,656,661, hits per frag:  3.29479[A[32mprocessed[31m 15,000,000 [32mfragments[0m
-hits: 49,290,719, hits per frag:  3.28972[A[32mprocessed[31m 15,500,001 [32mfragments[0m
-hits: 50,927,868, hits per frag:  3.29216[A[32mprocessed[31m 16,000,000 [32mfragments[0m
-hits: 52,572,792, hits per frag:  3.2875[A[32mprocessed[31m 16,500,000 [32mfragments[0m
-hits: 54,212,724, hits per frag:  3.2885[A[32mprocessed[31m 17,000,000 [32mfragments[0m
-hits: 55,848,271, hits per frag:  3.28985[A[32mprocessed[31m 17,500,000 [32mfragments[0m
-hits: 57,485,794, hits per frag:  3.28757[A[32mprocessed[31m 18,000,000 [32mfragments[0m
-hits: 59,128,610, hits per frag:  3.28858[A[32mprocessed[31m 18,500,000 [32mfragments[0m
-hits: 60,773,231, hits per frag:  3.28804[A[32mprocessed[31m 19,000,000 [32mfragments[0m
-hits: 62,410,130, hits per frag:  3.29067[A[32mprocessed[31m 19,500,000 [32mfragments[0m
-hits: 64,047,661, hits per frag:  3.2867[A[32mprocessed[31m 20,000,000 [32mfragments[0m
-hits: 65,691,033, hits per frag:  3.28654[A[32mprocessed[31m 20,500,000 [32mfragments[0m
-hits: 67,332,672, hits per frag:  3.28984[A[32mprocessed[31m 21,000,000 [32mfragments[0m
-hits: 68,968,281, hits per frag:  3.28679[A[32mprocessed[31m 21,500,000 [32mfragments[0m
-hits: 70,605,362, hits per frag:  3.28928[A[32mprocessed[31m 22,000,000 [32mfragments[0m
-hits: 72,251,806, hits per frag:  3.28934[A[32mprocessed[31m 22,500,000 [32mfragments[0m
-hits: 73,897,971, hits per frag:  3.28743[A[32mprocessed[31m 23,000,000 [32mfragments[0m
-hits: 75,536,871, hits per frag:  3.28535[A[32mprocessed[31m 23,500,000 [32mfragments[0m
-hits: 77,181,898, hits per frag:  3.28979
-
-
-
-
-
-
-
-[2021-03-27 18:57:35.700] [jointLog] [info] Computed 368,593 rich equivalence classes for further processing
-[2021-03-27 18:57:35.700] [jointLog] [info] Counted 21,253,986 total reads in the equivalence classes 
-[2021-03-27 18:57:35.712] [jointLog] [info] Number of orphans recovered using orphan rescue : 509,700
-[2021-03-27 18:57:35.712] [jointLog] [info] Number of mappings discarded because of alignment score : 12,415,501
-[2021-03-27 18:57:35.712] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,506,514
-[2021-03-27 18:57:35.712] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 1,019,446
-[2021-03-27 18:57:35.712] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 153,200
-[2021-03-27 18:57:35.712] [jointLog] [info] Mapping rate = 89.2423%
-
-[2021-03-27 18:57:35.712] [jointLog] [info] finished quantifyLibrary()
-[2021-03-27 18:57:35.733] [jointLog] [info] Starting optimizer
-[2021-03-27 18:57:36.062] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
-[2021-03-27 18:57:36.095] [jointLog] [info] iteration = 0 | max rel diff. = 5311.11
-[2021-03-27 18:57:36.419] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
-[2021-03-27 18:59:46.450] [jointLog] [info] Computed expected counts (for bias correction)
-[2021-03-27 18:59:46.451] [jointLog] [info] processed bias for 0.0% of the transcripts
-[2021-03-27 18:59:56.023] [jointLog] [info] processed bias for 10.0% of the transcripts
-[2021-03-27 19:00:06.357] [jointLog] [info] processed bias for 20.0% of the transcripts
-[2021-03-27 19:00:15.473] [jointLog] [info] processed bias for 30.0% of the transcripts
-[2021-03-27 19:00:25.288] [jointLog] [info] processed bias for 40.0% of the transcripts
-[2021-03-27 19:00:34.570] [jointLog] [info] processed bias for 50.0% of the transcripts
-[2021-03-27 19:00:44.015] [jointLog] [info] processed bias for 60.0% of the transcripts
-[2021-03-27 19:00:53.452] [jointLog] [info] processed bias for 70.0% of the transcripts
-[2021-03-27 19:01:03.495] [jointLog] [info] processed bias for 80.0% of the transcripts
-[2021-03-27 19:01:12.807] [jointLog] [info] processed bias for 90.0% of the transcripts
-[2021-03-27 19:01:23.209] [jointLog] [info] processed bias for 100.0% of the transcripts
-[2021-03-27 19:01:26.205] [jointLog] [info] iteration = 100 | max rel diff. = 10.328
-[2021-03-27 19:01:29.423] [jointLog] [info] iteration = 200 | max rel diff. = 2.94187
-[2021-03-27 19:01:32.842] [jointLog] [info] iteration = 300 | max rel diff. = 5.45204
-[2021-03-27 19:01:36.189] [jointLog] [info] iteration = 400 | max rel diff. = 2.2131
-[2021-03-27 19:01:39.657] [jointLog] [info] iteration = 500 | max rel diff. = 0.558641
-[2021-03-27 19:01:43.068] [jointLog] [info] iteration = 600 | max rel diff. = 0.246304
-[2021-03-27 19:01:46.294] [jointLog] [info] iteration = 700 | max rel diff. = 0.112368
-[2021-03-27 19:01:49.625] [jointLog] [info] iteration = 800 | max rel diff. = 2.61515
-[2021-03-27 19:01:53.022] [jointLog] [info] iteration = 900 | max rel diff. = 0.526095
-[2021-03-27 19:01:56.353] [jointLog] [info] iteration = 1,000 | max rel diff. = 0.352744
-[2021-03-27 19:01:59.622] [jointLog] [info] iteration = 1,100 | max rel diff. = 0.10284
-[2021-03-27 19:02:02.991] [jointLog] [info] iteration = 1,200 | max rel diff. = 19.8182
-[2021-03-27 19:02:04.455] [jointLog] [info] iteration = 1,248 | max rel diff. = 0.00971807
-[2021-03-27 19:02:04.557] [jointLog] [info] Finished optimizer
-[2021-03-27 19:02:04.557] [jointLog] [info] writing output 
-
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-SKIP salmon /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.2.Empty already run for /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-+ ./trimmomaticRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty intra
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty
-trimmomatic: 0.39
-+ echo 'read 1:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662986_1.fastq.gz
-read 1: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662986_1.fastq.gz
-+ echo 'read 2:' /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662986_2.fastq.gz
-read 2: /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662986_2.fastq.gz
-+ echo 'Trimming fastq'
-Trimming fastq
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty
-+ trimmomatic PE -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662986_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662986_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-TrimmomaticPE: Started with arguments:
- -threads 8 /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662986_1.fastq.gz /public/groups/kimlab/seqData/2021-03-08_AALE_resubmission/SRR10662986_2.fastq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_forward_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_forward_unpaired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_reverse_paired.fq.gz /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_reverse_unpaired.fq.gz ILLUMINACLIP:/public/groups/kimlab/genomes.annotations/adapters/TruSeq3-PE.fa:1:30:10:4:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
-Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
-ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Quality encoding detected as phred33
-Input Read Pairs: 23479646 Both Surviving: 22883236 (97.46%) Forward Only Surviving: 380170 (1.62%) Reverse Only Surviving: 154757 (0.66%) Dropped: 61483 (0.26%)
-TrimmomaticPE: Completed successfully
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-+ ./salmonRun.sh /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-cmd: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ 2021-03-27-16.16.56-PDT
-salmon version: salmon 1.3.0
-input: /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty
-output: intra.a549.3.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/*sel.align.gencode.v35.salmon.v1.3.0.sidx*
-++ find '/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/*sel.align.gencode.v35.salmon.v1.3.0.sidx*' -name quant.sf
-find: ‘/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/*sel.align.gencode.v35.salmon.v1.3.0.sidx*’: No such file or directory
-+ [[ ! -f '' ]]
-+ mkdir /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty
-+ '[' -f /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_single_end.fq.gz ']'
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty
-+ trim_fwd=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_forward_paired.fq.gz
-++ basename /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty
-+ trim_rev=/public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_reverse_paired.fq.gz
-+ salmon quant -i /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ --libType A -1 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_forward_paired.fq.gz -2 /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_reverse_paired.fq.gz -p 8 --validateMappings --gcBias --seqBias --recoverOrphans --rangeFactorizationBins 4 --output /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT
-Version Info: ### PLEASE UPGRADE SALMON ###
-### A newer version of salmon with important bug fixes and improvements is available. ####
-###
-The newest version, available at https://github.com/COMBINE-lab/salmon/releases
-contains new features, improvements, and bug fixes; please upgrade at your
-earliest convenience.
-###
-Sign up for the salmon mailing list to hear about new versions, features and updates at:
-https://oceangenomics.com/subscribe
-###
-### salmon (selective-alignment-based) v1.3.0
-### [ program ] => salmon 
-### [ command ] => quant 
-### [ index ] => { /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/ }
-### [ libType ] => { A }
-### [ mates1 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_forward_paired.fq.gz }
-### [ mates2 ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_output_reverse_paired.fq.gz }
-### [ threads ] => { 8 }
-### [ validateMappings ] => { }
-### [ gcBias ] => { }
-### [ seqBias ] => { }
-### [ recoverOrphans ] => { }
-### [ rangeFactorizationBins ] => { 4 }
-### [ output ] => { /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT }
-Logs will be written to /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty/intra.a549.3.Empty_sel.align.gencode.v35.salmon.v1.3.0.sidx_2021-03-27-16.16.56-PDT/logs
-[2021-03-27 19:25:34.714] [jointLog] [info] setting maxHashResizeThreads to 8
-[2021-03-27 19:25:34.714] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
-[2021-03-27 19:25:34.714] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
-[2021-03-27 19:25:34.714] [jointLog] [info] Usage of --validateMappings implies a default consensus slack of 0.2. Setting consensusSlack to 0.35.
-[2021-03-27 19:25:34.714] [jointLog] [info] parsing read library format
-[2021-03-27 19:25:34.714] [jointLog] [info] There is 1 library.
-[2021-03-27 19:25:34.854] [jointLog] [info] Loading pufferfish index
-[2021-03-27 19:25:34.855] [jointLog] [info] Loading dense pufferfish index.
------------------------------------------
-| Loading contig table | Time = 54.09 s
------------------------------------------
-size = 37233365
------------------------------------------
-| Loading contig offsets | Time = 168.12 ms
------------------------------------------
------------------------------------------
-| Loading reference lengths | Time = 2.2091 ms
------------------------------------------
------------------------------------------
-| Loading mphf table | Time = 2.2167 s
------------------------------------------
-size = 3779420184
-Number of ones: 37233364
-Number of ones per inventory item: 512
-Inventory entries filled: 72722
------------------------------------------
-| Loading contig boundaries | Time = 14.739 s
------------------------------------------
-size = 3779420184
------------------------------------------
-| Loading sequence | Time = 1.1204 s
------------------------------------------
-size = 2662419264
------------------------------------------
-| Loading positions | Time = 13.237 s
------------------------------------------
-size = 3465171825
------------------------------------------
-| Loading reference sequence | Time = 1.1078 s
------------------------------------------
------------------------------------------
-| Loading reference accumulative lengths | Time = 3.5407 ms
------------------------------------------
-[2021-03-27 19:27:01.546] [jointLog] [info] done
-[2021-03-27 19:27:01.546] [jointLog] [info] Index contained 228,948 targets
-
-
-
-
-[2021-03-27 19:27:09.161] [jointLog] [info] Number of decoys : 194
-[2021-03-27 19:27:09.161] [jointLog] [info] First decoy index : 228,715 
-[2021-03-27 19:27:10.409] [jointLog] [info] Automatically detected most likely library type as IU
-[A[32mprocessed[31m 500,000 [32mfragments[0m
-hits: 1,661,023, hits per frag:  3.3891[A[32mprocessed[31m 1,000,000 [32mfragments[0m
-hits: 3,322,017, hits per frag:  3.41987[A[32mprocessed[31m 1,500,000 [32mfragments[0m
-hits: 4,985,983, hits per frag:  3.39316[A[32mprocessed[31m 2,000,000 [32mfragments[0m
-hits: 6,650,526, hits per frag:  3.37577[A[32mprocessed[31m 2,500,000 [32mfragments[0m
-hits: 8,313,717, hits per frag:  3.37459[A[32mprocessed[31m 3,000,000 [32mfragments[0m
-hits: 9,974,678, hits per frag:  3.34377[A[32mprocessed[31m 3,500,000 [32mfragments[0m
-hits: 11,630,350, hits per frag:  3.35516[A[32mprocessed[31m 4,000,000 [32mfragments[0m
-hits: 13,295,940, hits per frag:  3.33178[A[32mprocessed[31m 4,500,000 [32mfragments[0m
-hits: 14,956,706, hits per frag:  3.33926[A[32mprocessed[31m 5,000,000 [32mfragments[0m
-hits: 16,615,114, hits per frag:  3.33627[A[32mprocessed[31m 5,500,000 [32mfragments[0m
-hits: 18,270,833, hits per frag:  3.3334[A[32mprocessed[31m 6,000,000 [32mfragments[0m
-hits: 19,936,833, hits per frag:  3.33967[A[32mprocessed[31m 6,500,000 [32mfragments[0m
-hits: 21,599,159, hits per frag:  3.32724[A[32mprocessed[31m 7,000,000 [32mfragments[0m
-hits: 23,257,144, hits per frag:  3.33968[A[32mprocessed[31m 7,500,000 [32mfragments[0m
-hits: 24,919,167, hits per frag:  3.32694[A[32mprocessed[31m 8,000,000 [32mfragments[0m
-hits: 26,578,037, hits per frag:  3.33433[A[32mprocessed[31m 8,500,000 [32mfragments[0m
-hits: 28,238,225, hits per frag:  3.32768[A[32mprocessed[31m 9,000,000 [32mfragments[0m
-hits: 29,900,024, hits per frag:  3.32757[A[32mprocessed[31m 9,500,000 [32mfragments[0m
-hits: 31,559,104, hits per frag:  3.3232[A[32mprocessed[31m 10,000,001 [32mfragments[0m
-hits: 33,219,986, hits per frag:  3.33264[A[32mprocessed[31m 10,500,000 [32mfragments[0m
-hits: 34,880,435, hits per frag:  3.33326[A[32mprocessed[31m 11,000,000 [32mfragments[0m
-hits: 36,533,537, hits per frag:  3.32777[A[32mprocessed[31m 11,500,001 [32mfragments[0m
-hits: 38,198,072, hits per frag:  3.32495[A[32mprocessed[31m 12,000,000 [32mfragments[0m
-hits: 39,867,123, hits per frag:  3.33356[A[32mprocessed[31m 12,500,000 [32mfragments[0m
-hits: 41,533,122, hits per frag:  3.32472[A[32mprocessed[31m 13,000,000 [32mfragments[0m
-hits: 43,204,322, hits per frag:  3.32641[A[32mprocessed[31m 13,500,000 [32mfragments[0m
-hits: 44,867,885, hits per frag:  3.32705[A[32mprocessed[31m 14,000,000 [32mfragments[0m
-hits: 46,540,679, hits per frag:  3.32512[A[32mprocessed[31m 14,500,000 [32mfragments[0m
-hits: 48,206,644, hits per frag:  3.33017[A[32mprocessed[31m 15,000,000 [32mfragments[0m
-hits: 49,875,580, hits per frag:  3.33191[A[32mprocessed[31m 15,500,000 [32mfragments[0m
-hits: 51,539,592, hits per frag:  3.32749[A[32mprocessed[31m 16,000,000 [32mfragments[0m
-hits: 53,208,207, hits per frag:  3.33262[A[32mprocessed[31m 16,500,000 [32mfragments[0m
-hits: 54,864,450, hits per frag:  3.32692[A[32mprocessed[31m 17,000,000 [32mfragments[0m
-hits: 56,523,404, hits per frag:  3.32841[A[32mprocessed[31m 17,500,000 [32mfragments[0m
-hits: 58,187,773, hits per frag:  3.33075[A[32mprocessed[31m 18,000,000 [32mfragments[0m
-hits: 59,854,031, hits per frag:  3.33224[A[32mprocessed[31m 18,500,000 [32mfragments[0m
-hits: 61,520,060, hits per frag:  3.33006[A[32mprocessed[31m 19,000,000 [32mfragments[0m
-hits: 63,181,995, hits per frag:  3.32595[A[32mprocessed[31m 19,500,000 [32mfragments[0m
-hits: 64,847,357, hits per frag:  3.32886[A[32mprocessed[31m 20,000,000 [32mfragments[0m
-hits: 66,509,594, hits per frag:  3.32645[A[32mprocessed[31m 20,500,000 [32mfragments[0m
-hits: 68,168,118, hits per frag:  3.33007[A[32mprocessed[31m 21,000,000 [32mfragments[0m
-hits: 69,830,778, hits per frag:  3.32741[A[32mprocessed[31m 21,500,000 [32mfragments[0m
-hits: 71,497,236, hits per frag:  3.33017[A[32mprocessed[31m 22,000,000 [32mfragments[0m
-hits: 73,159,915, hits per frag:  3.32773[A[32mprocessed[31m 22,500,000 [32mfragments[0m
-hits: 74,820,412, hits per frag:  3.33021
-
-
-
-
-
-
-
-[2021-03-27 19:35:14.048] [jointLog] [info] Computed 373,617 rich equivalence classes for further processing
-[2021-03-27 19:35:14.048] [jointLog] [info] Counted 20,427,397 total reads in the equivalence classes 
-[2021-03-27 19:35:14.060] [jointLog] [info] Number of orphans recovered using orphan rescue : 557,199
-[2021-03-27 19:35:14.060] [jointLog] [info] Number of mappings discarded because of alignment score : 12,122,957
-[2021-03-27 19:35:14.060] [jointLog] [info] Number of fragments entirely discarded because of alignment score : 1,440,977
-[2021-03-27 19:35:14.060] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 949,143
-[2021-03-27 19:35:14.060] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings to valid targets : 163,155
-[2021-03-27 19:35:14.060] [jointLog] [info] Mapping rate = 89.268%
-
-[2021-03-27 19:35:14.060] [jointLog] [info] finished quantifyLibrary()
-[2021-03-27 19:35:14.081] [jointLog] [info] Starting optimizer
-[2021-03-27 19:35:14.376] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
-[2021-03-27 19:35:14.409] [jointLog] [info] iteration = 0 | max rel diff. = 5279.46
-[2021-03-27 19:35:14.718] [jointLog] [info] iteration 11, adjusting effective lengths to account for biases
-[2021-03-27 19:37:22.612] [jointLog] [info] Computed expected counts (for bias correction)
-[2021-03-27 19:37:22.613] [jointLog] [info] processed bias for 0.0% of the transcripts
-[2021-03-27 19:37:32.645] [jointLog] [info] processed bias for 10.0% of the transcripts
-[2021-03-27 19:37:42.943] [jointLog] [info] processed bias for 20.0% of the transcripts
-[2021-03-27 19:37:52.166] [jointLog] [info] processed bias for 30.0% of the transcripts
-[2021-03-27 19:38:02.266] [jointLog] [info] processed bias for 40.0% of the transcripts
-[2021-03-27 19:38:12.395] [jointLog] [info] processed bias for 50.0% of the transcripts
-[2021-03-27 19:38:22.154] [jointLog] [info] processed bias for 60.0% of the transcripts
-[2021-03-27 19:38:32.127] [jointLog] [info] processed bias for 70.0% of the transcripts
-[2021-03-27 19:38:42.853] [jointLog] [info] processed bias for 80.0% of the transcripts
-[2021-03-27 19:38:51.789] [jointLog] [info] processed bias for 90.0% of the transcripts
-[2021-03-27 19:39:02.258] [jointLog] [info] processed bias for 100.0% of the transcripts
-[2021-03-27 19:39:05.353] [jointLog] [info] iteration = 100 | max rel diff. = 18.0164
-[2021-03-27 19:39:08.724] [jointLog] [info] iteration = 200 | max rel diff. = 11.7613
-[2021-03-27 19:39:12.154] [jointLog] [info] iteration = 300 | max rel diff. = 14.6145
-[2021-03-27 19:39:15.554] [jointLog] [info] iteration = 400 | max rel diff. = 0.977656
-[2021-03-27 19:39:19.014] [jointLog] [info] iteration = 500 | max rel diff. = 0.865432
-[2021-03-27 19:39:22.499] [jointLog] [info] iteration = 600 | max rel diff. = 0.372651
-[2021-03-27 19:39:25.974] [jointLog] [info] iteration = 700 | max rel diff. = 0.584652
-[2021-03-27 19:39:29.456] [jointLog] [info] iteration = 800 | max rel diff. = 0.97476
-[2021-03-27 19:39:31.795] [jointLog] [info] iteration = 869 | max rel diff. = 0.00784265
-[2021-03-27 19:39:31.896] [jointLog] [info] Finished optimizer
-[2021-03-27 19:39:31.896] [jointLog] [info] writing output 
-
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
-SKIP salmon /public/groups/kimlab/aale-KRAS-G12-transformation/data/2021-03-08_AALE_resubmission/intra.a549//intra.a549.3.Empty already run for /public/groups/kimlab/indexes/sel.align.gencode.v35.salmon.v1.3.0.sidx/
-+ exitStatus=0
-+ '[' 0 -ne 0 ']'
-+ set +x
