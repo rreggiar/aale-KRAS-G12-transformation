@@ -3210,6 +3210,7 @@ a549_de$de_682 %>%
   facet_col(~oe) +
   geom_vline(xintercept = 0, alpha = 0.3, linetype = 'dashed') + 
   geom_hline(yintercept = 0, alpha = 0.3, linetype = 'dashed') + 
+  theme(strip.background = element_rect()) +
   ylab('<--- WT   AALE log2FC   G12D --->') + xlab('A549 log2FC') -> plt_5C.plt
 
 
@@ -3228,6 +3229,7 @@ a549_te_de$de_682 %>%
   ggrepel::geom_text_repel(aes(label = ifelse(log2FoldChange < -0.5, gene_id, '')), 
                            show.legend = F) +
   facet_col(~oe) + 
+  theme(strip.background = element_rect()) +
   xlab('RNA log2FoldChange') +
   theme(legend.position = c(0.3, 0.99)) -> plt_5D.plt
 
