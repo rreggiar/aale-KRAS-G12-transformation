@@ -1,9 +1,7 @@
 # Mutant KRAS regulates transposable element RNA and innate immunity via KRAB zinc-finger genes 
 [![DOI](https://zenodo.org/badge/350592275.svg)](https://zenodo.org/badge/latestdoi/350592275)
+[![HTML code notebook](https://img.shields.io/badge/HTML%20code%20notebook-click-orange)](https://rreggiar.github.io/aale-KRAS-G12-transformation/)
 
-
-repo: aale-KRAS-G12-transformation  
-notebook: [anlaysis_deployement](https://rreggiar.github.io/aale-KRAS-G12-transformation/)
 
 ## Abstract:
 RAS genes are the most frequently mutated oncogenes in cancer, yet the effects of oncogenic RAS signaling on the noncoding transcriptome remain unclear. 
